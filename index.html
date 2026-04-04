@@ -828,7 +828,7 @@
     <div class="nav-item" onclick="navigateTo('firearms')">Firearms & Ammo</div>
     <div class="nav-item" onclick="navigateTo('apparel')">Apparel</div>
     <div class="nav-item" onclick="navigateTo('optics')">Optics</div>
-    <div class="nav-item sale">&#128293; Sale</div>
+    <div class="nav-item sale" onclick="navigateTo('sale')">&#128293; Sale</div>
   </div>
 </nav>
 
@@ -1409,23 +1409,90 @@ function navigateTo(page) {
     return;
   }
 
-  // Map pages to nav indices
-  const navMap = { fishing: 1, hunting: 2, firearms: 3, apparel: 4, optics: 5, archery: 1 };
-  if (navMap[page] !== undefined) {
-    document.querySelectorAll('.nav-item')[navMap[page]].classList.add('active');
+  // Handle "sale" — show all sale items across categories
+  if (page === 'sale') {
+    const saleItems = [];
+    for (const cat of Object.values(products)) {
+      saleItems.push(...cat.filter(p => p.badge === 'sale'));
+    }
+    document.getElementById('page-home').classList.remove('active');
+    document.getElementById('page-listing').classList.add('active');
+    document.getElementById('breadcrumbCategory').textContent = 'Sale';
+    document.getElementById('listingTitle').textContent = 'Sale Items';
+    document.getElementById('resultsCount').textContent = saleItems.length + ' Products';
+    document.getElementById('listingProducts').innerHTML = saleItems.length > 0
+      ? saleItems.map(p => createProductCard(p)).join('')
+      : '<p style="color:#888;">No sale items right now. Check back soon!</p>';
+    window.scrollTo(0, 0);
+    return;
   }
 
-  const titles = { fishing: 'Fishing', hunting: 'Hunting', firearms: 'Firearms & Ammo', apparel: 'Apparel', optics: 'Optics', archery: 'Archery' };
+  // Find and highlight the active nav item dynamically
+  const navItem = document.querySelector(`.nav-item[data-cat="${page}"]`);
+  if (navItem) navItem.classList.add('active');
+
+  // Get display name from category metadata, or format the key
+  const displayName = cloverCategoryMeta[page]?.name
+    || page.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
   document.getElementById('page-home').classList.remove('active');
   document.getElementById('page-listing').classList.add('active');
-  document.getElementById('breadcrumbCategory').textContent = titles[page] || page;
-  document.getElementById('listingTitle').textContent = titles[page] || page;
+  document.getElementById('breadcrumbCategory').textContent = displayName;
+  document.getElementById('listingTitle').textContent = displayName;
 
-  const items = products[page] || products.fishing;
+  const items = products[page] || [];
   document.getElementById('resultsCount').textContent = items.length + ' Products';
-  document.getElementById('listingProducts').innerHTML = items.map(p => createProductCard(p)).join('');
+  document.getElementById('listingProducts').innerHTML = items.length > 0
+    ? items.map(p => createProductCard(p)).join('')
+    : '<p style="color:#888;">No products in this category yet.</p>';
+
+  // Update sidebar filters dynamically based on the products in this category
+  updateSidebarFilters(items, displayName);
+
   window.scrollTo(0, 0);
+}
+
+function updateSidebarFilters(items, categoryName) {
+  const sidebar = document.querySelector('.sidebar');
+  if (!sidebar) return;
+
+  // Get unique brands in this category
+  const brands = [...new Set(items.map(p => p.brand))].sort();
+  // Get unique Clover subcategories
+  const subCats = [...new Set(items.map(p => p.cloverCategory).filter(Boolean))].sort();
+
+  let html = '';
+
+  if (subCats.length > 1) {
+    html += '<div class="filter-group"><h4>Subcategory</h4>';
+    subCats.forEach(sc => {
+      const count = items.filter(p => p.cloverCategory === sc).length;
+      html += `<label class="filter-option"><input type="checkbox" checked> ${sc} (${count})</label>`;
+    });
+    html += '</div>';
+  }
+
+  if (brands.length > 0) {
+    html += '<div class="filter-group"><h4>Brand</h4>';
+    brands.forEach(b => {
+      const count = items.filter(p => p.brand === b).length;
+      html += `<label class="filter-option"><input type="checkbox"> ${b} (${count})</label>`;
+    });
+    html += '</div>';
+  }
+
+  html += `<div class="filter-group"><h4>Price Range</h4>
+    <div class="price-range">
+      <input type="text" placeholder="$0"> &mdash; <input type="text" placeholder="$${Math.ceil(Math.max(...items.map(p => p.price), 100))}">
+    </div></div>`;
+
+  html += `<div class="filter-group"><h4>Availability</h4>
+    <label class="filter-option"><input type="checkbox" checked> In Stock (${items.filter(p => p.inStock).length})</label>
+  </div>`;
+
+  html += '<button class="btn btn-green" style="width:100%;text-align:center;">Apply Filters</button>';
+
+  sidebar.innerHTML = html;
 }
 
 // ===================== INIT =====================
@@ -1523,31 +1590,93 @@ async function runSync() {
   btn.textContent = '🔄 SYNC NOW';
 }
 
+// Store category metadata from Clover
+let cloverCategoryMeta = {};
+
 async function loadCloverProducts() {
   try {
     const res = await fetch(`${API_BASE}/api/products`);
     const data = await res.json();
     if (data.products && Object.keys(data.products).length > 0) {
-      // Merge Clover products into the website's product data
+      // Replace product data with Clover data
+      // Keep demo data as fallback for categories not in Clover
+      const cloverKeys = Object.keys(data.products);
       for (const [category, items] of Object.entries(data.products)) {
         products[category] = items;
       }
-      // Re-render the current page
-      const featured = [];
-      const bestSellers = [];
-      for (const cat of Object.values(products)) {
-        for (const p of cat.slice(0, 2)) featured.push(p);
-        for (const p of cat.slice(2, 4)) bestSellers.push(p);
+
+      // Store category metadata
+      if (data.categoryMeta) {
+        cloverCategoryMeta = data.categoryMeta;
       }
+
+      // Dynamically rebuild navigation from Clover categories
+      rebuildNavigation(data.categories || []);
+
+      // Dynamically rebuild category cards on homepage
+      rebuildCategoryCards(data.categories || []);
+
+      // Rebuild featured & best sellers from all Clover products
+      const allProducts = [];
+      for (const cat of Object.values(data.products)) {
+        allProducts.push(...cat);
+      }
+
+      // Featured = newest/sale items first, then fill with others
+      const saleItems = allProducts.filter(p => p.badge === 'sale' || p.badge === 'new');
+      const otherItems = allProducts.filter(p => !p.badge);
+      const featuredList = [...saleItems, ...otherItems].slice(0, 8);
+
+      // Best sellers = rest of the products
+      const featuredIds = new Set(featuredList.map(p => p.id));
+      const bestSellerList = allProducts.filter(p => !featuredIds.has(p.id)).slice(0, 8);
+
       document.getElementById('featuredProducts').innerHTML =
-        featured.slice(0, 8).map(p => createProductCard(p)).join('');
+        featuredList.map(p => createProductCard(p)).join('') || '<p style="color:#888;">No products yet. Sync from Clover to populate.</p>';
       document.getElementById('bestSellers').innerHTML =
-        bestSellers.slice(0, 8).map(p => createProductCard(p)).join('');
-      console.log('✅ Website updated with Clover product data');
+        bestSellerList.map(p => createProductCard(p)).join('') || '';
+
+      // Hide best sellers section if not enough products
+      const bestSellersSection = document.getElementById('bestSellers').closest('.section');
+      if (bestSellerList.length === 0 && bestSellersSection) {
+        bestSellersSection.style.display = 'none';
+      }
+
+      console.log('✅ Website updated with ' + allProducts.length + ' Clover products across ' + cloverKeys.length + ' categories');
     }
   } catch (err) {
     console.log('ℹ️ Running with built-in demo products (sync server not available)');
   }
+}
+
+function rebuildNavigation(categories) {
+  const navContainer = document.querySelector('.main-nav .container');
+  if (!navContainer || categories.length === 0) return;
+
+  // Build new nav: Home + each Clover category + Sale
+  let navHTML = '<div class="nav-item active" onclick="navigateTo(\'home\')">Home</div>';
+  for (const cat of categories) {
+    navHTML += `<div class="nav-item" onclick="navigateTo('${cat.key}')" data-cat="${cat.key}">${cat.name}</div>`;
+  }
+  navHTML += '<div class="nav-item sale" onclick="navigateTo('sale')">&#128293; Sale</div>';
+  navContainer.innerHTML = navHTML;
+}
+
+function rebuildCategoryCards(categories) {
+  const grid = document.querySelector('.category-grid');
+  if (!grid || categories.length === 0) return;
+
+  grid.innerHTML = categories.map(cat => {
+    const gradient = cat.gradient || ['#2a2a2a', '#151515'];
+    const icon = cat.icon || '&#127967;';
+    return `<div class="category-card" onclick="navigateTo('${cat.key}')">
+      <div class="category-card-bg" style="background: linear-gradient(145deg, ${gradient[0]}, ${gradient[1]});">${icon}</div>
+      <div class="category-card-content">
+        <h3>${cat.name}</h3>
+        <p>${cat.count} Product${cat.count !== 1 ? 's' : ''}</p>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function timeSince(date) {
@@ -1686,4 +1815,3 @@ document.addEventListener('keydown', function(e) {
 
 </body>
 </html>
-const API_BASE = '';

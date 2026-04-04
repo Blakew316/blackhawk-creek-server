@@ -155,23 +155,32 @@ async function syncFromClover() {
     console.log(`   🔍 Item "${dbgItem.name}" — raw price: ${dbgItem.price} cents ($${dbgItem.price ? (dbgItem.price / 100).toFixed(2) : '0.00'}), priceType: ${dbgItem.priceType || 'not set'}`);
   }
 
-  // 3. Transform Clover items into website product format
-  const products = {};
-  let idCounter = 1;
+  // 3. Merge Clover items with existing data (preserving manual edits and manual products)
+  let existingData = { products: {}, categoryMeta: {} };
+  let maxExistingId = 0;
+  const existingByClover = {};   // cloverId → { categoryKey, item }
+  const existingBySku = {};      // sku → { categoryKey, item }
 
-  // Load existing image URLs so we preserve them during sync
-  let existingImageMap = {};
   if (fs.existsSync(DATA_FILE)) {
     try {
-      const existingData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-      for (const existingItems of Object.values(existingData.products || {})) {
-        for (const p of existingItems) {
-          if (p.sku && p.imageUrl) existingImageMap[p.sku] = p.imageUrl;
+      existingData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+      // Build lookup maps of existing products
+      for (const [catKey, items] of Object.entries(existingData.products || {})) {
+        for (const p of items) {
+          if (p.id > maxExistingId) maxExistingId = p.id;
+          if (p.cloverId) existingByClover[p.cloverId] = { categoryKey: catKey, item: p };
+          if (p.sku) existingBySku[p.sku] = { categoryKey: catKey, item: p };
         }
       }
-      console.log(`   📸 Preserving ${Object.keys(existingImageMap).length} existing product images`);
+      console.log(`   📦 Found ${Object.keys(existingByClover).length} existing Clover items, ${maxExistingId} max ID`);
     } catch(e) { /* ignore */ }
   }
+
+  // Start with existing products (preserves manual products + edits)
+  const products = JSON.parse(JSON.stringify(existingData.products || {}));
+  let idCounter = maxExistingId + 1;
+  let updatedCount = 0;
+  let addedCount = 0;
 
   for (const item of itemsData.elements) {
     // Skip hidden/deleted items
@@ -189,42 +198,85 @@ async function syncFromClover() {
     // Convert Clover price (in cents) to dollars
     const priceInDollars = item.price ? item.price / 100 : 0;
 
-    // Build the product object
-    const product = {
-      id: idCounter++,
-      cloverId: item.id,
-      name: item.name,
-      brand: extractBrand(item.name) || 'Blackhawk Creek',
-      price: priceInDollars,
-      original: null,
-      rating: 4.5,
-      reviews: 0,
-      badge: item.tags?.elements?.some(t => t.name?.toLowerCase() === 'sale') ? 'sale'
-           : item.tags?.elements?.some(t => t.name?.toLowerCase() === 'new') ? 'new'
-           : null,
-      icon: getCategoryIcon(categoryDisplayName),
-      desc: item.description || `${item.name} — available at Blackhawk Creek Outfitters.`,
-      sku: item.sku || '',
-      inStock: !item.stockCount || item.stockCount > 0,
-      stockCount: item.stockCount || null,
-      cloverCategory: categoryDisplayName,
-      imageUrl: (item.sku && existingImageMap[item.sku]) ? existingImageMap[item.sku] : null,
-    };
-
-    // Check for sale price via alternate name or tags
+    // Check for sale price via alternate name
+    let salePrice = null;
     if (item.alternateName && item.alternateName.match(/^\d+\.?\d*$/)) {
-      product.original = priceInDollars;
-      product.price = parseFloat(item.alternateName);
+      salePrice = parseFloat(item.alternateName);
     }
 
-    // Group into category using Clover's actual name
-    if (!products[categoryKey]) products[categoryKey] = [];
-    products[categoryKey].push(product);
+    // Check if this item already exists (match by cloverId first, then SKU)
+    const existingMatch = existingByClover[item.id] || (item.sku ? existingBySku[item.sku] : null);
+
+    if (existingMatch) {
+      // UPDATE existing item — only update Clover-sourced fields, preserve manual edits
+      const existing = existingMatch.item;
+      const oldCatKey = existingMatch.categoryKey;
+
+      // Update fields from Clover (these are Clover's source of truth)
+      existing.cloverId = item.id;
+      existing.name = item.name;
+      existing.sku = item.sku || existing.sku;
+      existing.price = salePrice || priceInDollars;
+      existing.original = salePrice ? priceInDollars : null;
+      existing.inStock = !item.stockCount || item.stockCount > 0;
+      existing.stockCount = item.stockCount || existing.stockCount;
+      existing.desc = item.description || existing.desc;
+      existing.badge = item.tags?.elements?.some(t => t.name?.toLowerCase() === 'sale') ? 'sale'
+           : item.tags?.elements?.some(t => t.name?.toLowerCase() === 'new') ? 'new'
+           : existing.badge;
+      // Preserve imageUrl — don't overwrite manual uploads
+      // Preserve brand if manually edited (only set if currently default)
+      const cloverBrand = extractBrand(item.name);
+      if (cloverBrand && (!existing.brand || existing.brand === 'Blackhawk Creek')) {
+        existing.brand = cloverBrand;
+      }
+
+      // Handle category change from Clover
+      if (categoryKey !== oldCatKey) {
+        // Move to new category
+        products[oldCatKey] = (products[oldCatKey] || []).filter(p => p.id !== existing.id);
+        if (products[oldCatKey] && products[oldCatKey].length === 0) delete products[oldCatKey];
+        existing.cloverCategory = categoryDisplayName;
+        existing.icon = getCategoryIcon(categoryDisplayName);
+        if (!products[categoryKey]) products[categoryKey] = [];
+        products[categoryKey].push(existing);
+      } else {
+        existing.cloverCategory = categoryDisplayName;
+      }
+
+      updatedCount++;
+    } else {
+      // NEW item from Clover — add it
+      const product = {
+        id: idCounter++,
+        cloverId: item.id,
+        name: item.name,
+        brand: extractBrand(item.name) || 'Blackhawk Creek',
+        price: salePrice || priceInDollars,
+        original: salePrice ? priceInDollars : null,
+        rating: 4.5,
+        reviews: 0,
+        badge: item.tags?.elements?.some(t => t.name?.toLowerCase() === 'sale') ? 'sale'
+             : item.tags?.elements?.some(t => t.name?.toLowerCase() === 'new') ? 'new'
+             : null,
+        icon: getCategoryIcon(categoryDisplayName),
+        desc: item.description || `${item.name} — available at Blackhawk Creek Outfitters.`,
+        sku: item.sku || '',
+        inStock: !item.stockCount || item.stockCount > 0,
+        stockCount: item.stockCount || null,
+        cloverCategory: categoryDisplayName,
+        imageUrl: null,
+      };
+
+      if (!products[categoryKey]) products[categoryKey] = [];
+      products[categoryKey].push(product);
+      addedCount++;
+    }
   }
 
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
   const totalItems = Object.values(products).reduce((sum, arr) => sum + arr.length, 0);
-  console.log(`✅ Sync complete in ${elapsed}s — ${totalItems} products across ${Object.keys(products).length} categories\n`);
+  console.log(`✅ Sync complete in ${elapsed}s — ${totalItems} products (${addedCount} new, ${updatedCount} updated) across ${Object.keys(products).length} categories\n`);
 
   // Build category metadata with icons and gradients for the website
   const categoryMeta = {};
@@ -497,22 +549,22 @@ app.post('/api/products', (req, res) => {
   }
 });
 
-// ─── PUT /api/products/:id — Update a product ──────────────────────
+// ─── PUT /api/products/:id — Update a product (supports category change + image) ──
 app.put('/api/products/:id', (req, res) => {
   try {
     const productId = parseInt(req.params.id);
     const updates = req.body;
     const data = loadProductData();
     let found = false;
+    let foundItem = null;
+    let oldCategoryKey = null;
 
+    // Find the product
     for (const categoryKey of Object.keys(data.products)) {
       for (const item of data.products[categoryKey]) {
         if (item.id === productId) {
-          if (updates.name !== undefined) item.name = updates.name;
-          if (updates.brand !== undefined) item.brand = updates.brand;
-          if (updates.price !== undefined) item.price = parseFloat(updates.price);
-          if (updates.stock !== undefined) item.stockCount = parseInt(updates.stock);
-          if (updates.description !== undefined) item.desc = updates.description;
+          foundItem = item;
+          oldCategoryKey = categoryKey;
           found = true;
           break;
         }
@@ -520,10 +572,142 @@ app.put('/api/products/:id', (req, res) => {
       if (found) break;
     }
 
-    if (!found) return res.status(404).json({ error: 'Product not found' });
+    if (!found || !foundItem) return res.status(404).json({ error: 'Product not found' });
+
+    // Apply basic field updates
+    if (updates.name !== undefined) foundItem.name = updates.name;
+    if (updates.brand !== undefined) foundItem.brand = updates.brand;
+    if (updates.price !== undefined) foundItem.price = parseFloat(updates.price);
+    if (updates.stock !== undefined) foundItem.stockCount = parseInt(updates.stock);
+    if (updates.description !== undefined) foundItem.desc = updates.description;
+
+    // Handle image (base64 or URL)
+    if (updates.imageUrl !== undefined) {
+      let savedUrl = updates.imageUrl;
+      if (updates.imageUrl && updates.imageUrl.startsWith('data:image')) {
+        const matches = updates.imageUrl.match(/^data:image\/(\w+);base64,(.+)$/);
+        if (matches) {
+          const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+          const buffer = Buffer.from(matches[2], 'base64');
+          const filename = `product-${productId}-${Date.now()}.${ext}`;
+          fs.writeFileSync(path.join(IMAGES_DIR, filename), buffer);
+          savedUrl = `/images/${filename}`;
+        }
+      }
+      foundItem.imageUrl = savedUrl;
+    }
+
+    // Handle category change — move product between category arrays
+    if (updates.category !== undefined && updates.category) {
+      const newCategoryKey = categoryToKey(updates.category);
+      const newCategoryName = updates.category;
+
+      if (newCategoryKey !== oldCategoryKey) {
+        // Remove from old category
+        data.products[oldCategoryKey] = data.products[oldCategoryKey].filter(p => p.id !== productId);
+        if (data.products[oldCategoryKey].length === 0) {
+          delete data.products[oldCategoryKey];
+          if (data.categoryMeta) delete data.categoryMeta[oldCategoryKey];
+        }
+
+        // Add to new category
+        if (!data.products[newCategoryKey]) data.products[newCategoryKey] = [];
+        foundItem.cloverCategory = newCategoryName;
+        foundItem.icon = getCategoryIcon(newCategoryName);
+        data.products[newCategoryKey].push(foundItem);
+
+        // Update category metadata
+        if (!data.categoryMeta) data.categoryMeta = {};
+        const gradient = getCategoryGradient(newCategoryName);
+        data.categoryMeta[newCategoryKey] = {
+          key: newCategoryKey,
+          name: newCategoryName,
+          count: data.products[newCategoryKey].length,
+          icon: getCategoryIcon(newCategoryName),
+          gradient
+        };
+      } else {
+        // Same category key but maybe different display name
+        foundItem.cloverCategory = newCategoryName;
+      }
+    }
+
+    // Refresh all category metadata counts
+    if (data.categoryMeta) {
+      for (const [key, items] of Object.entries(data.products)) {
+        if (data.categoryMeta[key]) {
+          data.categoryMeta[key].count = items.length;
+        }
+      }
+      data.categories = Object.values(data.categoryMeta);
+    }
 
     saveProductData(data);
-    res.json({ success: true });
+    res.json({ success: true, product: foundItem });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── GET /api/products/export — Export all products as JSON ───────────
+app.get('/api/products/export', (req, res) => {
+  try {
+    const data = loadProductData();
+    const flat = [];
+    for (const [categoryKey, items] of Object.entries(data.products)) {
+      const catMeta = data.categoryMeta?.[categoryKey];
+      const categoryName = catMeta?.name || categoryKey;
+      for (const item of items) {
+        flat.push({
+          id: item.id,
+          cloverId: item.cloverId || '',
+          name: item.name,
+          brand: item.brand || '',
+          category: categoryName,
+          price: item.price || 0,
+          stockCount: item.stockCount || 0,
+          sku: item.sku || '',
+          description: item.desc || '',
+          imageUrl: item.imageUrl || '',
+          inStock: item.inStock !== false
+        });
+      }
+    }
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', 'attachment; filename="blackhawk-creek-products.json"');
+    res.json(flat);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── GET /api/products/export/csv — Export all products as CSV ───────
+app.get('/api/products/export/csv', (req, res) => {
+  try {
+    const data = loadProductData();
+    const rows = [['ID','Clover ID','Name','Brand','Category','Price','Stock','SKU','Description','Image URL','In Stock']];
+    for (const [categoryKey, items] of Object.entries(data.products)) {
+      const catMeta = data.categoryMeta?.[categoryKey];
+      const categoryName = catMeta?.name || categoryKey;
+      for (const item of items) {
+        rows.push([
+          item.id,
+          item.cloverId || '',
+          `"${(item.name || '').replace(/"/g, '""')}"`,
+          `"${(item.brand || '').replace(/"/g, '""')}"`,
+          `"${categoryName.replace(/"/g, '""')}"`,
+          item.price || 0,
+          item.stockCount || 0,
+          item.sku || '',
+          `"${(item.desc || '').replace(/"/g, '""')}"`,
+          item.imageUrl || '',
+          item.inStock !== false ? 'Yes' : 'No'
+        ]);
+      }
+    }
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="blackhawk-creek-products.csv"');
+    res.send(rows.map(r => r.join(',')).join('\n'));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

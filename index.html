@@ -97,7 +97,7 @@
     flex: 1; max-width: 520px; position: relative;
   }
   .search-bar input {
-    width: 100%; padding: 11px 48px 11px 18px;
+    width: 100%; padding: 11px 80px 11px 18px;
     background: var(--color-surface); border: 1px solid var(--color-border);
     border-radius: var(--radius);
     color: var(--color-text-dark); font-size: 13px;
@@ -110,7 +110,7 @@
     border-color: var(--color-tan);
     box-shadow: 0 0 0 3px rgba(201,169,110,0.1);
   }
-  .search-bar button {
+  .search-bar button.search-btn {
     position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
     background: var(--color-olive); border: none; color: white;
     padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;
@@ -118,7 +118,15 @@
     display: flex; align-items: center; justify-content: center;
   }
   .search-bar button svg { width: 16px; height: 16px; }
-  .search-bar button:hover { background: #4a5638; }
+  .search-bar button.search-btn:hover { background: #4a5638; }
+  .search-clear {
+    position: absolute; right: 46px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: #999; cursor: pointer;
+    padding: 4px; display: none; align-items: center; justify-content: center;
+    border-radius: 50%; transition: color 0.15s;
+  }
+  .search-clear:hover { color: #333; }
+  .search-clear.visible { display: flex; }
 
   .header-actions { display: flex; align-items: center; gap: 24px; }
   .header-action {
@@ -2185,8 +2193,11 @@
       </div>
     </div>
     <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="Search products..." oninput="performSearch()" onkeydown="if(event.key==='Enter'){event.preventDefault();performSearch();}">
-      <button onclick="performSearch()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+      <input type="text" id="searchInput" placeholder="Search products..." oninput="onSearchInput()" onkeydown="if(event.key==='Enter'){event.preventDefault();performSearch();}if(event.key==='Escape'){clearSearch();}">
+      <button class="search-clear" id="searchClear" onclick="clearSearch()" title="Clear search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <button class="search-btn" onclick="performSearch()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
     </div>
     <div class="header-actions">
       <div class="header-action" onclick="showAdminLoginModal()">
@@ -2562,6 +2573,10 @@
           <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>
           <span class="nav-label">Sync Clover</span>
         </button>
+        <button class="sidebar-nav-item" onclick="switchBackofficeTab('pages')">
+          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+          <span class="nav-label">Footer Pages</span>
+        </button>
       </nav>
 
       <div class="sidebar-footer">
@@ -2814,6 +2829,45 @@
       </div>
     </div>
 
+    <!-- FOOTER PAGES EDITOR -->
+    <div id="pagesTab" style="display: none;">
+      <div class="backoffice-header">
+        <h1 class="backoffice-title">Footer Pages</h1>
+        <p style="margin: 4px 0 0; color: #888; font-size: 13px;">Edit the footer navigation links and their page content. Changes are saved automatically.</p>
+      </div>
+      <div style="background: white; padding: 24px; border-radius: 10px; max-width: 900px;">
+        <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+          <select id="footerSectionSelect" onchange="loadFooterSection()" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; font-family: inherit; flex:1;">
+          </select>
+          <button class="bo-btn primary" onclick="addFooterSection()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Section
+          </button>
+        </div>
+
+        <div id="footerSectionEditor" style="display:none;">
+          <div style="margin-bottom: 14px;">
+            <label style="display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:4px;">Section Title</label>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="footerSectionTitle" style="flex:1;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;font-family:inherit;">
+              <button class="bo-btn danger" onclick="deleteFooterSection()" style="font-size:12px;">Delete Section</button>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <label style="font-size:12px;font-weight:600;color:#555;">Links</label>
+              <button class="bo-btn secondary" onclick="addFooterLink()" style="font-size:11px;padding:4px 10px;">+ Add Link</button>
+            </div>
+            <div id="footerLinksEditor"></div>
+          </div>
+
+          <button class="bo-btn primary" onclick="saveFooterPages()" style="width:100%;">Save Changes</button>
+          <p id="footerSaveStatus" style="text-align:center;font-size:12px;color:#059669;margin-top:8px;display:none;">Saved!</p>
+        </div>
+      </div>
+    </div>
+
     <div id="categoriesTab" style="display: none;">
       <div class="backoffice-header">
         <h1 class="backoffice-title">Manage Categories</h1>
@@ -2970,36 +3024,23 @@
   </div>
 </div>
 
+<!-- FOOTER PAGE VIEWER -->
+<div class="page footer-page-viewer" id="footerPageViewer">
+  <div class="container" style="padding: 40px 20px; max-width: 800px; margin: 0 auto;">
+    <button onclick="closeFooterPage()" style="display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:#2563eb;cursor:pointer;font-size:14px;font-family:inherit;padding:0;margin-bottom:24px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Shop
+    </button>
+    <h1 id="footerPageTitle" style="font-size:28px;font-weight:700;color:#1a1a1a;margin-bottom:20px;"></h1>
+    <div id="footerPageContent" style="font-size:15px;line-height:1.8;color:#444;white-space:pre-wrap;"></div>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <footer class="footer">
   <div class="container">
-    <div class="footer-content">
-      <div class="footer-section">
-        <h4>About Us</h4>
-        <a href="#">Our Story</a>
-        <a href="#">Quality Promise</a>
-        <a href="#">Sustainability</a>
-      </div>
-      <div class="footer-section">
-        <h4>Customer Service</h4>
-        <a href="#">Help & Support</a>
-        <a href="#">Track Order</a>
-        <a href="#">Returns</a>
-        <a href="#">Shipping Info</a>
-        <a href="#">Free Shipping on Orders Over $100</a>
-      </div>
-      <div class="footer-section">
-        <h4>Resources</h4>
-        <a href="#">Fishing Tips</a>
-        <a href="#">Gear Guide</a>
-        <a href="#">Blog</a>
-      </div>
-      <div class="footer-section">
-        <h4>Legal</h4>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-        <a href="#">Accessibility</a>
-      </div>
+    <div class="footer-content" id="footerDynamic">
+      <!-- Footer sections loaded dynamically from saved data -->
     </div>
     <div class="footer-bottom">
       <p>&copy; 2024 Blackhawk Creek Outfitters. All rights reserved.</p>
@@ -3024,6 +3065,7 @@ async function initApp() {
   updateCartUI();
   await loadProducts();
   buildNavigation();
+  loadFooterPagesFromServer();
   goToHomepage();
 }
 
@@ -3609,6 +3651,21 @@ function finishCheckout() {
 }
 
 // ============ SEARCH & FILTER ============
+function onSearchInput() {
+  const val = document.getElementById('searchInput').value;
+  const clearBtn = document.getElementById('searchClear');
+  if (clearBtn) clearBtn.classList.toggle('visible', val.length > 0);
+  performSearch();
+}
+
+function clearSearch() {
+  const input = document.getElementById('searchInput');
+  input.value = '';
+  document.getElementById('searchClear').classList.remove('visible');
+  displayProducts(allProducts);
+  input.focus();
+}
+
 function performSearch() {
   const query = document.getElementById('searchInput').value.toLowerCase().trim();
   if (!query) {
@@ -3622,7 +3679,6 @@ function performSearch() {
     (p.sku && p.sku.toLowerCase().includes(query))
   );
   displayProducts(filtered);
-  // Make sure we're on the storefront and scroll to results
   const storefront = document.getElementById('storefront');
   if (storefront && !storefront.classList.contains('active')) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -3690,15 +3746,15 @@ function goToStorefront() {
 }
 
 function switchBackofficeTab(tab) {
-  const tabs = ['inventory', 'add', 'categories', 'sales', 'sync'];
+  const tabs = ['inventory', 'add', 'categories', 'sales', 'sync', 'pages'];
   tabs.forEach(t => {
     const el = document.getElementById(t + 'Tab');
     if (el) el.style.display = t === tab ? 'block' : 'none';
   });
 
   // Update sidebar active state — matches sidebar button order:
-  // inventory(0), categories(1), add(2), sales(3), sync(4)
-  const tabToIndex = { inventory: 0, categories: 1, add: 2, sales: 3, sync: 4 };
+  // inventory(0), categories(1), add(2), sales(3), sync(4), pages(5)
+  const tabToIndex = { inventory: 0, categories: 1, add: 2, sales: 3, sync: 4, pages: 5 };
   document.querySelectorAll('.sidebar-nav .sidebar-nav-item').forEach(btn => btn.classList.remove('active'));
   const allNavItems = document.querySelectorAll('.sidebar-nav .sidebar-nav-item');
   if (allNavItems[tabToIndex[tab]] !== undefined) allNavItems[tabToIndex[tab]].classList.add('active');
@@ -3707,6 +3763,7 @@ function switchBackofficeTab(tab) {
   if (tab === 'categories') loadCategoriesTab();
   if (tab === 'sales') loadSalesDashboard();
   if (tab === 'inventory') { updateSidebarProductCount(); loadInventoryTable(); }
+  if (tab === 'pages') loadFooterPagesEditor();
 }
 
 function updateSidebarProductCount() {
@@ -4562,6 +4619,172 @@ function exportSales() {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
+}
+
+// ============ FOOTER PAGES ============
+let footerPagesData = [
+  { title: 'About Us', links: [
+    { label: 'Our Story', content: 'Welcome to Blackhawk Creek Outfitters. We are passionate about the outdoors and dedicated to providing the best fishing and hunting gear to our community.' },
+    { label: 'Quality Promise', content: 'We stand behind every product we sell. Our team personally tests and curates each item in our catalog to ensure it meets our high standards.' },
+    { label: 'Sustainability', content: 'We are committed to sustainable practices and supporting conservation efforts to protect the natural resources we all enjoy.' }
+  ]},
+  { title: 'Customer Service', links: [
+    { label: 'Help & Support', content: 'Need help? Contact us at support@blackhawkcreek.com or call us during business hours. We are here to help with any questions about your order or our products.' },
+    { label: 'Track Order', content: 'To track your order, check your email for the shipping confirmation with tracking information. If you need further assistance, please contact our support team.' },
+    { label: 'Returns', content: 'We accept returns within 30 days of purchase. Items must be in original condition with tags attached. Contact us to initiate a return.' },
+    { label: 'Shipping Info', content: 'We offer free shipping on orders over $100. Standard shipping typically takes 3-5 business days. Expedited options are available at checkout.' }
+  ]},
+  { title: 'Resources', links: [
+    { label: 'Fishing Tips', content: 'Check back for fishing tips, seasonal guides, and expert advice to help you make the most of your time on the water.' },
+    { label: 'Gear Guide', content: 'Not sure what gear you need? Our gear guide breaks down essential equipment for beginners and experienced anglers alike.' },
+    { label: 'Blog', content: 'Visit our blog for the latest news, product reviews, and stories from the Blackhawk Creek community.' }
+  ]},
+  { title: 'Legal', links: [
+    { label: 'Privacy Policy', content: 'Your privacy is important to us. We collect only the information necessary to process your orders and improve your shopping experience. We never sell your personal data to third parties.' },
+    { label: 'Terms of Service', content: 'By using this website, you agree to our terms of service. All products are subject to availability. Prices are subject to change without notice.' },
+    { label: 'Accessibility', content: 'We are committed to making our website accessible to all users. If you experience any difficulties, please contact us and we will be happy to assist you.' }
+  ]}
+];
+
+async function loadFooterPagesFromServer() {
+  try {
+    const res = await fetch(API_BASE + '/api/footer-pages');
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.length > 0) footerPagesData = data;
+    }
+  } catch (e) { /* use defaults */ }
+  renderFooter();
+}
+
+function renderFooter() {
+  const container = document.getElementById('footerDynamic');
+  if (!container) return;
+  container.innerHTML = footerPagesData.map((section, si) => {
+    const linksHtml = section.links.map((link, li) =>
+      `<a href="#" onclick="openFooterPage(${si}, ${li}); return false;">${link.label}</a>`
+    ).join('');
+    return `<div class="footer-section"><h4>${section.title}</h4>${linksHtml}</div>`;
+  }).join('');
+}
+
+function openFooterPage(sectionIndex, linkIndex) {
+  const section = footerPagesData[sectionIndex];
+  if (!section) return;
+  const link = section.links[linkIndex];
+  if (!link) return;
+  document.getElementById('footerPageTitle').textContent = link.label;
+  document.getElementById('footerPageContent').textContent = link.content || 'No content yet.';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('footerPageViewer').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function closeFooterPage() {
+  document.getElementById('footerPageViewer').classList.remove('active');
+  document.getElementById('homePage').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ---- Admin: Footer Pages Editor ----
+function loadFooterPagesEditor() {
+  const select = document.getElementById('footerSectionSelect');
+  select.innerHTML = footerPagesData.map((s, i) =>
+    `<option value="${i}">${s.title}</option>`
+  ).join('');
+  if (footerPagesData.length > 0) {
+    select.value = '0';
+    loadFooterSection();
+  } else {
+    document.getElementById('footerSectionEditor').style.display = 'none';
+  }
+}
+
+function loadFooterSection() {
+  const idx = parseInt(document.getElementById('footerSectionSelect').value);
+  const section = footerPagesData[idx];
+  if (!section) { document.getElementById('footerSectionEditor').style.display = 'none'; return; }
+
+  document.getElementById('footerSectionEditor').style.display = 'block';
+  document.getElementById('footerSectionTitle').value = section.title;
+  document.getElementById('footerSaveStatus').style.display = 'none';
+
+  const editor = document.getElementById('footerLinksEditor');
+  editor.innerHTML = section.links.map((link, li) => `
+    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:14px;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <label style="font-size:11px;font-weight:600;color:#666;">Link ${li + 1}</label>
+        <button onclick="removeFooterLink(${li})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:11px;font-weight:600;">Remove</button>
+      </div>
+      <input type="text" value="${link.label}" onchange="updateFooterLink(${li}, 'label', this.value)"
+        placeholder="Link label" style="width:100%;padding:7px 10px;border:1px solid #ddd;border-radius:5px;font-size:13px;font-family:inherit;margin-bottom:6px;box-sizing:border-box;">
+      <textarea onchange="updateFooterLink(${li}, 'content', this.value)"
+        placeholder="Page content shown when customer clicks this link..."
+        style="width:100%;padding:7px 10px;border:1px solid #ddd;border-radius:5px;font-size:13px;font-family:inherit;min-height:80px;resize:vertical;box-sizing:border-box;">${link.content || ''}</textarea>
+    </div>
+  `).join('');
+}
+
+function updateFooterLink(linkIdx, field, value) {
+  const sIdx = parseInt(document.getElementById('footerSectionSelect').value);
+  if (footerPagesData[sIdx] && footerPagesData[sIdx].links[linkIdx]) {
+    footerPagesData[sIdx].links[linkIdx][field] = value;
+  }
+}
+
+function addFooterLink() {
+  const sIdx = parseInt(document.getElementById('footerSectionSelect').value);
+  if (!footerPagesData[sIdx]) return;
+  footerPagesData[sIdx].links.push({ label: 'New Link', content: '' });
+  loadFooterSection();
+}
+
+function removeFooterLink(linkIdx) {
+  const sIdx = parseInt(document.getElementById('footerSectionSelect').value);
+  if (!footerPagesData[sIdx]) return;
+  footerPagesData[sIdx].links.splice(linkIdx, 1);
+  loadFooterSection();
+}
+
+function addFooterSection() {
+  const name = prompt('New section title:');
+  if (!name || !name.trim()) return;
+  footerPagesData.push({ title: name.trim(), links: [] });
+  loadFooterPagesEditor();
+  document.getElementById('footerSectionSelect').value = String(footerPagesData.length - 1);
+  loadFooterSection();
+}
+
+function deleteFooterSection() {
+  const sIdx = parseInt(document.getElementById('footerSectionSelect').value);
+  if (!confirm('Delete this section and all its links?')) return;
+  footerPagesData.splice(sIdx, 1);
+  loadFooterPagesEditor();
+}
+
+async function saveFooterPages() {
+  // Also save the current section title
+  const sIdx = parseInt(document.getElementById('footerSectionSelect').value);
+  if (footerPagesData[sIdx]) {
+    footerPagesData[sIdx].title = document.getElementById('footerSectionTitle').value.trim() || footerPagesData[sIdx].title;
+  }
+
+  try {
+    const res = await fetch(API_BASE + '/api/footer-pages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(footerPagesData)
+    });
+    if (res.ok) {
+      const status = document.getElementById('footerSaveStatus');
+      status.style.display = 'block';
+      setTimeout(() => status.style.display = 'none', 2000);
+      renderFooter();
+      loadFooterPagesEditor();
+    }
+  } catch (e) {
+    alert('Error saving footer pages: ' + e.message);
+  }
 }
 
 // ============ STARTUP ============

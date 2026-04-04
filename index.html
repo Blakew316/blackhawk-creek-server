@@ -1224,36 +1224,14 @@
   }
 
   .sidebar-brand {
-    padding: 22px 20px;
+    padding: 18px 16px 14px;
     border-bottom: 1px solid rgba(255,255,255,0.08);
     display: flex;
     align-items: center;
-    gap: 12px;
-  }
-  .sidebar-brand-icon {
-    width: 36px;
-    height: 36px;
-    background: var(--color-olive);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
     justify-content: center;
-    font-size: 18px;
-    color: white;
-    flex-shrink: 0;
   }
-  .sidebar-brand-text {
-    font-size: 14px;
-    font-weight: 700;
-    color: white;
-    line-height: 1.2;
-  }
-  .sidebar-brand-sub {
-    font-size: 10px;
-    color: #7a8399;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 2px;
+  .sidebar-brand svg {
+    display: block;
   }
 
   .sidebar-section-label {
@@ -1299,17 +1277,23 @@
     font-weight: 600;
   }
   .sidebar-nav-item .nav-icon {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
     flex-shrink: 0;
-    opacity: 0.7;
+    opacity: 0.55;
+  }
+  .sidebar-nav-item .nav-icon svg {
+    width: 18px;
+    height: 18px;
   }
   .sidebar-nav-item.active .nav-icon {
     opacity: 1;
+  }
+  .sidebar-nav-item:hover .nav-icon {
+    opacity: 0.85;
   }
   .sidebar-nav-item .nav-label {
     flex: 1;
@@ -1362,6 +1346,7 @@
       overflow-x: auto;
     }
     .sidebar-brand { display: none; }
+    .sidebar-brand svg { width: 130px; }
     .sidebar-section-label { display: none; }
     .sidebar-divider { display: none; }
     .sidebar-footer { margin-top: 0; border: none; padding: 4px; }
@@ -1377,6 +1362,139 @@
     }
     .sidebar-nav-item .nav-icon { display: none; }
     .backoffice-main { padding: 16px; }
+  }
+
+  /* ===================== PROFESSIONAL ADMIN UI ===================== */
+  .bo-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .bo-btn.primary { background: var(--color-olive); color: white; }
+  .bo-btn.primary:hover { background: #4a5638; }
+  .bo-btn.secondary { background: #f0f0f0; color: #444; border: 1px solid #ddd; }
+  .bo-btn.secondary:hover { background: #e4e4e4; }
+  .bo-btn.danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+  .bo-btn.danger:hover { background: #fee2e2; }
+
+  .inventory-table-wrap {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .inventory-table-wrap .inventory-table {
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
+    margin: 0;
+  }
+
+  .inventory-table thead th {
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 12px 16px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #6b7280;
+    font-weight: 600;
+  }
+  .inventory-table tbody tr {
+    transition: background 0.1s;
+  }
+  .inventory-table tbody tr:hover {
+    background: #f8fafc;
+  }
+  .inventory-table tbody tr.row-selected {
+    background: #f0fdf4;
+  }
+  .inventory-table tbody tr.row-selected:hover {
+    background: #dcfce7;
+  }
+
+  .td-product-name {
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .cat-tag {
+    display: inline-block;
+    padding: 2px 10px;
+    background: #f3f4f6;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #4b5563;
+    font-weight: 500;
+  }
+
+  .stock-indicator {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .stock-indicator.stock-ok { background: #ecfdf5; color: #059669; }
+  .stock-indicator.stock-low { background: #fffbeb; color: #d97706; }
+  .stock-indicator.stock-out { background: #fef2f2; color: #dc2626; }
+
+  .btn-delete-sm {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    transition: all 0.15s;
+  }
+  .btn-delete-sm:hover {
+    border-color: #fca5a5;
+    background: #fef2f2;
+    color: #dc2626;
+  }
+
+  .bulk-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #166534;
+  }
+
+  input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-olive);
+    cursor: pointer;
+  }
+
+  .backoffice-main .backoffice-header {
+    margin-bottom: 20px;
+  }
+  .backoffice-main .backoffice-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
   }
 
   /* ===================== SALES DASHBOARD ===================== */
@@ -1721,27 +1839,32 @@
     <!-- LEFT SIDEBAR -->
     <aside class="backoffice-sidebar">
       <div class="sidebar-brand">
-        <div class="sidebar-brand-icon">&#127967;</div>
-        <div>
-          <div class="sidebar-brand-text">Blackhawk Creek</div>
-          <div class="sidebar-brand-sub">Admin Dashboard</div>
-        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 110" style="width: 170px; height: auto;">
+          <defs>
+            <filter id="soften2" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur in="SourceGraphic" stdDeviation="3"/></filter>
+            <mask id="edgeFade2"><rect x="8" y="4" width="344" height="102" rx="6" ry="6" fill="white" filter="url(#soften2)"/></mask>
+          </defs>
+          <rect x="0" y="0" width="360" height="110" fill="#1c1c1c" mask="url(#edgeFade2)"/>
+          <rect x="22" y="12" width="316" height="86" rx="3" ry="3" fill="none" stroke="#c9a96e" stroke-width="2.2"/>
+          <text x="180" y="58" text-anchor="middle" fill="#ffffff" font-family="'Oswald',sans-serif" font-size="28" font-weight="700" letter-spacing="3">BLACKHAWK CREEK</text>
+          <text x="180" y="85" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-family="'Oswald',sans-serif" font-size="16" font-weight="400" letter-spacing="7">OUTFITTERS</text>
+        </svg>
       </div>
 
       <div class="sidebar-section-label">Inventory</div>
       <nav class="sidebar-nav">
         <button class="sidebar-nav-item active" onclick="switchBackofficeTab('inventory')">
-          <span class="nav-icon">&#128230;</span>
+          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span>
           <span class="nav-label">All Products</span>
           <span class="nav-badge" id="sidebarProductCount">0</span>
         </button>
-        <button class="sidebar-nav-item" onclick="switchBackofficeTab('add')">
-          <span class="nav-icon">&#10010;</span>
-          <span class="nav-label">Add Product</span>
-        </button>
         <button class="sidebar-nav-item" onclick="switchBackofficeTab('categories')">
-          <span class="nav-icon">&#128193;</span>
+          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
           <span class="nav-label">Categories</span>
+        </button>
+        <button class="sidebar-nav-item" onclick="switchBackofficeTab('add')">
+          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>
+          <span class="nav-label">Add Product</span>
         </button>
       </nav>
 
@@ -1749,7 +1872,7 @@
       <div class="sidebar-section-label">Sales</div>
       <nav class="sidebar-nav">
         <button class="sidebar-nav-item" onclick="switchBackofficeTab('sales')">
-          <span class="nav-icon">&#128200;</span>
+          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
           <span class="nav-label">Sales & Reports</span>
         </button>
       </nav>
@@ -1758,14 +1881,14 @@
       <div class="sidebar-section-label">Settings</div>
       <nav class="sidebar-nav">
         <button class="sidebar-nav-item" onclick="switchBackofficeTab('sync')">
-          <span class="nav-icon">&#128260;</span>
+          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>
           <span class="nav-label">Sync Clover</span>
         </button>
       </nav>
 
       <div class="sidebar-footer">
         <button class="sidebar-nav-item" onclick="goToStorefront()">
-          <span class="nav-icon">&#127968;</span>
+          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></span>
           <span class="nav-label">Back to Store</span>
         </button>
       </div>
@@ -1776,29 +1899,47 @@
   <div class="backoffice-container">
 
     <div id="inventoryTab">
-      <div class="backoffice-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <h1 class="backoffice-title" style="margin: 0;">Inventory Management</h1>
-        <div style="display: flex; gap: 8px;">
-          <button onclick="exportProducts('csv')" style="padding: 8px 16px; background: #3d4a2f; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">&#x2913; Export CSV</button>
-          <button onclick="exportProducts('json')" style="padding: 8px 16px; background: #555; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">&#x2913; Export JSON</button>
+      <div class="backoffice-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h1 class="backoffice-title" style="margin: 0;">Products</h1>
+          <p style="margin: 4px 0 0; color: #888; font-size: 13px;" id="inventorySubtitle">Manage your product catalog</p>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <input type="text" id="inventorySearch" placeholder="Search products..." oninput="filterInventoryTable()" style="padding: 8px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; width: 200px; font-family: inherit;">
+          <button onclick="exportProducts('csv')" class="bo-btn secondary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export CSV
+          </button>
         </div>
       </div>
-      <table class="inventory-table" id="inventoryTable">
-        <thead>
-          <tr>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Brand</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>Stock</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="inventoryTableBody">
-          <!-- Rows will be populated by JavaScript -->
-        </tbody>
-      </table>
+
+      <!-- Bulk action bar (hidden by default) -->
+      <div id="bulkActionBar" class="bulk-bar" style="display: none;">
+        <span id="bulkSelectedCount">0 selected</span>
+        <button onclick="bulkEditSelected()" class="bo-btn primary" style="padding: 6px 14px; font-size: 12px;">Edit Selected</button>
+        <button onclick="bulkDeleteSelected()" class="bo-btn danger" style="padding: 6px 14px; font-size: 12px;">Delete Selected</button>
+        <button onclick="clearSelection()" class="bo-btn secondary" style="padding: 6px 14px; font-size: 12px;">Cancel</button>
+      </div>
+
+      <div class="inventory-table-wrap">
+        <table class="inventory-table" id="inventoryTable">
+          <thead>
+            <tr>
+              <th style="width: 40px; text-align: center;"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)" title="Select all"></th>
+              <th style="width: 56px;">Image</th>
+              <th>Product Name</th>
+              <th>Brand</th>
+              <th>Category</th>
+              <th style="text-align: right;">Price</th>
+              <th style="text-align: center;">Stock</th>
+              <th style="width: 80px; text-align: center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryTableBody">
+            <!-- Rows will be populated by JavaScript -->
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div id="addTab" style="display: none;">
@@ -2586,51 +2727,155 @@ function switchBackofficeTab(tab) {
     if (el) el.style.display = t === tab ? 'block' : 'none';
   });
 
-  // Update sidebar active state
-  const tabToIndex = { inventory: 0, add: 1, categories: 2, sales: 3, sync: 4 };
-  document.querySelectorAll('.sidebar-nav-item').forEach(btn => btn.classList.remove('active'));
+  // Update sidebar active state — matches sidebar button order:
+  // inventory(0), categories(1), add(2), sales(3), sync(4)
+  const tabToIndex = { inventory: 0, categories: 1, add: 2, sales: 3, sync: 4 };
+  document.querySelectorAll('.sidebar-nav .sidebar-nav-item').forEach(btn => btn.classList.remove('active'));
   const allNavItems = document.querySelectorAll('.sidebar-nav .sidebar-nav-item');
-  if (allNavItems[tabToIndex[tab]]) allNavItems[tabToIndex[tab]].classList.add('active');
+  if (allNavItems[tabToIndex[tab]] !== undefined) allNavItems[tabToIndex[tab]].classList.add('active');
 
   if (tab === 'sync') loadSyncStatus();
   if (tab === 'categories') loadCategoriesTab();
   if (tab === 'sales') loadSalesDashboard();
-  if (tab === 'inventory') updateSidebarProductCount();
+  if (tab === 'inventory') { updateSidebarProductCount(); loadInventoryTable(); }
 }
 
 function updateSidebarProductCount() {
   const badge = document.getElementById('sidebarProductCount');
   if (badge) badge.textContent = allProducts.length;
+  const sub = document.getElementById('inventorySubtitle');
+  if (sub) sub.textContent = allProducts.length + ' products in catalog';
 }
+
+let selectedProductIds = new Set();
 
 function loadInventoryTable() {
   const tbody = document.getElementById('inventoryTableBody');
   tbody.innerHTML = '';
+  const query = (document.getElementById('inventorySearch')?.value || '').toLowerCase();
 
-  allProducts.forEach(product => {
+  const filtered = query
+    ? allProducts.filter(p => p.name.toLowerCase().includes(query) || (p.brand && p.brand.toLowerCase().includes(query)) || (p.category && p.category.toLowerCase().includes(query)) || (p.sku && p.sku.toLowerCase().includes(query)))
+    : allProducts;
+
+  const placeholderSVG = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50"><rect fill="#f5f5f5" width="50" height="50" rx="6"/><text x="25" y="28" text-anchor="middle" fill="#ccc" font-family="sans-serif" font-size="9">No img</text></svg>')}`;
+
+  filtered.forEach(product => {
     const row = document.createElement('tr');
-    let imageHTML = '';
-    if (product.imageUrl) {
-      imageHTML = `<div class="product-thumbnail"><img src="${product.imageUrl}" alt="${product.name}"></div>`;
-    } else {
-      imageHTML = '<div class="product-thumbnail"></div>';
-    }
+    row.className = selectedProductIds.has(product.id) ? 'row-selected' : '';
+    const imgSrc = product.imageUrl || placeholderSVG;
+    const stockVal = product.stockCount || product.stock || 0;
+    const stockClass = stockVal === 0 ? 'stock-out' : stockVal <= 5 ? 'stock-low' : 'stock-ok';
+    const checked = selectedProductIds.has(product.id) ? 'checked' : '';
 
     row.innerHTML = `
-      <td>${imageHTML}</td>
-      <td>${product.name}</td>
-      <td>${product.brand || '—'}</td>
-      <td>${product.category || '—'}</td>
-      <td>$${(product.price || 0).toFixed(2)}</td>
-      <td>${product.stockCount || product.stock || 0}</td>
-      <td>
-        <button class="btn-upload" onclick="triggerImageUpload(${product.id})">Upload</button>
-        <button class="btn-edit" onclick="editProduct(${product.id})">Edit</button>
-        <button class="btn-delete" onclick="deleteProduct(${product.id})">Delete</button>
+      <td style="text-align: center;" onclick="event.stopPropagation()"><input type="checkbox" class="row-checkbox" data-id="${product.id}" ${checked} onchange="toggleRowSelection(${product.id}, this)"></td>
+      <td><div class="product-thumbnail"><img src="${imgSrc}" alt="${product.name}" onerror="this.src='${placeholderSVG}'"></div></td>
+      <td class="td-product-name">${product.name}</td>
+      <td style="color: #666;">${product.brand || '\u2014'}</td>
+      <td><span class="cat-tag">${product.category || 'Uncategorized'}</span></td>
+      <td style="text-align: right; font-weight: 600;">$${(product.price || 0).toFixed(2)}</td>
+      <td style="text-align: center;"><span class="stock-indicator ${stockClass}">${stockVal}</span></td>
+      <td style="text-align: center;" onclick="event.stopPropagation()">
+        <button class="btn-delete-sm" onclick="deleteProduct(${product.id})" title="Delete">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
       </td>
     `;
+
+    // Click row to open edit modal
+    row.style.cursor = 'pointer';
+    row.onclick = function() { editProduct(product.id); };
     tbody.appendChild(row);
   });
+
+  // Update select-all checkbox state
+  const selectAll = document.getElementById('selectAllCheckbox');
+  if (selectAll) selectAll.checked = false;
+  updateBulkBar();
+}
+
+function filterInventoryTable() {
+  loadInventoryTable();
+}
+
+function toggleRowSelection(productId, checkbox) {
+  if (checkbox.checked) {
+    selectedProductIds.add(productId);
+  } else {
+    selectedProductIds.delete(productId);
+  }
+  // Update row highlight
+  const row = checkbox.closest('tr');
+  if (row) row.className = checkbox.checked ? 'row-selected' : '';
+  updateBulkBar();
+}
+
+function toggleSelectAll(master) {
+  const checkboxes = document.querySelectorAll('.row-checkbox');
+  checkboxes.forEach(cb => {
+    const id = parseInt(cb.dataset.id);
+    cb.checked = master.checked;
+    if (master.checked) {
+      selectedProductIds.add(id);
+      cb.closest('tr').className = 'row-selected';
+    } else {
+      selectedProductIds.delete(id);
+      cb.closest('tr').className = '';
+    }
+  });
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  const bar = document.getElementById('bulkActionBar');
+  const countEl = document.getElementById('bulkSelectedCount');
+  if (selectedProductIds.size > 0) {
+    bar.style.display = 'flex';
+    countEl.textContent = selectedProductIds.size + ' selected';
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+function clearSelection() {
+  selectedProductIds.clear();
+  document.querySelectorAll('.row-checkbox').forEach(cb => {
+    cb.checked = false;
+    cb.closest('tr').className = '';
+  });
+  const selectAll = document.getElementById('selectAllCheckbox');
+  if (selectAll) selectAll.checked = false;
+  updateBulkBar();
+}
+
+function bulkEditSelected() {
+  if (selectedProductIds.size === 0) return;
+  // Edit the first selected product
+  const firstId = Array.from(selectedProductIds)[0];
+  editProduct(firstId);
+}
+
+async function bulkDeleteSelected() {
+  if (selectedProductIds.size === 0) return;
+  if (!confirm('Delete ' + selectedProductIds.size + ' selected product(s)? This cannot be undone.')) return;
+
+  const ids = Array.from(selectedProductIds);
+  let deleted = 0;
+  for (const id of ids) {
+    try {
+      const res = await fetch(API_BASE + '/api/products/' + id, { method: 'DELETE' });
+      if (res.ok) deleted++;
+    } catch(e) { /* skip */ }
+  }
+
+  selectedProductIds.clear();
+  await loadProducts();
+  buildNavigation();
+  displayProducts(allProducts);
+  loadInventoryTable();
+  updateSidebarProductCount();
+  alert(deleted + ' product(s) deleted.');
 }
 
 function triggerImageUpload(productId) {

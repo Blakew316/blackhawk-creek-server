@@ -3575,12 +3575,23 @@ async function processCheckout() {
   btnText.textContent = 'Processing...';
 
   try {
-    // Tokenize card via Clover
-    const tokenResult = await cloverTokenizer.createToken();
+    // Tokenize card via Clover (with 30s timeout)
+    console.log('🔐 Tokenizing card...');
+    let tokenResult;
+    try {
+      tokenResult = await Promise.race([
+        cloverTokenizer.createToken(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Card tokenization timed out. Please refresh and try again.')), 30000))
+      ]);
+    } catch (tokenErr) {
+      throw new Error(tokenErr.message || 'Card tokenization failed. Please check your card details and try again.');
+    }
+
+    console.log('🔐 Token result:', tokenResult);
 
     if (tokenResult.errors) {
       const firstError = Object.values(tokenResult.errors)[0];
-      throw new Error(firstError || 'Invalid card details');
+      throw new Error(firstError || 'Invalid card details. Please check and try again.');
     }
 
     if (!tokenResult.token) {
@@ -3603,32 +3614,54 @@ async function processCheckout() {
 
     const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
 
-    // Send to our server
-    const res = await fetch(API_BASE + '/api/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        token: tokenResult.token,
-        amount: Math.round(subtotal * 100) / 100,
-        items,
-        email,
-        shipping: {
-          firstName: shipFirst,
-          lastName: shipLast,
-          address: shipAddress,
-          apt: document.getElementById('shipApt').value.trim(),
-          city: shipCity,
-          state: shipState,
-          zip: shipZip
-        },
-        billing: { zip: billZip }
-      })
-    });
+    // Send to our server (with 60s timeout)
+    console.log('💳 Sending payment to server...');
+    const controller = new AbortController();
+    const serverTimeout = setTimeout(() => controller.abort(), 60000);
 
-    const data = await res.json();
+    let res;
+    try {
+      res = await fetch(API_BASE + '/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          token: tokenResult.token,
+          amount: Math.round(subtotal * 100) / 100,
+          items,
+          email,
+          shipping: {
+            firstName: shipFirst,
+            lastName: shipLast,
+            address: shipAddress,
+            apt: document.getElementById('shipApt').value.trim(),
+            city: shipCity,
+            state: shipState,
+            zip: shipZip
+          },
+          billing: { zip: billZip }
+        })
+      });
+    } catch (fetchErr) {
+      if (fetchErr.name === 'AbortError') {
+        throw new Error('Payment request timed out. Please check your connection and try again.');
+      }
+      throw new Error('Could not reach the payment server. Please check your connection.');
+    } finally {
+      clearTimeout(serverTimeout);
+    }
+
+    let data;
+    try {
+      data = await res.json();
+    } catch (parseErr) {
+      throw new Error('Unexpected response from payment server. Please try again.');
+    }
+
+    console.log('💳 Server response:', res.status, data);
 
     if (!res.ok) {
-      throw new Error(data.error || 'Payment failed');
+      throw new Error(data.error || 'Payment failed. Please try again.');
     }
 
     // Show confirmation
@@ -3645,7 +3678,8 @@ async function processCheckout() {
     await loadProducts();
 
   } catch (err) {
-    errorEl.textContent = err.message;
+    console.error('❌ Checkout error:', err);
+    errorEl.textContent = err.message || 'Something went wrong. Please try again.';
     errorEl.style.display = 'block';
   } finally {
     btn.disabled = false;

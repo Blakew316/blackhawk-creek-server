@@ -960,6 +960,7 @@
     <div class="backoffice-nav">
       <button class="active" onclick="switchBackofficeTab('inventory')">Inventory</button>
       <button onclick="switchBackofficeTab('add')">Add Product</button>
+      <button onclick="switchBackofficeTab('sync')">Sync Clover</button>
       <button onclick="goToStorefront()">← Back to Store</button>
     </div>
 
@@ -1016,6 +1017,23 @@
           </div>
           <button type="submit" class="btn-primary" style="width: 100%;">Add Product</button>
         </form>
+      </div>
+    </div>
+
+    <div id="syncTab" style="display: none;">
+      <div class="backoffice-header">
+        <h1 class="backoffice-title">Sync from Clover POS</h1>
+      </div>
+      <div style="background: white; padding: 30px; border-radius: 10px; max-width: 600px;">
+        <p style="color: #555; margin-bottom: 20px; line-height: 1.6;">Pull the latest products, prices, and categories from your Clover POS system. This will update your website inventory to match Clover.</p>
+        <div id="syncStatus" style="margin-bottom: 20px; padding: 16px; background: #f5f5f5; border-radius: 8px; font-size: 13px; color: #555;">
+          Checking sync status...
+        </div>
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1a1a1a;">Admin Password</label>
+          <input type="password" id="syncPassword" placeholder="Enter admin password" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: Inter;">
+        </div>
+        <button class="btn-primary" style="width: 100%;" onclick="runCloverSync()" id="syncButton">Sync Now</button>
       </div>
     </div>
   </div>
@@ -1426,13 +1444,16 @@ function goToStorefront() {
 function switchBackofficeTab(tab) {
   document.getElementById('inventoryTab').style.display = tab === 'inventory' ? 'block' : 'none';
   document.getElementById('addTab').style.display = tab === 'add' ? 'block' : 'none';
+  document.getElementById('syncTab').style.display = tab === 'sync' ? 'block' : 'none';
 
   document.querySelectorAll('.backoffice-nav button').forEach((btn, idx) => {
     btn.classList.remove('active');
-    if ((idx === 0 && tab === 'inventory') || (idx === 1 && tab === 'add')) {
+    if ((idx === 0 && tab === 'inventory') || (idx === 1 && tab === 'add') || (idx === 2 && tab === 'sync')) {
       btn.classList.add('active');
     }
   });
+
+  if (tab === 'sync') loadSyncStatus();
 }
 
 function loadInventoryTable() {
@@ -1592,6 +1613,55 @@ async function handleAddProduct(event) {
   } catch (error) {
     console.error('Add product error:', error);
     alert('Error adding product: ' + error.message);
+  }
+}
+
+// ============ CLOVER SYNC ============
+async function loadSyncStatus() {
+  const el = document.getElementById('syncStatus');
+  try {
+    const res = await fetch(API_BASE + '/api/sync-status');
+    const data = await res.json();
+    if (data.lastSync) {
+      const date = new Date(data.lastSync);
+      el.innerHTML = '<strong>Last synced:</strong> ' + date.toLocaleString() + '<br><strong>Products:</strong> ' + data.itemCount + '<br><strong>Clover configured:</strong> ' + (data.configured ? 'Yes' : 'No — check environment variables');
+    } else {
+      el.innerHTML = '<strong>Status:</strong> No sync has been run yet.' + (data.configured ? '' : '<br><span style="color:#b83a2e;">Clover credentials not configured. Check your environment variables on Render.</span>');
+    }
+  } catch (err) {
+    el.innerHTML = '<span style="color:#b83a2e;">Could not reach server.</span>';
+  }
+}
+
+async function runCloverSync() {
+  const password = document.getElementById('syncPassword').value;
+  if (!password) { alert('Please enter the admin password'); return; }
+
+  const btn = document.getElementById('syncButton');
+  btn.textContent = 'Syncing...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(API_BASE + '/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert('Sync complete! ' + data.message);
+      await loadProducts();
+      buildNavigation();
+      displayProducts(allProducts);
+      loadSyncStatus();
+    } else {
+      alert('Sync failed: ' + (data.error || 'Unknown error'));
+    }
+  } catch (err) {
+    alert('Sync error: ' + err.message);
+  } finally {
+    btn.textContent = 'Sync Now';
+    btn.disabled = false;
   }
 }
 

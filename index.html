@@ -3060,240 +3060,164 @@ function autoCategorize(name) {
 }
 
 // Auto-resolve product images from manufacturer Shopify stores (client-side)
-let _imgCache = null;
-async function buildClientImageCache() {
-  if (_imgCache) return _imgCache;
-  async function fetchShopify(url) {
-    try {
-      const r = await fetch(url + '/products.json?limit=250');
-      const d = await r.json();
-      const m = {};
-      (d.products || []).forEach(p => {
-        const t = p.title.toLowerCase();
-        const img = p.images && p.images[0] ? p.images[0].src.split('?')[0] : null;
-        if (img) {
-          m[t] = img;
-          if (p.variants) p.variants.forEach(v => {
-            m[(t + ' - ' + (v.title || '')).toLowerCase()] = v.featured_image ? v.featured_image.src.split('?')[0] : img;
-          });
-        }
-      });
-      return m;
-    } catch (e) { console.warn('Image fetch failed:', url, e.message); return {}; }
-  }
-  try {
-    const [s6, ba, ard] = await Promise.all([
-      fetchShopify('https://6thsensefishing.com'),
-      fetchShopify('https://bassassassin.com'),
-      fetchShopify('https://ardentoutdoors.com')
-    ]);
-    const s6k = Object.keys(s6), bak = Object.keys(ba), ardk = Object.keys(ard);
-    function findImg(store, sk, key, color) {
-      const c = (color || '').toLowerCase().trim();
-      if (c) {
-        const m1 = sk.find(k => k.includes(key) && k.includes(c) && !k.includes('/'));
-        if (m1) return store[m1];
-        const m2 = sk.find(k => k.includes(key) && k.includes(c));
-        if (m2) return store[m2];
-      }
-      const base = sk.filter(k => k === key || (k.startsWith(key) && k.split(' - ').length <= 2));
-      if (base.length) { base.sort((a,b) => a.length - b.length); return store[base[0]]; }
-      const any = sk.find(k => k.includes(key));
-      return any ? store[any] : null;
-    }
-    const rules = [
-      [/divine spinnerbait/i, s6, s6k, 'divine spinnerbait'],
-      [/divine swim jig/i, s6, s6k, 'divine swim jig'],
-      [/flock blade/i, s6, s6k, 'flock blade series'],
-      [/vega hush frog/i, s6, s6k, 'vega hush frog'],
-      [/vega frog/i, s6, s6k, 'vega frog'],
-      [/boosa/i, s6, s6k, 'boosa'],
-      [/ridge lizard/i, s6, s6k, 'ridge lizard 5.7'],
-      [/crappie strobe/i, s6, s6k, 'crappie strobe'],
-      [/strobe minnow/i, s6, s6k, 'strobe minnow'],
-      [/pressure series/i, s6, s6k, 'pressure series'],
-      [/jugular h/i, s6, s6k, 'jugular hybrid hook'],
-      [/catfish hook/i, s6, s6k, 'catfish hook'],
-      [/live minnow hook/i, s6, s6k, 'live minnow hook'],
-      [/bluegill.*hook|sunfish.*hook/i, s6, s6k, 'bluegill and sunfish hook'],
-      [/lead split shot/i, s6, s6k, 'splitball'],
-      [/lead worm weight/i, s6, s6k, 'divine worm weights'],
-      [/6th sense banner/i, s6, s6k, '6th sense club banner'],
-      [/duke\s*\d/i, s6, s6k, 'duke'],
-      [/hogwalla/i, s6, s6k, 'hogwalla 5.8'],
-      [/nedfry/i, s6, s6k, 'nedfry 4.6'],
-      [/bamboosa/i, s6, s6k, 'bamboosa 5.3'],
-      [/crappie shindo/i, s6, s6k, 'the crappie shindo 2.2'],
-      [/panorama axle/i, s6, s6k, 'panorama axle jighead'],
-      [/quake/i, s6, s6k, 'quake'],
-      [/splashback/i, s6, s6k, 'splashback popper'],
-      [/pecos underspin/i, s6, s6k, 'pecos underspin jighead'],
-      [/juggle head/i, s6, s6k, 'masterclass juggle head'],
-      [/finesse minnow/i, s6, s6k, 'finesse minnow jighead'],
-      [/6th sense hat/i, s6, s6k, 'sobro capsule hat'],
-      [/railworm|rail worm/i, ba, bak, '7" rail worm'],
-      [/tapout/i, ba, bak, '7.5" tapout'],
-      [/twitch\s*\d/i, ba, bak, '6" twitch'],
-      [/fw shad/i, ba, bak, '5" fw shad'],
-      [/crappie dapper/i, ba, bak, '2" crappie dapper'],
-      [/tiny shad/i, ba, bak, '2" pro tiny shad'],
-      [/reel butter oil/i, ard, ardk, 'reel butter oil'],
-      [/reel butter grease/i, ard, ardk, 'reel butter grease'],
-      [/ardent reel care/i, ard, ardk, 'reel care'],
-      [/lubrication kit/i, ard, ardk, 'reel butter lubrication pack'],
-      [/reel kleen/i, ard, ardk, 'reel kleen cleaning kit'],
-      [/cooler-d-funk.*wipe/i, ard, ardk, 'cooler d-funk wipes'],
-      [/cooler-d-funk/i, ard, ardk, 'cooler d-funk 16 oz bottle'],
-      [/fish-d-funk.*wipe|fish.d.funk.*wipe/i, ard, ardk, 'fish d_funk wipes'],
-      [/fish-d-funk|fish.d.funk/i, ard, ardk, 'fish-d-funk 8oz. spray'],
-      [/combo.*finesse/i, ard, ardk, 'finesse ultra-light combo'],
-      [/combo.*big water/i, ard, ardk, 'big water comfort grip combos'],
-      [/combo.*super duty/i, ard, ardk, 'super duty spinning combo'],
-      [/combo.*primo/i, ard, ardk, 'comfort grip combo - primo'],
-      [/combo.*vario|combo.*hd|combo.*pink/i, ard, ardk, 'finesse ultra-light combo'],
-    ];
-    _imgCache = { rules, findImg };
-    console.log('Image cache built:', s6k.length, '+', bak.length, '+', ardk.length, 'entries');
-  } catch (e) { console.warn('Image cache failed:', e.message); _imgCache = {}; }
-  return _imgCache;
-}
-function resolveImage(name) {
-  if (!_imgCache || !_imgCache.rules) return null;
-  const parts = name.split(/\s*-\s*/);
-  let color = '';
-  for (let i = 1; i < parts.length; i++) {
-    const p = parts[i].trim().toLowerCase();
-    if (p && !/^\d/.test(p) && !/(oz|hook|pk|ct|dc|\d+\s*(ct|pk))$/i.test(p) && p.length > 1) { color = p; break; }
-  }
-  for (const [regex, store, sk, key] of _imgCache.rules) {
-    if (regex.test(name)) return _imgCache.findImg(store, sk, key, color);
-  }
-  return null;
-}
-
-// Auto-resolve product prices from manufacturer Shopify stores (client-side)
-let _priceCache = null;
-async function buildClientPriceCache() {
-  if (_priceCache) return _priceCache;
-  // Fetch all pages from a Shopify store
-  async function fetchAllShopifyPrices(baseUrl, maxPages) {
-    const priceMap = {};
-    for (let page = 1; page <= maxPages; page++) {
-      try {
-        const r = await fetch(baseUrl + '/products.json?limit=250&page=' + page);
-        const d = await r.json();
-        const prods = d.products || [];
-        if (prods.length === 0) break;
-        prods.forEach(p => {
-          const t = p.title.toLowerCase();
-          if (p.variants) {
-            p.variants.forEach(v => {
-              const price = parseFloat(v.price);
-              if (price > 0) {
-                const vKey = (t + ' - ' + (v.title || '')).toLowerCase();
-                priceMap[vKey] = price;
-                // Also store base title with first variant price
-                if (!priceMap[t]) priceMap[t] = price;
-              }
-            });
-          }
-        });
-      } catch (e) { console.warn('Price fetch failed page ' + page + ':', baseUrl, e.message); break; }
-    }
-    return priceMap;
-  }
-  try {
-    // 6th Sense needs all 11 pages (~2552 products), Bass Assassin & Ardent fit in 1 page
-    const [s6, ba, ard] = await Promise.all([
-      fetchAllShopifyPrices('https://6thsensefishing.com', 11),
-      fetchAllShopifyPrices('https://bassassassin.com', 1),
-      fetchAllShopifyPrices('https://ardentoutdoors.com', 1)
-    ]);
-    const s6k = Object.keys(s6), bak = Object.keys(ba), ardk = Object.keys(ard);
-    function findPrice(store, sk, key, color) {
-      const c = (color || '').toLowerCase().trim();
-      if (c) {
-        // Try exact variant match with color
-        const m1 = sk.find(k => k.includes(key) && k.includes(c) && !k.includes('/'));
-        if (m1) return store[m1];
-        const m2 = sk.find(k => k.includes(key) && k.includes(c));
-        if (m2) return store[m2];
-      }
-      // Fall back to base product price
-      const base = sk.filter(k => k === key || (k.startsWith(key) && k.split(' - ').length <= 2));
-      if (base.length) { base.sort((a,b) => a.length - b.length); return store[base[0]]; }
-      const any = sk.find(k => k.includes(key));
-      return any ? store[any] : null;
-    }
-    const rules = [
-      [/divine spinnerbait/i, s6, s6k, 'divine spinnerbait'],
-      [/divine swim jig/i, s6, s6k, 'divine swim jig'],
-      [/flock blade/i, s6, s6k, 'flock blade series'],
-      [/vega hush frog/i, s6, s6k, 'vega hush frog'],
-      [/vega frog/i, s6, s6k, 'vega frog'],
-      [/boosa/i, s6, s6k, 'boosa'],
-      [/ridge lizard/i, s6, s6k, 'ridge lizard 5.7'],
-      [/crappie strobe/i, s6, s6k, 'crappie strobe'],
-      [/strobe minnow/i, s6, s6k, 'strobe minnow'],
-      [/pressure series/i, s6, s6k, 'pressure series'],
-      [/jugular h/i, s6, s6k, 'jugular hybrid hook'],
-      [/catfish hook/i, s6, s6k, 'catfish hook'],
-      [/live minnow hook/i, s6, s6k, 'live minnow hook'],
-      [/bluegill.*hook|sunfish.*hook/i, s6, s6k, 'bluegill and sunfish hook'],
-      [/lead split shot/i, s6, s6k, 'splitball'],
-      [/lead worm weight/i, s6, s6k, 'divine worm weights'],
-      [/6th sense banner/i, s6, s6k, '6th sense club banner'],
-      [/duke\s*\d/i, s6, s6k, 'duke'],
-      [/hogwalla/i, s6, s6k, 'hogwalla 5.8'],
-      [/nedfry/i, s6, s6k, 'nedfry 4.6'],
-      [/bamboosa/i, s6, s6k, 'bamboosa 5.3'],
-      [/crappie shindo/i, s6, s6k, 'the crappie shindo 2.2'],
-      [/panorama axle/i, s6, s6k, 'panorama axle jighead'],
-      [/quake/i, s6, s6k, 'quake'],
-      [/splashback/i, s6, s6k, 'splashback popper'],
-      [/pecos underspin/i, s6, s6k, 'pecos underspin jighead'],
-      [/juggle head/i, s6, s6k, 'masterclass juggle head'],
-      [/finesse minnow/i, s6, s6k, 'finesse minnow jighead'],
-      [/6th sense hat/i, s6, s6k, 'sobro capsule hat'],
-      [/railworm|rail worm/i, ba, bak, '7" rail worm'],
-      [/tapout/i, ba, bak, '7.5" tapout'],
-      [/twitch\s*\d/i, ba, bak, '6" twitch'],
-      [/fw shad/i, ba, bak, '5" fw shad'],
-      [/crappie dapper/i, ba, bak, '2" crappie dapper'],
-      [/tiny shad/i, ba, bak, '2" pro tiny shad'],
-      [/reel butter oil/i, ard, ardk, 'reel butter oil'],
-      [/reel butter grease/i, ard, ardk, 'reel butter grease'],
-      [/ardent reel care/i, ard, ardk, 'reel care'],
-      [/lubrication kit/i, ard, ardk, 'reel butter lubrication pack'],
-      [/reel kleen/i, ard, ardk, 'reel kleen cleaning kit'],
-      [/cooler-d-funk.*wipe/i, ard, ardk, 'cooler d-funk wipes'],
-      [/cooler-d-funk/i, ard, ardk, 'cooler d-funk 16 oz bottle'],
-      [/fish-d-funk.*wipe|fish.d.funk.*wipe/i, ard, ardk, 'fish d_funk wipes'],
-      [/fish-d-funk|fish.d.funk/i, ard, ardk, 'fish-d-funk 8oz. spray'],
-      [/combo.*finesse/i, ard, ardk, 'finesse ultra-light combo'],
-      [/combo.*big water/i, ard, ardk, 'big water comfort grip combos'],
-      [/combo.*super duty/i, ard, ardk, 'super duty spinning combo'],
-      [/combo.*primo/i, ard, ardk, 'comfort grip combo - primo'],
-      [/combo.*vario|combo.*hd|combo.*pink/i, ard, ardk, 'finesse ultra-light combo'],
-    ];
-    _priceCache = { rules, findPrice };
-    console.log('Price cache built:', s6k.length, '+', bak.length, '+', ardk.length, 'entries');
-  } catch (e) { console.warn('Price cache failed:', e.message); _priceCache = {}; }
-  return _priceCache;
-}
-function resolvePrice(name) {
-  if (!_priceCache || !_priceCache.rules) return null;
-  const parts = name.split(/\s*-\s*/);
-  let color = '';
-  for (let i = 1; i < parts.length; i++) {
-    const p = parts[i].trim().toLowerCase();
-    if (p && !/^\d/.test(p) && !/(oz|hook|pk|ct|dc|\d+\s*(ct|pk))$/i.test(p) && p.length > 1) { color = p; break; }
-  }
-  for (const [regex, store, sk, key] of _priceCache.rules) {
-    if (regex.test(name)) return _priceCache.findPrice(store, sk, key, color);
-  }
-  return null;
-}
+// Hardcoded product image + price map — zero external dependencies, instant loading, unbreakable
+const PRODUCT_DATA = {
+  "Railworm 7\" - Redbug - 10 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/RW58451-WEBSITE-scaled.jpg", 5.99],
+  "Railworm 7\" - Green Pumpkin/Blue Glitter - 10 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/RW58484-WEBSITE-scaled.jpg", 5.99],
+  "Railworm 7\" - Watermelon/Red Glitter - 10 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/RW58484-WEBSITE-scaled.jpg", 5.99],
+  "Railworm 7\" - Red Shad/Green Glitter - 10 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/RW58484-WEBSITE-scaled.jpg", 5.99],
+  "Railworm 7\" - Junebug/Blue Glitter Tail - 10 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/RW58484-WEBSITE-scaled.jpg", 5.99],
+  "Tapout 7.5\" - Candy Bug - 12 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/TO64470-WEBSITE-scaled.jpg", 5.99],
+  "Tapout 7.5\" - Root-N-Nanner - 12 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/TO64469-WEBSITE-scaled.jpg", 5.99],
+  "Tapout 7.5\" - Watermelon Magic - 12 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/TO64403-WEBSITE-scaled.jpg", 5.99],
+  "Tapout 7.5\" - Pink - 12 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/TO64109-WEBSITE-scaled.jpg", 5.99],
+  "Twitch 6\" - Florida Sunset - 8 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/TA9498-WEBSITE-1-scaled.jpg", 7.99],
+  "Twitch 6\" - Sherbert - 8 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/TA9342-WEBSITE-1-scaled.jpg", 7.99],
+  "Twitch 6\" - Rainbow Trout - 8 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/TA9332-WEBSITE-1-scaled.jpg", 7.99],
+  "Twitch 6\" - Arkansas Shiner - 8 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/TA9331-WEBSITE-1-scaled.jpg", 7.99],
+  "Twitch 6\" - Pink - 8 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/TA9109-WEBSITE-1-scaled.jpg", 7.99],
+  "FW Shad 5\" - Stinky Pink - 8 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/SA10428WEBSITE.jpg", 7.99],
+  "FW Shad 5\" - Cool Ice - 8 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/SA10329WEBSITE.jpg", 7.99],
+  "FW Shad 5\" - Candy Corn - 8 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/SA10305WEBSITE.jpg", 7.99],
+  "FW Shad 5\" - Butt Naked - 8 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/SA10275WEBSITE.jpg", 7.99],
+  "FW Shad 5\" - Glow/Fire Tail - 8 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/SA10354WEBSITE.jpg", 7.99],
+  "FW Shad 5\" - Fire Tiger - 8 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/SA10245WEBSITE.jpg", 7.99],
+  "FW Shad 5\" - Electric Shiner - 8 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/SA10129WEBSITE.jpg", 7.99],
+  "FW Shad 5\" - Pink - 8 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/SA10109WEBSITE.jpg", 7.99],
+  "Crappie Dapper 2\" - Monkey Milk - 10 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/DDA48527-WEBSITE-scaled.jpg", 5.99],
+  "Crappie Dapper 2\" - Blue Grass - 10 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/DDA48521-WEBSITE-scaled.jpg", 5.99],
+  "Crappie Dapper 2\" - Pink Ghost - 10 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/DDA48476-WEBSITE-scaled.jpg", 5.99],
+  "Crappie Dapper 2\" - Slammin Chicken - 10 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/DDA48435-WEBSITE-scaled.jpg", 5.99],
+  "Crappie Dapper 2\" - Chicken On a Chain - 10 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/DDA48214-WEBSITE-scaled.jpg", 5.99],
+  "Tiny Shad 1.5\" - Blue Ice - 15 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/PTS69522-WEBSITE-scaled.jpg", 4.99],
+  "Tiny Shad 1.5\" - Pink Ghost - 15 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/PTS69476-WEBSITE-scaled.jpg", 4.99],
+  "Tiny Shad 1.5\" - Opening Night - 15 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/PTS69265-WEBSITE-scaled.jpg", 4.99],
+  "Tiny Shad 1.5\" - Limetreuse - 15 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/PTS69475-WEBSITE-scaled.jpg", 4.99],
+  "Tiny Shad 1.5\" - Green Monster - 15 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/PTS69265-WEBSITE-scaled.jpg", 4.99],
+  "Tiny Shad 1.5\" - Alewife - 15 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/PTS69108-WEBSITE-scaled.jpg", 4.99],
+  "Combo - Finesse 6'6\" ML 2000 Spinning": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/files/VC0556UL2-4.jpg", 94.99],
+  "Combo - Finesse 5'6\" UL 500 Spinning": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/files/VC0556UL2-4.jpg", 94.99],
+  "Combo - Big Water Freshwater 7'6\" Med 4000 Spinning": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/files/Bigwater-SaltwaterComfortGripCombo_12006.jpg", 104.99],
+  "Combo - Big Water Freshwater 7'0\" Med 3000 Spinning": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/files/Bigwater-SaltwaterComfortGripCombo_12006.jpg", 104.99],
+  "Combo - Super Duty 7'6\" MH 5000 Spinning": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/products/Super_20Duty_20Combo_Large_Web.jpg", 64.99],
+  "Combo - HD 1000 Blue 5'6\" UL 2pc": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/files/VC0556UL2-4.jpg", 94.99],
+  "Combo - PRIMO 2000 Yellow/Black Spinning 6'6\" Med 2pc": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/files/OvergripCombosBoth_ColoredHandles.jpg", 99.99],
+  "Combo - PRIMO 2000 White/Orange Spinning 6'6\" Med 2pc": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/files/OvergripCombosBoth_ColoredHandles.jpg", 99.99],
+  "Combo - VARIO 2000 Blue Spinning 6'6\" Med 2pc": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/files/VC0556UL2-4.jpg", 94.99],
+  "Combo - Pink Spinning 10 Reel 1BB": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/files/VC0556UL2-4.jpg", 94.99],
+  "COOLER-D-FUNK Wipes - 30 ct": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/products/D-FUNKCOOLERWP_Wipes.jpg", 8.99],
+  "COOLER-D-FUNK Bottle 16 oz": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/products/D-FUNKCOOLERBT_Spray.jpg", 8.99],
+  "FISH-D-FUNK 8 oz Bottle": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/products/D-FUNK1004_Spray5.jpg", 8.99],
+  "FISH-D-FUNK Wipes - 30 ct": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/products/D-FUNK1001_Wipes-Clamshell.jpg", 7.99],
+  "Ardent Reel Care Freshwater 3 Pack": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/files/4174-ADT-A_2200.jpg", 27.99],
+  "Lubrication Kit": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/files/4780-A_2022_1000.jpg", 21.49],
+  "Reel Kleen Cleaning Kit": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/files/4170-A_2022_1000-2.jpg", 32.99],
+  "Reel Butter Oil - Retail Pkg": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/files/0220-A_2022_1000_395f1ec4-f384-41f9-8987-29ed9dfd579a.jpg", 8.99],
+  "Reel Butter Grease - Retail Pkg": ["https://cdn.shopify.com/s/files/1/0626/4160/2760/products/0201-A_2022_1000.jpg", 8.99],
+  "6th Sense Banner 60x24 - Thermal Hog - DC": ["https://cdn.shopify.com/s/files/1/2824/3500/files/BannermockupTH1600.png", 29.99],
+  "Divine Spinnerbait 3/4oz - Shad Pro - DC": ["https://cdn.shopify.com/s/files/1/2824/3500/products/DivineSpinnerbait-ShadPro.jpg", 8.99],
+  "Divine Spinnerbait 1/2oz - Shad Ice": ["https://cdn.shopify.com/s/files/1/2824/3500/products/DivineSpinnerbait-ShadIce.jpg", 8.99],
+  "Divine Spinnerbait 3/4oz - Bone-Treuse Pearl - DC": ["https://cdn.shopify.com/s/files/1/2824/3500/products/DivineSpinnerbait-Bonetreusepearl.jpg", 8.99],
+  "Divine Spinnerbait 1/2oz - Lavender Shad": ["https://cdn.shopify.com/s/files/1/2824/3500/products/DivineSpinnerbait-Lavendershad.jpg", 8.99],
+  "Flock Blade 5/16oz - 2/0 hook - Pro Blue": ["https://cdn.shopify.com/s/files/1/2824/3500/files/1_05b70364-e114-4a9a-9f43-ad2aa536e2f2.png", 7.99],
+  "Flock Blade 5/16oz - 2/0 hook - Morning Dawn": ["https://cdn.shopify.com/s/files/1/2824/3500/files/Morning_Dawn_7442a37f-1fa5-4b7b-a00e-f6680c17a95c.png", 7.99],
+  "Flock Blade 5/16oz - 2/0 hook - Chartruese and White": ["https://cdn.shopify.com/s/files/1/2824/3500/files/3_2481dab7-68f9-41df-a81c-cfd447039bec.png", 7.99],
+  "Divine Swim Jig - 3/8oz - 4K Bluegill": ["https://cdn.shopify.com/s/files/1/2824/3500/products/4kshad_97ddf39c-2a3f-4787-8e67-053ea782dde7.jpg", 5.99],
+  "Divine Swim Jig - 1/2oz - Rayburn Red": ["https://cdn.shopify.com/s/files/1/2824/3500/products/RayburnRed.jpg", 5.99],
+  "Divine Swim Jig - 1/2oz - Lavender Shad": ["https://cdn.shopify.com/s/files/1/2824/3500/products/lavender_shad_7c1e587e-ae5b-42f5-a352-c7437d990b45.jpg", 5.99],
+  "Divine Swim Jig - 1/2oz - Sexified Shad": ["https://cdn.shopify.com/s/files/1/2824/3500/products/sexified_shad_7b42fba2-3752-4fbc-9245-9acebd49d168.jpg", 5.99],
+  "Divine Swim Jig - 1/2oz - Gizzard Flash": ["https://cdn.shopify.com/s/files/1/2824/3500/products/gizzard_flash_3c1b16ec-2ca2-4e07-9d90-ffe39362e8bc.jpg", 5.99],
+  "Divine Swim Jig - 3/8oz - Candy Bluegill": ["https://cdn.shopify.com/s/files/1/2824/3500/products/candy_bluegill_5449165c-e71d-4150-ba9c-10c00fdc2712.jpg", 5.99],
+  "Vega Frog - Black": ["https://cdn.shopify.com/s/files/1/2824/3500/products/image_fcb5ff62-84d1-41df-b78c-301eb0849d16.jpg", 9.99],
+  "Vega Frog - Pickle Breath": ["https://cdn.shopify.com/s/files/1/2824/3500/products/image_59f63ec5-5505-40ac-a653-641a9bf2de19.jpg", 9.99],
+  "Vega Frog - Gill Fest": ["https://cdn.shopify.com/s/files/1/2824/3500/products/image_545cea5a-1f9a-4676-b126-88fb2f5cd026.jpg", 9.99],
+  "Vega Hush Frog - Ivory White": ["https://cdn.shopify.com/s/files/1/2824/3500/files/IvoryWhite.png", 9.99],
+  "Vega Hush Frog - Lily Pad": ["https://cdn.shopify.com/s/files/1/2824/3500/files/Frogville.png", 9.99],
+  "Boosa Ribbon Tail 9.6 - Watermelon Red": ["https://cdn.shopify.com/s/files/1/2824/3500/files/WM_RED_PRO.png", 6.99],
+  "Ridge Lizard 5.7 - Watermelon Red": ["https://cdn.shopify.com/s/files/1/2824/3500/files/WatermelonRedPro.png", 5.99],
+  "Ridge Lizard 5.7 - Black N Blue": ["https://cdn.shopify.com/s/files/1/2824/3500/files/BlackNBluePro.png", 5.99],
+  "Ridge Lizard 5.7 - Junebug Red": ["https://cdn.shopify.com/s/files/1/2824/3500/files/JunebugRed.png", 5.99],
+  "Ridge Lizard 5.7 - Green Pumpkin Pro": ["https://cdn.shopify.com/s/files/1/2824/3500/files/GreenPumpkinPro_83375574-8da9-48ac-b341-e83440f0eeea.png", 5.99],
+  "Ridge Lizard 5.7 - Plum Bug": ["https://cdn.shopify.com/s/files/1/2824/3500/files/PlumBug_6bfe18f3-8449-466f-9706-b319e870289d.png", 5.99],
+  "Ridge Lizard 5.7 - Watermelon Candy Magic": ["https://cdn.shopify.com/s/files/1/2824/3500/files/WatermelonCandyMagic_a83f22ae-8e11-4a16-af2e-40788c062510.png", 5.99],
+  "Ridge Lizard 5.7 - BlackOut": ["https://cdn.shopify.com/s/files/1/2824/3500/files/Blackout.png", 5.99],
+  "Ridge Lizard 5.7 - PB&J Pro": ["https://cdn.shopify.com/s/files/1/2824/3500/files/PB_JPro.png", 3.88],
+  "Duke 55 - Chrome Black Back": ["https://cdn.shopify.com/s/files/1/2824/3500/files/CHBB.png", 9.99],
+  "Duke 65 - Boiled Crawfish": ["https://cdn.shopify.com/s/files/1/2824/3500/products/Duke-BoiledCrawfish.jpg", 9.99],
+  "Duke 65 - Brown Eye": ["https://cdn.shopify.com/s/files/1/2824/3500/products/Duke-Browneye.jpg", 9.99],
+  "Duke 55 - Rambo Red": ["https://cdn.shopify.com/s/files/1/2824/3500/products/Duke-RamboRed.jpg", 9.99],
+  "Boosa Ribbon Tail 9.6 - Plum Dawn": ["https://cdn.shopify.com/s/files/1/2824/3500/files/plumdawn_5529cb8b-5f6c-47c9-a279-e395f1aaa69a.png", 4.99],
+  "Boosa Ribbon Tail 9.6 - Blue Fleck Magic": ["https://cdn.shopify.com/s/files/1/2824/3500/files/BLUE_FLECK_MAGIC_0ab9f861-5204-4d32-90a0-8bafa2fa85dd.png", 6.99],
+  "Boosa Ribbon Tail 9.6 - Junebug Juice": ["https://cdn.shopify.com/s/files/1/2824/3500/files/JUNEBUGJUICE_3812ace7-72f6-4112-9ee4-2d02433213fc.png", 4.99],
+  "Boosa Ribbon Tail 9.6 - Plum Bug": ["https://cdn.shopify.com/s/files/1/2824/3500/files/PLUMBUG.png", 4.99],
+  "Hogwalla - Green Pumpkin Pro": ["https://cdn.shopify.com/s/files/1/2824/3500/files/GreenPumpkinPro_5.jpg", 5.99],
+  "Hogwalla 5.8 - Junebug Red": ["https://cdn.shopify.com/s/files/1/2824/3500/products/Hogwalla-JunebugRed.jpg", 5.99],
+  "Hogwalla 5.8 - Plum Bug": ["https://cdn.shopify.com/s/files/1/2824/3500/products/Hogwalla-PlumBug.jpg", 5.99],
+  "Hogwalla 5.8 - Watermelon Candy Magic": ["https://cdn.shopify.com/s/files/1/2824/3500/products/Hogwalla-WatermelonCandyMagic.jpg", 5.99],
+  "Hogwalla 5.8 - Watermelon Gill": ["https://cdn.shopify.com/s/files/1/2824/3500/products/Hogwalla-WatermelonGill.jpg", 5.99],
+  "Hogwalla 5.8 - Black N Blue Pro": ["https://cdn.shopify.com/s/files/1/2824/3500/files/frontandback_1.png", 5.99],
+  "NedFry 4.6 - Chartreuse Pepper": ["https://cdn.shopify.com/s/files/1/2824/3500/products/nedfry-ChartreusePepper.jpg", 5.99],
+  "NedFry 4.6 - Bluegrass Magic": ["https://cdn.shopify.com/s/files/1/2824/3500/products/NF46-BGMC.jpg", 5.99],
+  "NedFry 4.6 - Plum Fleck": ["https://cdn.shopify.com/s/files/1/2824/3500/products/NF46-PF.jpg", 5.99],
+  "Quake 80 Suspending - 4K Bluegill - DC": ["https://cdn.shopify.com/s/files/1/2824/3500/products/q70-4k_shad_10f03349-e77f-43df-a4ef-73177fe04853.jpg", 7.99],
+  "SplashBack 70 - Bluegill Fire": ["https://cdn.shopify.com/s/files/1/2824/3500/products/SB70-BGF_3c5b571c-116b-4c0a-9289-efd252568f67.jpg", 9.99],
+  "SplashBack 70 - Ghost Bone Minnow": ["https://cdn.shopify.com/s/files/1/2824/3500/products/SB70-Ghost_Bone_Minnow_0b362509-7e50-4222-8fe9-f8ec57c8b95f.jpg", 9.99],
+  "Crappie Strobe 2.1 - 4K Shad": ["https://cdn.shopify.com/s/files/1/2824/3500/files/GREEN_SHINER_548f3d52-c133-423e-bdd0-e3e1997e8692.png", 7.99],
+  "Crappie Strobe 2.1 - Pro Blue": ["https://cdn.shopify.com/s/files/1/2824/3500/files/Pro_Blue.png", 7.99],
+  "Crappie Strobe 2.1 - Smoke Flash": ["https://cdn.shopify.com/s/files/1/2824/3500/files/Smoke_Flash_1.png", 7.99],
+  "Strobe Minnow 3.2 - Live Minnow": ["https://cdn.shopify.com/s/files/1/2824/3500/files/Live_Minnow.png", 9.99],
+  "Strobe Minnow 3.2 - Log Perch": ["https://cdn.shopify.com/s/files/1/2824/3500/files/STROBEMINNOW_LOGPERCH.png", 9.99],
+  "Strobe Minnow 3.2 - Olive Flash": ["https://cdn.shopify.com/s/files/1/2824/3500/files/Olive_Flash_1.png", 8.99],
+  "Pressure Series - PD7 - Blue-Treuse Shad": ["https://cdn.shopify.com/s/files/1/2824/3500/files/MatteNatural.jpg", 9.99],
+  "Pressure Series - PD7 - Brown Eye": ["https://cdn.shopify.com/s/files/1/2824/3500/files/MatteNatural.jpg", 9.99],
+  "Pressure Series - PD7 - Citrus 6": ["https://cdn.shopify.com/s/files/1/2824/3500/files/MatteNatural.jpg", 9.99],
+  "Pressure Series - PD4 - Ghost Pro Blue - DC": ["https://cdn.shopify.com/s/files/1/2824/3500/files/MatteNatural.jpg", 9.99],
+  "Pressure Series - PD7 - Green Threadfin": ["https://cdn.shopify.com/s/files/1/2824/3500/files/MatteNatural.jpg", 9.99],
+  "Pressure Series - PD4 - Morning Dawn": ["https://cdn.shopify.com/s/files/1/2824/3500/files/MatteNatural.jpg", 9.99],
+  "Jugular Hook - 1/0 (5 pk)": ["https://cdn.shopify.com/s/files/1/2824/3500/products/Jugular_Hook_PIXELZ.jpg", 3.99],
+  "Jugular Hook - 2/0 (5 pk)": ["https://cdn.shopify.com/s/files/1/2824/3500/products/Jugular_Hook_PIXELZ.jpg", 3.99],
+  "JUGULAR Hybrid Hooks - 3/0 (5 pk)": ["https://cdn.shopify.com/s/files/1/2824/3500/products/Jugular_Hook_PIXELZ.jpg", 3.99],
+  "JUGULAR Hybrid Hooks - 4/0 (5 pk)": ["https://cdn.shopify.com/s/files/1/2824/3500/products/Jugular_Hook_PIXELZ.jpg", 3.99],
+  "JUGULAR Hybrid Hooks - 5/0 (5 pk)": ["https://cdn.shopify.com/s/files/1/2824/3500/products/Jugular_Hook_PIXELZ.jpg", 3.99],
+  "Catfish Hook - 2/0 (5 pk)": ["https://cdn.shopify.com/s/files/1/2824/3500/products/CATFISHHOOKSv1.png", 3.99],
+  "Catfish Hook - 3/0 (5 pk)": ["https://cdn.shopify.com/s/files/1/2824/3500/products/CATFISHHOOKSv1.png", 3.99],
+  "Catfish Hook - 4/0 (5 pk)": ["https://cdn.shopify.com/s/files/1/2824/3500/products/CATFISHHOOKSv1.png", 3.99],
+  "Catfish Hook - 5/0 (5 pk)": ["https://cdn.shopify.com/s/files/1/2824/3500/products/CATFISHHOOKSv1.png", 3.99],
+  "Catfish Hook - 6/0 (5 pk)": ["https://cdn.shopify.com/s/files/1/2824/3500/products/CATFISHHOOKSv1.png", 3.99],
+  "Live Minnow Hook - 4 (8 pk)": ["https://cdn.shopify.com/s/files/1/2824/3500/products/LIVEBAITMINNOWv1.png", 3.99],
+  "Live Minnow Hook - 6 (8 pk)": ["https://cdn.shopify.com/s/files/1/2824/3500/products/LIVEBAITMINNOWv1.png", 3.99],
+  "Lead Split Shot Weights - 1/4oz - Raw": ["https://cdn.shopify.com/s/files/1/2824/3500/files/splitshotweight.png", 3.49],
+  "Lead Split Shot Weights - 1/8oz - Raw": ["https://cdn.shopify.com/s/files/1/2824/3500/files/splitshotweight.png", 3.49],
+  "Lead Split Shot Weights - 5/32oz - Raw": ["https://cdn.shopify.com/s/files/1/2824/3500/files/splitshotweight.png", 3.49],
+  "Lead Worm Weight - 1/8oz - Raw": ["https://cdn.shopify.com/s/files/1/2824/3500/products/leadwormweight.png", 3.99],
+  "Lead Worm Weight - 3/16oz - Raw": ["https://cdn.shopify.com/s/files/1/2824/3500/products/leadwormweight.png", 3.99],
+  "Lead Worm Weight - 1/4oz - Raw": ["https://cdn.shopify.com/s/files/1/2824/3500/products/leadwormweight.png", 3.99],
+  "Bluegill & Sunfish Hook - 12 (8 pk)": ["https://cdn.shopify.com/s/files/1/2824/3500/products/BLUEGILLSUNFISHv1.png", 3.99],
+  "Pecos Underspin Jighead - Willow Version - Black Neon": ["https://cdn.shopify.com/s/files/1/2824/3500/files/RoyalMinnow_1.png", 4.99],
+  "Pecos Underspin Jighead - Willow Version - Black Rose": ["https://cdn.shopify.com/s/files/1/2824/3500/files/RoyalMinnow_1.png", 4.99],
+  "Pecos Underspin Jighead - Willow Version - Pro Chicken": ["https://cdn.shopify.com/s/files/1/2824/3500/files/RoyalMinnow_1.png", 4.99],
+  "Pecos Underspin Jighead - Willow Version - Pro Shad": ["https://cdn.shopify.com/s/files/1/2824/3500/files/RoyalMinnow_1.png", 4.99],
+  "Pecos Underspin Jighead - Willow Version - Royal Minnow": ["https://cdn.shopify.com/s/files/1/2824/3500/files/RoyalMinnow_1.png", 4.99],
+  "Juggle Head - 3/8oz - 2/0 - 4K Shad": ["https://cdn.shopify.com/s/files/1/2824/3500/files/raw_21c76d1e-4c4c-4a98-9390-e1cafbefb21e.png", 5.99],
+  "Juggle Head - 5/16oz - 1/0 - 4K Shad": ["https://cdn.shopify.com/s/files/1/2824/3500/files/raw_21c76d1e-4c4c-4a98-9390-e1cafbefb21e.png", 5.99],
+  "Juggle Head - 5/16oz - 1/0 Raw": ["https://cdn.shopify.com/s/files/1/2824/3500/files/raw_21c76d1e-4c4c-4a98-9390-e1cafbefb21e.png", 5.99],
+  "Juggle Head - 3/8oz - 2/0 - Raw": ["https://cdn.shopify.com/s/files/1/2824/3500/files/raw_21c76d1e-4c4c-4a98-9390-e1cafbefb21e.png", 5.99],
+  "Juggle Head - 5/16oz - 1/0 - American Shad": ["https://cdn.shopify.com/s/files/1/2824/3500/files/americanshad.png", 5.99],
+  "Juggle Head - 3/8oz - 2/0 - American Shad": ["https://cdn.shopify.com/s/files/1/2824/3500/files/americanshad.png", 5.99],
+  "Juggle Head - 5/16oz - 1/ 0 - Smoke 6": ["https://cdn.shopify.com/s/files/1/2824/3500/files/smoke6_ed191091-0868-475c-816e-0f828335721a.png", 5.99],
+  "Juggle Head - 3/8oz - 2/0 - Smoke 6": ["https://cdn.shopify.com/s/files/1/2824/3500/files/smoke6_ed191091-0868-475c-816e-0f828335721a.png", 5.99],
+  "Finesse Minnow Jighead - 3/ 8oz 2/0 - 3PK - Gizzard Flash": ["https://cdn.shopify.com/s/files/1/2824/3500/files/GizzardFlash_9608ecbe-863d-4111-830a-685711cc023c.png", 5.99],
+  "Finesse Minnow Jighead - 5/ 16oz 1/0 - 3PK - Gizzard Flash": ["https://cdn.shopify.com/s/files/1/2824/3500/files/GizzardFlash_9608ecbe-863d-4111-830a-685711cc023c.png", 5.99],
+  "Finesse Minnow Jighead - 3/ 8oz 2/0 - 3PK - Pro Green Shad": ["https://cdn.shopify.com/s/files/1/2824/3500/files/ProGreenShad.png", 5.99],
+  "Finesse Minnow Jighead - 5/ 16oz 1/0 - 3PK - Pro Green Shad": ["https://cdn.shopify.com/s/files/1/2824/3500/files/ProGreenShad.png", 5.99],
+  "Finesse Minnow Jighead - 3/ 8oz 2/0 - 3PK - Smoke 6": ["https://cdn.shopify.com/s/files/1/2824/3500/files/Smoke6_1.png", 5.99],
+  "Finesse Minnow Jighead - 5/16oz 1/0 - 3PK - Smoke 6": ["https://cdn.shopify.com/s/files/1/2824/3500/files/Smoke6_1.png", 5.99],
+  "6th Sense Hat - 6HAT-633": ["https://cdn.shopify.com/s/files/1/2824/3500/files/THERMALHOGSOBROHATCASES.png", 39.99],
+  "6th Sense Hat - 6HAT-648": ["https://cdn.shopify.com/s/files/1/2824/3500/files/THERMALHOGSOBROHATCASES.png", 39.99],
+  "6th Sense Hat - 6HAT-630": ["https://cdn.shopify.com/s/files/1/2824/3500/files/THERMALHOGSOBROHATCASES.png", 39.99],
+};
+function resolveImage(name) { const d = PRODUCT_DATA[name]; return d ? d[0] : null; }
+function resolvePrice(name) { const d = PRODUCT_DATA[name]; return d ? d[1] : null; }
 
 async function loadProducts(retries = 3) {
   for (let attempt = 1; attempt <= retries; attempt++) {
@@ -3312,30 +3236,25 @@ async function loadProducts(retries = 3) {
         }
       });
       products = allProducts;
-      // Auto-resolve images and prices in the background (non-blocking)
+      // Auto-resolve images and prices from hardcoded data (instant, no async needed)
       const needsImages = allProducts.some(p => !p.imageUrl);
       const needsPrices = allProducts.some(p => !p.price || p.price === 0);
       if (needsImages || needsPrices) {
-        const tasks = [];
-        if (needsImages) tasks.push(buildClientImageCache());
-        if (needsPrices) tasks.push(buildClientPriceCache());
-        Promise.all(tasks).then(() => {
-          let imgResolved = 0, priceResolved = 0;
-          allProducts.forEach(p => {
-            if (!p.imageUrl) {
-              const url = resolveImage(p.name);
-              if (url) { p.imageUrl = url; imgResolved++; }
-            }
-            if (!p.price || p.price === 0) {
-              const price = resolvePrice(p.name);
-              if (price) { p.price = price; priceResolved++; }
-            }
-          });
-          if (imgResolved > 0 || priceResolved > 0) {
-            console.log('Resolved ' + imgResolved + ' images, ' + priceResolved + ' prices');
-            displayProducts(currentCategory === 'All' ? allProducts : allProducts.filter(pp => pp.category === currentCategory));
+        let imgResolved = 0, priceResolved = 0;
+        allProducts.forEach(p => {
+          if (!p.imageUrl) {
+            const url = resolveImage(p.name);
+            if (url) { p.imageUrl = url; imgResolved++; }
+          }
+          if (!p.price || p.price === 0) {
+            const price = resolvePrice(p.name);
+            if (price) { p.price = price; priceResolved++; }
           }
         });
+        if (imgResolved > 0 || priceResolved > 0) {
+          console.log('Resolved ' + imgResolved + ' images, ' + priceResolved + ' prices from hardcoded data');
+          displayProducts(currentCategory === 'All' ? allProducts : allProducts.filter(pp => pp.category === currentCategory));
+        }
       }
       return;
     } catch (error) {

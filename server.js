@@ -326,6 +326,9 @@ function resolveProductImage(productName) {
 
 // ─── Sync products from Clover ──────────────────────────
 async function syncFromClover() {
+  // DATA PROTECTION: This sync ONLY adds new products and updates stock counts.
+  // It NEVER overwrites: images, prices, categories, or names of existing products.
+  // These fields are resolved from manufacturer websites and must not be touched.
   console.log('\n🔄 Starting Clover sync...');
   const startTime = Date.now();
 
@@ -454,9 +457,10 @@ async function syncFromClover() {
 
       // Update fields from Clover ONLY if not manually edited
       existing.cloverId = item.id;
-      if (!manualEdits.name) existing.name = item.name;
+      // Never overwrite product names — they are the key for image/price matching
+      // if (!manualEdits.name) existing.name = item.name;
       existing.sku = item.sku || existing.sku;
-      if (!manualEdits.price) {
+      if (!manualEdits.price && (!existing.price || existing.price === 0)) {
         existing.price = salePrice || priceInDollars;
         existing.original = salePrice ? priceInDollars : null;
       }
@@ -476,18 +480,16 @@ async function syncFromClover() {
         existing.brand = cloverBrand;
       }
 
-      // Handle category change from Clover
-      if (categoryKey !== oldCatKey) {
-        // Move to new category
+      // Only move if the product was in "general" (uncategorized) — NEVER move already-categorized products
+      if (categoryKey !== oldCatKey && oldCatKey === 'general') {
         products[oldCatKey] = (products[oldCatKey] || []).filter(p => p.id !== existing.id);
         if (products[oldCatKey] && products[oldCatKey].length === 0) delete products[oldCatKey];
         existing.cloverCategory = categoryDisplayName;
         existing.icon = getCategoryIcon(categoryDisplayName);
         if (!products[categoryKey]) products[categoryKey] = [];
         products[categoryKey].push(existing);
-      } else {
-        existing.cloverCategory = categoryDisplayName;
       }
+      // Don't update cloverCategory for already-categorized products
 
       updatedCount++;
     } else {

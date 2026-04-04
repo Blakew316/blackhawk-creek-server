@@ -1557,135 +1557,141 @@
   .checkout-section {
     background: white;
     border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 20px;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
   }
   .checkout-section-title {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: #111827;
-    margin: 0 0 18px;
+    margin: 0 0 14px;
     padding-bottom: 0;
     border-bottom: none;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
   .checkout-section-title .section-num {
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
     background: var(--color-olive);
     color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     flex-shrink: 0;
   }
   .checkout-field {
-    margin-bottom: 14px;
+    margin-bottom: 10px;
     flex: 1;
   }
   .checkout-field label {
     display: block;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
-    color: #374151;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
+    color: #6b7280;
+    margin-bottom: 3px;
+    letter-spacing: 0.2px;
   }
   .checkout-field input,
   .checkout-field select {
     width: 100%;
-    padding: 12px 14px;
-    border: 1.5px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 14px;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
     font-family: inherit;
     color: #111827;
     background: white;
     transition: border-color 0.15s, box-shadow 0.15s;
     box-sizing: border-box;
+    height: 36px;
   }
   .checkout-field input:focus,
   .checkout-field select:focus {
     outline: none;
     border-color: var(--color-olive);
-    box-shadow: 0 0 0 3px rgba(61,74,47,0.1);
+    box-shadow: 0 0 0 2px rgba(61,74,47,0.08);
+  }
+  .checkout-field input::placeholder {
+    color: #c0c4cc;
+    font-size: 12px;
   }
   .checkout-row {
     display: flex;
-    gap: 12px;
+    gap: 10px;
   }
 
   /* Clover iframe fields */
   .clover-iframe-field {
-    border: 1.5px solid #d1d5db;
-    border-radius: 8px;
-    padding: 2px;
-    min-height: 44px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 1px 2px;
+    min-height: 36px;
     background: white;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     transition: border-color 0.15s, box-shadow 0.15s;
   }
   .clover-iframe-field.focused {
     border-color: var(--color-olive);
-    box-shadow: 0 0 0 3px rgba(61,74,47,0.1);
+    box-shadow: 0 0 0 2px rgba(61,74,47,0.08);
   }
   .clover-iframe-field.error {
     border-color: #dc2626;
-    box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+    box-shadow: 0 0 0 2px rgba(220,38,38,0.08);
   }
   .clover-iframe-field iframe {
     width: 100% !important;
-    height: 40px !important;
+    height: 34px !important;
   }
 
   .payment-card-wrap {
-    background: #fafafa;
+    background: #f9fafb;
     border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 18px;
+    border-radius: 8px;
+    padding: 14px;
   }
   .payment-card-icons {
     display: flex;
-    gap: 8px;
-    margin-bottom: 14px;
+    gap: 6px;
+    margin-bottom: 12px;
+    align-items: center;
   }
   .card-icon {
-    width: 42px;
-    height: 28px;
-    border-radius: 4px;
-    border: 1px solid #e5e7eb;
+    height: 26px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    background: white;
+    border-radius: 4px;
     overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   }
-  .card-icon svg { width: 34px; height: 22px; }
+  .card-icon svg {
+    height: 26px;
+    width: auto;
+    display: block;
+  }
 
   .place-order-btn {
     width: 100%;
-    padding: 16px;
+    padding: 13px;
     background: var(--color-olive);
     color: white;
     border: none;
-    border-radius: 10px;
-    font-size: 16px;
+    border-radius: 8px;
+    font-size: 15px;
     font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     transition: background 0.15s, transform 0.1s;
     font-family: inherit;
-    margin-top: 20px;
+    margin-top: 16px;
   }
   .place-order-btn:hover { background: #4a5638; transform: translateY(-1px); }
   .place-order-btn:active { transform: translateY(0); }
@@ -1734,8 +1740,8 @@
   .checkout-summary-card {
     background: white;
     border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 24px;
+    border-radius: 10px;
+    padding: 20px;
     position: sticky;
     top: 20px;
   }
@@ -2370,17 +2376,43 @@
           <h3 class="checkout-section-title"><span class="section-num">3</span> Payment</h3>
           <div class="payment-card-wrap">
             <div class="payment-card-icons">
+              <!-- Visa -->
               <span class="card-icon" title="Visa">
-                <svg viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="32" rx="4" fill="#1A1F71"/><path d="M20.3 21.2h-2.8l1.7-10.4h2.8L20.3 21.2zm11.6-10.1c-.6-.2-1.4-.4-2.5-.4-2.8 0-4.7 1.4-4.7 3.5 0 1.5 1.4 2.3 2.5 2.8 1.1.5 1.5.9 1.5 1.3 0 .7-.9 1-1.7 1-1.1 0-1.8-.2-2.7-.6l-.4-.2-.4 2.4c.7.3 1.9.6 3.2.6 2.9 0 4.8-1.4 4.9-3.6 0-1.2-.7-2.1-2.4-2.9-1-.5-1.6-.8-1.6-1.3 0-.4.5-.9 1.6-.9.9 0 1.6.2 2.1.4l.3.1.4-2.2zm7.1 0h-2.2c-.7 0-1.2.2-1.5.9l-4.2 9.6h2.9l.6-1.6h3.6l.3 1.6h2.6L37 11.1zm-3.5 6.7l1.5-3.8.4-1.1.2 1 .9 3.9h-3zm-20.8-6.7l-2.6 7.1-.3-1.4c-.5-1.6-2-3.4-3.7-4.3l2.5 9h3l4.5-10.4h-3.4z" fill="#fff"/><path d="M13.3 10.8H9l-.1.3c3.5.9 5.9 3 6.8 5.5l-1-4.8c-.2-.7-.7-.9-1.4-1z" fill="#F9A533"/></svg>
+                <svg viewBox="0 0 750 471" xmlns="http://www.w3.org/2000/svg" style="height:20px;width:auto;">
+                  <rect width="750" height="471" rx="40" fill="#1A1F71"/>
+                  <path d="M278.2 334.2h-60.6l37.9-233.9h60.6L278.2 334.2z" fill="#fff"/>
+                  <path d="M524.3 105.6c-12-4.6-30.7-9.5-54.1-9.5-59.6 0-101.6 31.6-101.9 76.9-.4 33.5 29.9 52.2 52.8 63.3 23.4 11.4 31.3 18.7 31.2 28.9-.2 15.6-18.7 22.7-36 22.7-24.1 0-36.9-3.5-56.6-12.2l-7.8-3.7-8.4 52c14.1 6.5 40 12.1 66.9 12.4 63.4 0 104.6-31.3 105.1-79.6.3-26.5-15.8-46.7-50.6-63.3-21-10.8-33.9-17.9-33.8-28.8 0-9.6 10.9-19.9 34.5-19.9 19.7-.3 33.9 4.2 45-8.9l7.3-3.4 8.4-50.8z" fill="#fff"/>
+                  <path d="M661.6 100.3h-46.6c-14.4 0-25.2 4.2-31.6 19.3L486 334.2h63.4l12.7-34.8h77.4l7.3 34.8H704L661.6 100.3zm-74.7 169.6c5-13.5 24.2-65.6 24.2-65.6-.4.6 5-13.6 8-22.4l4.1 20.2 14 67.8h-50.3z" fill="#fff"/>
+                  <path d="M232.8 100.3l-59.1 159.4-6.3-32.2c-11-37.2-45.2-77.5-83.5-97.7l54 203.3h63.9l95.1-232.8h-64.1z" fill="#fff"/>
+                  <path d="M131.9 100.3H37.2l-.8 4.7C113 121.6 164 161.5 183.4 210.2L163.8 120c-3.4-14.8-14-19.2-31.9-19.7z" fill="#F9A533"/>
+                </svg>
               </span>
+              <!-- Mastercard -->
               <span class="card-icon" title="Mastercard">
-                <svg viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="32" rx="4" fill="#252525"/><circle cx="19" cy="16" r="8" fill="#EB001B"/><circle cx="29" cy="16" r="8" fill="#F79E1B"/><path d="M24 10.3a8 8 0 0 1 3 5.7 8 8 0 0 1-3 5.7 8 8 0 0 1-3-5.7 8 8 0 0 1 3-5.7z" fill="#FF5F00"/></svg>
+                <svg viewBox="0 0 750 471" xmlns="http://www.w3.org/2000/svg" style="height:20px;width:auto;">
+                  <rect width="750" height="471" rx="40" fill="#000"/>
+                  <circle cx="299" cy="235.5" r="140" fill="#EB001B"/>
+                  <circle cx="451" cy="235.5" r="140" fill="#F79E1B"/>
+                  <path d="M375 130.7a140 140 0 0 0-52 104.8 140 140 0 0 0 52 104.8 140 140 0 0 0 52-104.8 140 140 0 0 0-52-104.8z" fill="#FF5F00"/>
+                </svg>
               </span>
+              <!-- Amex -->
               <span class="card-icon" title="American Express">
-                <svg viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="32" rx="4" fill="#006FCF"/><path d="M7 15l2.5-5.5h3l1.4 3.2 1.4-3.2h3L20.8 15l-2.5 5.5h-2.8l-1.5-3.4-1.5 3.4H9.7L7 15zm17.5-5.5h8.3l1.4 1.7 1.5-1.7h3l-3.2 3.5 3.2 3.5-3.2-3.5-3.2 3.5h-3l-1.5-1.7-1.4 1.7h-2.8l3-3.5-3-3.5zm1.2 2h5.6m-5.6 3h5.6" stroke="#fff" stroke-width="0.5" fill="none"/><text x="24" y="18" text-anchor="middle" fill="white" font-family="sans-serif" font-size="6.5" font-weight="700">AMEX</text></svg>
+                <svg viewBox="0 0 750 471" xmlns="http://www.w3.org/2000/svg" style="height:20px;width:auto;">
+                  <rect width="750" height="471" rx="40" fill="#2E77BC"/>
+                  <text x="375" y="260" text-anchor="middle" fill="white" font-family="Arial,Helvetica,sans-serif" font-size="100" font-weight="700" letter-spacing="2">AMEX</text>
+                  <text x="375" y="330" text-anchor="middle" fill="white" font-family="Arial,Helvetica,sans-serif" font-size="42" letter-spacing="4">AMERICAN EXPRESS</text>
+                </svg>
               </span>
+              <!-- Discover -->
               <span class="card-icon" title="Discover">
-                <svg viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="32" rx="4" fill="#fff"/><path d="M0 20c12 4 36 4 48 0v8a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4v-8z" fill="#F48120"/><circle cx="28" cy="16" r="5" fill="#F48120"/><text x="14" y="18" fill="#231F20" font-family="sans-serif" font-size="6" font-weight="700">DISC</text><text x="34" y="18" fill="#231F20" font-family="sans-serif" font-size="5" font-weight="600">VER</text></svg>
+                <svg viewBox="0 0 750 471" xmlns="http://www.w3.org/2000/svg" style="height:20px;width:auto;">
+                  <rect width="750" height="471" rx="40" fill="#fff" stroke="#ddd" stroke-width="2"/>
+                  <path d="M0 280C180 380 570 380 750 280V471H0z" fill="#F47216"/>
+                  <circle cx="462" cy="235" r="75" fill="#F47216"/>
+                  <text x="300" y="250" text-anchor="middle" fill="#231F20" font-family="Arial,Helvetica,sans-serif" font-size="90" font-weight="700">DISC</text>
+                  <text x="580" y="250" text-anchor="middle" fill="#231F20" font-family="Arial,Helvetica,sans-serif" font-size="90" font-weight="700">VER</text>
+                </svg>
               </span>
             </div>
             <!-- Clover iframe tokenizer mounts here -->

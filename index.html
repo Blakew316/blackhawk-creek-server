@@ -2008,7 +2008,7 @@ function submitAdminPassword() {
 }
 
 function goToBackoffice() {
-  document.getElementById('storefront').classList.remove('active');
+  document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
   document.getElementById('backoffice').classList.add('active');
   loadInventoryTable();
 }

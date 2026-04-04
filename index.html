@@ -1490,8 +1490,12 @@
     </div>
 
     <div id="inventoryTab">
-      <div class="backoffice-header">
-        <h1 class="backoffice-title">Inventory Management</h1>
+      <div class="backoffice-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <h1 class="backoffice-title" style="margin: 0;">Inventory Management</h1>
+        <div style="display: flex; gap: 8px;">
+          <button onclick="exportProducts('csv')" style="padding: 8px 16px; background: #3d4a2f; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">&#x2913; Export CSV</button>
+          <button onclick="exportProducts('json')" style="padding: 8px 16px; background: #555; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">&#x2913; Export JSON</button>
+        </div>
       </div>
       <table class="inventory-table" id="inventoryTable">
         <thead>
@@ -1637,6 +1641,65 @@
     <div class="modal-footer">
       <button class="modal-button primary" onclick="submitAdminPassword()">Login</button>
       <button class="modal-button secondary" onclick="closeAdminModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT PRODUCT MODAL -->
+<div class="modal" id="editProductModal">
+  <div class="modal-content" style="max-width: 520px;">
+    <button class="modal-close" onclick="closeEditModal()">&times;</button>
+    <div class="modal-header">Edit Product</div>
+    <div class="modal-body" style="padding: 0;">
+      <form id="editProductForm" onsubmit="saveProductEdit(event)" style="display: flex; flex-direction: column; gap: 16px;">
+        <input type="hidden" id="editProductId">
+
+        <!-- Image preview + upload -->
+        <div style="text-align: center;">
+          <div id="editImagePreview" style="width: 120px; height: 120px; margin: 0 auto 10px; border-radius: 8px; overflow: hidden; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border: 2px dashed #ccc; cursor: pointer;" onclick="document.getElementById('editImageInput').click()">
+            <span id="editImagePlaceholder" style="color: #999; font-size: 12px;">Click to upload</span>
+          </div>
+          <input type="file" id="editImageInput" accept="image/*" style="display: none;" onchange="previewEditImage(event)">
+          <button type="button" onclick="document.getElementById('editImageInput').click()" style="background: none; border: 1px solid #ccc; padding: 6px 14px; border-radius: 6px; font-size: 12px; color: #555; cursor: pointer;">Change Image</button>
+        </div>
+
+        <!-- Product Name -->
+        <div>
+          <label style="display: block; font-weight: 600; margin-bottom: 4px; color: #333; font-size: 13px;">Product Name</label>
+          <input type="text" id="editProductName" required style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+        </div>
+
+        <!-- Brand -->
+        <div>
+          <label style="display: block; font-weight: 600; margin-bottom: 4px; color: #333; font-size: 13px;">Brand</label>
+          <input type="text" id="editProductBrand" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+        </div>
+
+        <!-- Price & Stock side by side -->
+        <div style="display: flex; gap: 12px;">
+          <div style="flex: 1;">
+            <label style="display: block; font-weight: 600; margin-bottom: 4px; color: #333; font-size: 13px;">Price ($)</label>
+            <input type="number" id="editProductPrice" step="0.01" min="0" required style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+          </div>
+          <div style="flex: 1;">
+            <label style="display: block; font-weight: 600; margin-bottom: 4px; color: #333; font-size: 13px;">Stock Count</label>
+            <input type="number" id="editProductStock" min="0" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+          </div>
+        </div>
+
+        <!-- Category -->
+        <div>
+          <label style="display: block; font-weight: 600; margin-bottom: 4px; color: #333; font-size: 13px;">Category</label>
+          <select id="editProductCategory" style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: white; box-sizing: border-box;">
+            <!-- Options populated dynamically -->
+          </select>
+        </div>
+
+        <div class="modal-footer" style="margin-top: 8px; padding-top: 16px; border-top: 1px solid #eee;">
+          <button type="submit" class="modal-button primary">Save Changes</button>
+          <button type="button" class="modal-button secondary" onclick="closeEditModal()">Cancel</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -2121,40 +2184,124 @@ async function uploadProductImage(productId, base64Data) {
   }
 }
 
+// ============ EDIT PRODUCT MODAL ============
+let editImageData = null; // stores base64 of newly selected image
+
 function editProduct(productId) {
   const product = allProducts.find(p => p.id === productId);
   if (!product) return;
 
-  const newName = prompt('Product Name:', product.name);
-  if (newName === null) return;
-  const newBrand = prompt('Brand:', product.brand || '');
-  if (newBrand === null) return;
-  const newPrice = prompt('Price:', product.price);
-  if (newPrice === null) return;
-  const newStock = prompt('Stock:', product.stockCount || product.stock || 0);
-  if (newStock === null) return;
+  editImageData = null;
 
-  fetch(API_BASE + '/api/products/' + productId, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name: newName,
-      brand: newBrand,
-      price: parseFloat(newPrice),
-      stock: parseInt(newStock)
-    })
-  }).then(res => {
+  // Populate form fields
+  document.getElementById('editProductId').value = product.id;
+  document.getElementById('editProductName').value = product.name || '';
+  document.getElementById('editProductBrand').value = product.brand || '';
+  document.getElementById('editProductPrice').value = product.price || 0;
+  document.getElementById('editProductStock').value = product.stockCount || product.stock || 0;
+
+  // Populate category dropdown
+  const catSelect = document.getElementById('editProductCategory');
+  catSelect.innerHTML = '';
+  const categories = new Set();
+  allProducts.forEach(p => { if (p.category) categories.add(p.category); });
+  // Add common defaults if not present
+  ['Fishing', 'Hunting', 'Outdoor', 'Camping', 'Apparel', 'Archery', 'General'].forEach(c => categories.add(c));
+
+  const sortedCats = Array.from(categories).sort();
+  sortedCats.forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    if (cat === product.category) opt.selected = true;
+    catSelect.appendChild(opt);
+  });
+
+  // Show image preview
+  const previewContainer = document.getElementById('editImagePreview');
+  const placeholder = document.getElementById('editImagePlaceholder');
+  if (product.imageUrl) {
+    previewContainer.innerHTML = '<img src="' + product.imageUrl + '" alt="Product" style="width:100%;height:100%;object-fit:cover;">';
+  } else {
+    previewContainer.innerHTML = '<span id="editImagePlaceholder" style="color:#999;font-size:12px;">Click to upload</span>';
+  }
+
+  document.getElementById('editProductModal').classList.add('active');
+}
+
+function closeEditModal() {
+  document.getElementById('editProductModal').classList.remove('active');
+  editImageData = null;
+}
+
+function previewEditImage(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    editImageData = e.target.result;
+    const previewContainer = document.getElementById('editImagePreview');
+    previewContainer.innerHTML = '<img src="' + editImageData + '" alt="Preview" style="width:100%;height:100%;object-fit:cover;">';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveProductEdit(event) {
+  event.preventDefault();
+
+  const productId = parseInt(document.getElementById('editProductId').value);
+  const payload = {
+    name: document.getElementById('editProductName').value.trim(),
+    brand: document.getElementById('editProductBrand').value.trim(),
+    price: parseFloat(document.getElementById('editProductPrice').value),
+    stock: parseInt(document.getElementById('editProductStock').value) || 0,
+    category: document.getElementById('editProductCategory').value
+  };
+
+  // Include image if a new one was selected
+  if (editImageData) {
+    payload.imageUrl = editImageData;
+  }
+
+  try {
+    const res = await fetch(API_BASE + '/api/products/' + productId, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
     if (res.ok) {
-      alert('Product updated');
-      loadProducts().then(() => {
-        buildNavigation();
-        displayProducts(allProducts);
-        loadInventoryTable();
-      });
+      closeEditModal();
+      await loadProducts();
+      buildNavigation();
+      displayProducts(allProducts);
+      loadInventoryTable();
     } else {
-      alert('Failed to update product');
+      const data = await res.json();
+      alert('Failed to update: ' + (data.error || 'Unknown error'));
     }
-  }).catch(err => alert('Error: ' + err.message));
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}
+
+// ============ EXPORT PRODUCTS ============
+function exportProducts(format) {
+  const url = API_BASE + '/api/products/export' + (format === 'csv' ? '/csv' : '');
+  const filename = 'blackhawk-creek-products.' + format;
+
+  fetch(url)
+    .then(res => res.blob())
+    .then(blob => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    })
+    .catch(err => alert('Export failed: ' + err.message));
 }
 
 async function deleteProduct(productId) {

@@ -1203,34 +1203,180 @@
     background: #ff4444;
   }
 
-  .backoffice-nav {
+  /* Sidebar layout for backoffice */
+  .backoffice-layout {
     display: flex;
-    gap: 16px;
-    margin-bottom: 30px;
+    min-height: 100vh;
   }
 
-  .backoffice-nav button {
-    padding: 10px 20px;
-    background: none;
-    border: 2px solid var(--color-border);
-    color: var(--color-text-dark);
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all var(--transition);
-    font-size: 13px;
+  .backoffice-sidebar {
+    width: 240px;
+    min-width: 240px;
+    background: #1a1f2e;
+    color: #c0c6d4;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 10;
+  }
+
+  .sidebar-brand {
+    padding: 22px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sidebar-brand-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--color-olive);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: white;
+    flex-shrink: 0;
+  }
+  .sidebar-brand-text {
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+  }
+  .sidebar-brand-sub {
+    font-size: 10px;
+    color: #7a8399;
     text-transform: uppercase;
     letter-spacing: 1px;
+    margin-top: 2px;
   }
 
-  .backoffice-nav button.active {
+  .sidebar-section-label {
+    padding: 20px 20px 8px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #5a6378;
+    font-weight: 600;
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 10px;
+  }
+
+  .sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: #9aa0b0;
+    transition: all 0.15s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+  }
+  .sidebar-nav-item:hover {
+    background: rgba(255,255,255,0.06);
+    color: #e0e4ec;
+  }
+  .sidebar-nav-item.active {
+    background: rgba(61,74,47,0.5);
+    color: #ffffff;
+    font-weight: 600;
+  }
+  .sidebar-nav-item .nav-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+  .sidebar-nav-item.active .nav-icon {
+    opacity: 1;
+  }
+  .sidebar-nav-item .nav-label {
+    flex: 1;
+  }
+  .sidebar-nav-item .nav-badge {
     background: var(--color-olive);
     color: white;
-    border-color: var(--color-olive);
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 700;
   }
 
-  .backoffice-nav button:hover {
-    border-color: var(--color-olive);
+  .sidebar-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.06);
+    margin: 8px 16px;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px 10px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .backoffice-main {
+    flex: 1;
+    background: #f4f5f7;
+    padding: 30px;
+    overflow-y: auto;
+    min-height: 100vh;
+  }
+
+  /* Override .backoffice-container to not add extra padding */
+  #backoffice .backoffice-container {
+    max-width: none;
+    padding: 0;
+  }
+
+  @media (max-width: 900px) {
+    .backoffice-layout {
+      flex-direction: column;
+    }
+    .backoffice-sidebar {
+      width: 100%;
+      min-width: unset;
+      height: auto;
+      position: relative;
+      flex-direction: row;
+      overflow-x: auto;
+    }
+    .sidebar-brand { display: none; }
+    .sidebar-section-label { display: none; }
+    .sidebar-divider { display: none; }
+    .sidebar-footer { margin-top: 0; border: none; padding: 4px; }
+    .sidebar-nav {
+      flex-direction: row;
+      padding: 8px;
+      gap: 4px;
+    }
+    .sidebar-nav-item {
+      padding: 8px 12px;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+    .sidebar-nav-item .nav-icon { display: none; }
+    .backoffice-main { padding: 16px; }
   }
 
   /* ===================== SALES DASHBOARD ===================== */
@@ -1571,15 +1717,63 @@
 
 <!-- BACKOFFICE PAGE -->
 <div id="backoffice" class="page">
+  <div class="backoffice-layout">
+    <!-- LEFT SIDEBAR -->
+    <aside class="backoffice-sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-icon">&#127967;</div>
+        <div>
+          <div class="sidebar-brand-text">Blackhawk Creek</div>
+          <div class="sidebar-brand-sub">Admin Dashboard</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section-label">Inventory</div>
+      <nav class="sidebar-nav">
+        <button class="sidebar-nav-item active" onclick="switchBackofficeTab('inventory')">
+          <span class="nav-icon">&#128230;</span>
+          <span class="nav-label">All Products</span>
+          <span class="nav-badge" id="sidebarProductCount">0</span>
+        </button>
+        <button class="sidebar-nav-item" onclick="switchBackofficeTab('add')">
+          <span class="nav-icon">&#10010;</span>
+          <span class="nav-label">Add Product</span>
+        </button>
+        <button class="sidebar-nav-item" onclick="switchBackofficeTab('categories')">
+          <span class="nav-icon">&#128193;</span>
+          <span class="nav-label">Categories</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section-label">Sales</div>
+      <nav class="sidebar-nav">
+        <button class="sidebar-nav-item" onclick="switchBackofficeTab('sales')">
+          <span class="nav-icon">&#128200;</span>
+          <span class="nav-label">Sales & Reports</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section-label">Settings</div>
+      <nav class="sidebar-nav">
+        <button class="sidebar-nav-item" onclick="switchBackofficeTab('sync')">
+          <span class="nav-icon">&#128260;</span>
+          <span class="nav-label">Sync Clover</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="sidebar-nav-item" onclick="goToStorefront()">
+          <span class="nav-icon">&#127968;</span>
+          <span class="nav-label">Back to Store</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- RIGHT CONTENT AREA -->
+    <main class="backoffice-main">
   <div class="backoffice-container">
-    <div class="backoffice-nav">
-      <button class="active" onclick="switchBackofficeTab('inventory')">Inventory</button>
-      <button onclick="switchBackofficeTab('add')">Add Product</button>
-      <button onclick="switchBackofficeTab('categories')">Categories</button>
-      <button onclick="switchBackofficeTab('sales')">Sales & Reports</button>
-      <button onclick="switchBackofficeTab('sync')">Sync Clover</button>
-      <button onclick="goToStorefront()">&larr; Back to Store</button>
-    </div>
 
     <div id="inventoryTab">
       <div class="backoffice-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
@@ -1821,6 +2015,8 @@
         </div>
       </div>
     </div>
+  </div>
+    </main>
   </div>
 </div>
 
@@ -2354,6 +2550,9 @@ function goToBackoffice() {
   document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
   document.getElementById('backoffice').classList.add('active');
   loadInventoryTable();
+  updateSidebarProductCount();
+  // Reset sidebar to inventory tab
+  switchBackofficeTab('inventory');
 }
 
 function goToHomepage() {
@@ -2387,15 +2586,21 @@ function switchBackofficeTab(tab) {
     if (el) el.style.display = t === tab ? 'block' : 'none';
   });
 
-  const tabOrder = ['inventory', 'add', 'categories', 'sales', 'sync'];
-  document.querySelectorAll('.backoffice-nav button').forEach((btn, idx) => {
-    btn.classList.remove('active');
-    if (tabOrder[idx] === tab) btn.classList.add('active');
-  });
+  // Update sidebar active state
+  const tabToIndex = { inventory: 0, add: 1, categories: 2, sales: 3, sync: 4 };
+  document.querySelectorAll('.sidebar-nav-item').forEach(btn => btn.classList.remove('active'));
+  const allNavItems = document.querySelectorAll('.sidebar-nav .sidebar-nav-item');
+  if (allNavItems[tabToIndex[tab]]) allNavItems[tabToIndex[tab]].classList.add('active');
 
   if (tab === 'sync') loadSyncStatus();
   if (tab === 'categories') loadCategoriesTab();
   if (tab === 'sales') loadSalesDashboard();
+  if (tab === 'inventory') updateSidebarProductCount();
+}
+
+function updateSidebarProductCount() {
+  const badge = document.getElementById('sidebarProductCount');
+  if (badge) badge.textContent = allProducts.length;
 }
 
 function loadInventoryTable() {

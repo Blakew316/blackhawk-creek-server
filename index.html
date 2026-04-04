@@ -1774,23 +1774,14 @@
     color: #9ca3af;
     margin-top: 12px;
   }
-  /* Trust badges */
-  .checkout-trust {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid #f0f0f0;
+  /* Hide Clover SDK injected branding */
+  .clover-footer,
+  [class*="clover-brand"],
+  [class*="clover-footer"],
+  [class*="powered-by"],
+  .clover-iframe-field + div:not(.checkout-row):not(.checkout-field) {
+    display: none !important;
   }
-  .trust-badge {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 11px;
-    color: #9ca3af;
-  }
-  .trust-badge svg { width: 14px; height: 14px; color: #059669; }
 
   .back-to-cart-btn {
     display: flex;
@@ -2194,7 +2185,7 @@
       </div>
     </div>
     <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="Search products...">
+      <input type="text" id="searchInput" placeholder="Search products..." oninput="performSearch()" onkeydown="if(event.key==='Enter'){event.preventDefault();performSearch();}">
       <button onclick="performSearch()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
     </div>
     <div class="header-actions">
@@ -2477,21 +2468,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           <span id="placeOrderText">Place Order</span>
         </button>
-        <p class="checkout-disclaimer">Your payment is processed securely by Clover. We never store your card details.</p>
-        <div class="checkout-trust">
-          <div class="trust-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            SSL Encrypted
-          </div>
-          <div class="trust-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            PCI Compliant
-          </div>
-          <div class="trust-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            Secure Payments
-          </div>
-        </div>
+        <p class="checkout-disclaimer">Your payment is encrypted and secure. We never store your card details.</p>
       </div>
 
       <!-- RIGHT: Order Summary -->
@@ -3633,7 +3610,7 @@ function finishCheckout() {
 
 // ============ SEARCH & FILTER ============
 function performSearch() {
-  const query = document.getElementById('searchInput').value.toLowerCase();
+  const query = document.getElementById('searchInput').value.toLowerCase().trim();
   if (!query) {
     displayProducts(allProducts);
     return;
@@ -3641,9 +3618,18 @@ function performSearch() {
   const filtered = allProducts.filter(p =>
     p.name.toLowerCase().includes(query) ||
     (p.brand && p.brand.toLowerCase().includes(query)) ||
-    (p.category && p.category.toLowerCase().includes(query))
+    (p.category && p.category.toLowerCase().includes(query)) ||
+    (p.sku && p.sku.toLowerCase().includes(query))
   );
   displayProducts(filtered);
+  // Make sure we're on the storefront and scroll to results
+  const storefront = document.getElementById('storefront');
+  if (storefront && !storefront.classList.contains('active')) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    storefront.classList.add('active');
+  }
+  const productsSection = document.querySelector('.products-section');
+  if (productsSection) productsSection.scrollIntoView({ behavior: 'smooth' });
 }
 
 function scrollToProducts() {

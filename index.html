@@ -234,7 +234,7 @@
   .hero-home {
     position: relative;
     height: 600px;
-    background: url('https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1920&q=80&auto=format') center center / cover no-repeat;
+    background: #1a2612;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -244,14 +244,30 @@
     color: var(--color-cream);
     padding: 60px 40px;
   }
+  .hero-home .hero-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+  .hero-home .hero-poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
   .hero-home::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, rgba(29,29,29,0.55) 0%, rgba(61,74,47,0.65) 100%);
+    background: linear-gradient(to bottom, rgba(29,29,29,0.5) 0%, rgba(61,74,47,0.6) 100%);
     z-index: 1;
   }
-  .hero-home * { position: relative; z-index: 2; }
+  .hero-home h1, .hero-home .hero-tagline, .hero-home .hero-home-button { position: relative; z-index: 2; }
   .hero-home h1 {
     font-family: var(--font-heading);
     font-size: 56px;
@@ -1312,11 +1328,28 @@
 
 <!-- HOMEPAGE -->
 <div id="homepage" class="page">
-  <!-- HERO SECTION -->
+  <!-- HERO SECTION WITH VIDEO -->
   <section class="hero-home">
+    <video class="hero-video" autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1920&q=80&auto=format">
+      <source src="https://videos.pexels.com/video-files/5236941/5236941-hd_1920_1080_30fps.mp4" type="video/mp4">
+      <source src="https://videos.pexels.com/video-files/5236941/5236941-sd_640_360_30fps.mp4" type="video/mp4">
+    </video>
+    <img class="hero-poster" src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1920&q=80&auto=format" alt="" style="display:none;" onload="this.style.display='block'">
     <h1>BLACKHAWK CREEK<br>OUTFITTERS</h1>
     <p class="hero-tagline">East Texas's premier destination for fishing, hunting, and outdoor gear. Locally owned, expertly stocked.</p>
     <button class="hero-home-button" onclick="goToShop()">EXPLORE OUR GEAR</button>
+    <script>
+      (function(){
+        var v = document.querySelector('.hero-video');
+        var poster = document.querySelector('.hero-poster');
+        if(v) {
+          v.addEventListener('playing', function(){ if(poster) poster.style.display='none'; });
+          v.addEventListener('error', function(){ if(poster) poster.style.display='block'; });
+          // Hide poster once video can play
+          v.addEventListener('canplay', function(){ if(poster) poster.style.display='none'; });
+        }
+      })();
+    </script>
   </section>
 
   <!-- CATEGORY CARDS -->

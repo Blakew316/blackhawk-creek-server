@@ -10,7 +10,7 @@
   :root {
     --color-dark: #161616;
     --color-darker: #0e0e0e;
-    --color-olive: #3a4a2d;
+    --color-olive: #3d4a2f;
     --color-green: #465a33;
     --color-green-light: #587140;
     --color-brown: #5e3a1e;
@@ -23,19 +23,22 @@
     --color-lightgray: #b5b5b5;
     --color-red: #b83a2e;
     --color-red-dark: #952f25;
-    --color-surface: #1c1c1c;
-    --color-surface-2: #232323;
-    --color-border: #2a2a2a;
-    --color-border-hover: #3a3a3a;
-    --radius: 8px;
+    --color-surface: #ffffff;
+    --color-surface-2: #f9f9f9;
+    --color-border: #e0e0e0;
+    --color-border-hover: #d0d0d0;
+    --color-bg: #f5f5f5;
+    --color-text-dark: #1a1a1a;
+    --color-text-body: #555555;
+    --radius: 10px;
     --radius-lg: 12px;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-    --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
-    --shadow-lg: 0 12px 40px rgba(0,0,0,0.5);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+    --shadow-lg: 0 12px 24px rgba(0,0,0,0.12);
     --shadow-glow: 0 0 30px rgba(202,169,110,0.08);
     --font-heading: 'Oswald', sans-serif;
     --font-body: 'Inter', sans-serif;
-    --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition: 0.3s ease;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -44,8 +47,8 @@
 
   body {
     font-family: var(--font-body);
-    background: var(--color-darker);
-    color: var(--color-cream);
+    background: var(--color-bg);
+    color: var(--color-text-body);
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -80,9 +83,9 @@
 
   /* ===================== HEADER ===================== */
   .header {
-    background: var(--color-dark);
+    background: var(--color-olive);
     padding: 16px 0;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
     position: sticky; top: 0; z-index: 1000;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -101,13 +104,13 @@
     font-family: var(--font-heading);
     font-size: 21px; font-weight: 600;
     letter-spacing: 4px; text-transform: uppercase;
-    color: var(--color-tan);
+    color: #ffffff;
     line-height: 1.1;
   }
   .logo-sub {
     font-family: var(--font-heading);
     font-size: 10px; letter-spacing: 6px; text-transform: uppercase;
-    color: #666; font-weight: 400;
+    color: rgba(255,255,255,0.7); font-weight: 400;
   }
 
   .search-bar {
@@ -117,11 +120,11 @@
     width: 100%; padding: 11px 48px 11px 18px;
     background: var(--color-surface); border: 1px solid var(--color-border);
     border-radius: var(--radius);
-    color: var(--color-cream); font-size: 13px;
+    color: var(--color-text-dark); font-size: 13px;
     font-family: var(--font-body);
     transition: all var(--transition);
   }
-  .search-bar input::placeholder { color: #555; }
+  .search-bar input::placeholder { color: #999; }
   .search-bar input:focus {
     outline: none;
     border-color: var(--color-tan);
@@ -133,16 +136,16 @@
     padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 14px;
     transition: background var(--transition);
   }
-  .search-bar button:hover { background: var(--color-green-light); }
+  .search-bar button:hover { background: #4a5638; }
 
   .header-actions { display: flex; align-items: center; gap: 24px; }
   .header-action {
     display: flex; flex-direction: column; align-items: center;
-    font-size: 10px; font-weight: 500; color: #888; cursor: pointer;
+    font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.8); cursor: pointer;
     transition: color var(--transition);
     letter-spacing: 0.5px;
   }
-  .header-action:hover { color: var(--color-tan); }
+  .header-action:hover { color: white; }
   .header-action .icon { font-size: 22px; margin-bottom: 3px; }
   .cart-badge { position: relative; }
   .cart-count {
@@ -158,7 +161,7 @@
   .main-nav {
     background: var(--color-olive);
     border-bottom: none;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
   .main-nav .container {
     display: flex; align-items: center; gap: 0;
@@ -172,7 +175,7 @@
     font-family: var(--font-heading);
     font-size: 13px; font-weight: 400;
     letter-spacing: 2px; text-transform: uppercase;
-    color: rgba(255,255,255,0.8);
+    color: rgba(255,255,255,0.9);
     cursor: pointer;
     transition: all var(--transition);
     position: relative;
@@ -196,714 +199,683 @@
   .hero {
     position: relative;
     height: 560px;
-    background: linear-gradient(135deg, #121a0c 0%, #1e150a 40%, #0e0e0e 100%);
+    background: linear-gradient(135deg, #3d4a2f 0%, #4a5638 40%, #333 100%);
     overflow: hidden;
-    display: flex; align-items: center;
-  }
-  .hero-bg-pattern {
-    position: absolute; inset: 0;
-    background-image:
-      radial-gradient(ellipse at 15% 50%, rgba(70,90,51,0.25) 0%, transparent 55%),
-      radial-gradient(ellipse at 80% 30%, rgba(94,58,30,0.15) 0%, transparent 50%);
+    display: none;
   }
   .hero-content {
     position: relative; z-index: 2;
-    max-width: 620px; padding: 0 40px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 60px 40px;
   }
-  .hero-badge {
+  .hero-text { color: var(--color-cream); }
+  .hero-eyebrow {
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 12px; opacity: 0.85;
+  }
+  .hero-headline {
+    font-family: var(--font-heading);
+    font-size: 56px; font-weight: 600; line-height: 1.2;
+    margin-bottom: 20px; text-transform: uppercase;
+  }
+  .hero-subheadline {
+    font-size: 18px; margin-bottom: 32px; opacity: 0.9; max-width: 520px;
+  }
+  .hero-button {
     display: inline-block;
-    background: var(--color-red);
-    color: white;
-    font-family: var(--font-heading);
-    font-size: 11px; font-weight: 500;
-    letter-spacing: 2.5px; text-transform: uppercase;
-    padding: 6px 18px; border-radius: var(--radius);
-    margin-bottom: 20px;
-  }
-  .hero h1 {
-    font-family: var(--font-heading);
-    font-size: 54px; font-weight: 700;
-    line-height: 1.05; text-transform: uppercase;
-    margin-bottom: 18px;
-    letter-spacing: 1px;
-  }
-  .hero h1 span { color: var(--color-gold); }
-  .hero p {
-    font-size: 15px; line-height: 1.7;
-    color: #999; margin-bottom: 32px;
-    font-weight: 400;
-  }
-  .hero-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
-  .btn {
-    display: inline-block;
-    font-family: var(--font-heading);
-    font-size: 13px; font-weight: 500;
-    letter-spacing: 2px; text-transform: uppercase;
-    padding: 14px 34px; border-radius: var(--radius);
-    cursor: pointer; transition: all var(--transition); border: none;
-  }
-  .btn-primary {
+    padding: 16px 40px;
     background: var(--color-gold);
     color: var(--color-darker);
-    box-shadow: 0 2px 12px rgba(218,178,78,0.2);
-  }
-  .btn-primary:hover {
-    background: #e4be58;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(218,178,78,0.3);
-  }
-  .btn-outline {
-    background: transparent;
-    border: 1.5px solid rgba(201,169,110,0.5);
-    color: var(--color-tan);
-  }
-  .btn-outline:hover {
-    background: var(--color-tan); color: var(--color-darker);
-    border-color: var(--color-tan);
-  }
-  .btn-red { background: var(--color-red); color: white; }
-  .btn-red:hover { background: var(--color-red-dark); transform: translateY(-1px); }
-  .btn-green { background: var(--color-olive); color: white; }
-  .btn-green:hover { background: var(--color-green-light); transform: translateY(-1px); }
-
-  .hero-image-area {
-    position: absolute; right: 0; top: 0; bottom: 0;
-    width: 55%; display: flex; align-items: center; justify-content: center;
-  }
-  .hero-product-display {
-    width: 360px; height: 360px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(218,178,78,0.06) 0%, transparent 70%);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 160px;
-    filter: drop-shadow(0 10px 40px rgba(0,0,0,0.4));
-  }
-
-  /* ===================== PROMO BAR ===================== */
-  .promo-bar {
-    background: linear-gradient(90deg, var(--color-brown) 0%, #4a2a15 100%);
-    padding: 13px 0;
-    text-align: center;
     font-family: var(--font-heading);
-    font-size: 13px; font-weight: 400;
-    letter-spacing: 2.5px; text-transform: uppercase;
-    color: rgba(255,255,255,0.85);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition);
   }
-  .promo-bar strong { color: var(--color-gold); font-weight: 500; }
+  .hero-button:hover {
+    background: #c99a4e;
+    transform: translateY(-2px);
+  }
 
-  /* ===================== SECTION & CATEGORY CARDS ===================== */
-  .section { padding: 60px 0; }
+  /* ===================== PRODUCTS SECTION ===================== */
+  .products-section {
+    padding: 60px 0;
+    background: var(--color-bg);
+  }
   .section-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 32px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--color-border);
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .section-eyebrow {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--color-olive);
+    margin-bottom: 12px;
+    font-weight: 600;
   }
   .section-title {
     font-family: var(--font-heading);
-    font-size: 24px; font-weight: 600;
-    letter-spacing: 3px; text-transform: uppercase;
-    color: var(--color-cream);
-  }
-  .section-title::before {
-    content: '';
-    display: inline-block; width: 3px; height: 20px;
-    background: var(--color-gold);
-    margin-right: 14px; vertical-align: middle;
-    border-radius: 2px;
-  }
-  .section-link {
-    font-family: var(--font-heading);
-    font-size: 12px; letter-spacing: 2px;
+    font-size: 42px;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    margin-bottom: 16px;
     text-transform: uppercase;
-    color: var(--color-tan);
-    cursor: pointer;
-    transition: color var(--transition);
+    letter-spacing: 2px;
   }
-  .section-link:hover { color: var(--color-gold); }
-
-  .category-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: 14px;
-  }
-  .category-card {
-    position: relative; border-radius: var(--radius-lg); overflow: hidden;
-    height: 240px; cursor: pointer;
-    transition: all var(--transition);
-    border: 1px solid transparent;
-  }
-  .category-card:hover {
-    transform: translateY(-6px);
-    box-shadow: var(--shadow-lg);
-    border-color: rgba(201,169,110,0.15);
-  }
-  .category-card-bg {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 72px;
-    transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
-    opacity: 0.9;
-  }
-  .category-card:hover .category-card-bg { transform: scale(1.08); }
-  .category-card-content {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    padding: 20px;
-    background: linear-gradient(transparent, rgba(0,0,0,0.9));
-  }
-  .category-card-content h3 {
-    font-family: var(--font-heading);
-    font-size: 16px; font-weight: 500;
-    letter-spacing: 2px; text-transform: uppercase;
-    color: var(--color-cream);
-  }
-  .category-card-content p {
-    font-size: 11px; color: #888;
-    margin-top: 4px; font-weight: 400;
+  .section-subtitle {
+    font-size: 16px;
+    color: var(--color-text-body);
+    max-width: 600px;
+    margin: 0 auto;
   }
 
-  /* ===================== PRODUCT GRID ===================== */
-  .product-grid {
+  .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 28px;
   }
+
+  /* ===================== PRODUCT CARD ===================== */
   .product-card {
     background: var(--color-surface);
-    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
     overflow: hidden;
     transition: all var(--transition);
     cursor: pointer;
-    border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-shadow: var(--shadow-sm);
   }
   .product-card:hover {
-    transform: translateY(-6px);
-    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    box-shadow: var(--shadow-md);
     border-color: var(--color-border-hover);
+    transform: translateY(-4px);
   }
-  .product-image {
-    height: 230px;
-    background: linear-gradient(180deg, #151515 0%, #1a1a1a 100%);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 72px;
-    position: relative;
-    transition: background var(--transition);
+
+  .product-card-image {
+    width: 100%;
+    height: 200px;
+    background: var(--color-surface-2);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .product-card:hover .product-image {
-    background: linear-gradient(180deg, #181818 0%, #1e1e1e 100%);
+  .product-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
-  .product-badge {
-    position: absolute; top: 12px; left: 12px;
-    font-family: var(--font-heading);
-    font-size: 10px; font-weight: 500;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    padding: 4px 12px; border-radius: 6px;
+
+  .product-card-content {
+    padding: 18px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
-  .badge-sale { background: var(--color-red); color: white; }
-  .badge-new { background: var(--color-green); color: white; }
-  .badge-hot { background: #c67b1a; color: white; }
-  .product-wishlist {
-    position: absolute; top: 12px; right: 12px;
-    width: 34px; height: 34px;
-    background: rgba(0,0,0,0.4);
-    backdrop-filter: blur(8px);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px; cursor: pointer;
-    transition: all var(--transition);
-    border: 1px solid rgba(255,255,255,0.06);
-  }
-  .product-wishlist:hover { background: var(--color-red); border-color: transparent; }
-  .product-info { padding: 18px; }
+
   .product-brand {
-    font-size: 10px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 1.5px;
-    color: var(--color-tan);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--color-olive);
+    font-weight: 600;
     margin-bottom: 6px;
   }
+
   .product-name {
     font-family: var(--font-heading);
-    font-size: 15px; font-weight: 400;
-    color: var(--color-cream);
-    margin-bottom: 10px;
-    line-height: 1.35;
-    letter-spacing: 0.3px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-text-dark);
+    margin-bottom: 12px;
+    line-height: 1.4;
   }
-  .product-rating {
-    display: flex; align-items: center; gap: 6px;
-    margin-bottom: 10px;
-  }
-  .stars { color: var(--color-gold); font-size: 12px; letter-spacing: 1px; }
-  .rating-count { font-size: 11px; color: #666; font-weight: 400; }
+
   .product-price {
-    display: flex; align-items: baseline; gap: 8px;
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-olive);
     margin-bottom: 14px;
-  }
-  .price-current {
-    font-family: var(--font-heading);
-    font-size: 22px; font-weight: 600;
-    color: var(--color-cream);
-  }
-  .price-original {
-    font-size: 13px; color: #666;
-    text-decoration: line-through;
-  }
-  .price-save {
-    font-size: 11px; font-weight: 600;
-    color: var(--color-red);
-    letter-spacing: 0.3px;
-  }
-  .product-card .btn {
-    width: 100%; text-align: center;
-    padding: 11px; font-size: 12px;
-    border-radius: 8px;
-    letter-spacing: 1.5px;
+    margin-top: auto;
   }
 
-  /* ===================== FEATURED BRANDS ===================== */
-  .brands-bar {
-    background: var(--color-surface);
-    padding: 36px 0;
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border);
-  }
-  .brands-grid {
-    display: flex; align-items: center; justify-content: space-around;
-    flex-wrap: wrap; gap: 28px;
-  }
-  .brand-logo {
-    font-family: var(--font-heading);
-    font-size: 16px; font-weight: 500;
-    letter-spacing: 4px; text-transform: uppercase;
-    color: #444; transition: color var(--transition);
-    cursor: pointer;
-  }
-  .brand-logo:hover { color: var(--color-tan); }
-
-  /* ===================== DEALS BANNER ===================== */
-  .deals-banner {
-    background: linear-gradient(135deg, #3a2010 0%, #2a1608 100%);
-    padding: 56px 0;
-    position: relative; overflow: hidden;
-  }
-  .deals-banner::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse at 30% 50%, rgba(218,178,78,0.04) 0%, transparent 60%);
-  }
-  .deals-content {
-    position: relative; z-index: 1;
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 24px;
-  }
-  .deals-text h2 {
-    font-family: var(--font-heading);
-    font-size: 32px; font-weight: 600;
+  .product-card-button {
+    width: 100%;
+    padding: 10px 16px;
+    background: var(--color-olive);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
     text-transform: uppercase;
-    margin-bottom: 8px;
-    letter-spacing: 2px;
-  }
-  .deals-text h2 span { color: var(--color-gold); }
-  .deals-text p { color: #999; font-size: 14px; font-weight: 400; }
-
-  /* ===================== SERVICES ===================== */
-  .services-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-    gap: 16px;
-  }
-  .service-card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    padding: 32px 28px;
-    text-align: center;
+    letter-spacing: 1px;
+    cursor: pointer;
     transition: all var(--transition);
   }
-  .service-card:hover {
-    border-color: var(--color-border-hover);
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
-  }
-  .service-icon {
-    font-size: 36px; margin-bottom: 16px;
-    display: inline-block;
-  }
-  .service-card h3 {
-    font-family: var(--font-heading);
-    font-size: 15px; font-weight: 500;
-    letter-spacing: 2px; text-transform: uppercase;
-    margin-bottom: 10px;
-    color: var(--color-tan);
-  }
-  .service-card p {
-    font-size: 12px; color: #777; line-height: 1.7;
-    font-weight: 400;
-  }
-
-  /* ===================== NEWSLETTER ===================== */
-  .newsletter {
-    background: linear-gradient(135deg, #2a3620 0%, #1e2816 100%);
-    padding: 56px 0;
-  }
-  .newsletter-content {
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 32px;
-  }
-  .newsletter-text h2 {
-    font-family: var(--font-heading);
-    font-size: 26px; font-weight: 600;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    letter-spacing: 2px;
-  }
-  .newsletter-text p { color: #999; font-size: 13px; font-weight: 400; }
-  .newsletter-form { display: flex; gap: 10px; flex-wrap: wrap; }
-  .newsletter-form input {
-    padding: 13px 20px; width: 300px;
-    background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.12);
-    border-radius: var(--radius); color: white; font-size: 13px;
-    font-family: var(--font-body);
-    transition: border-color var(--transition);
-  }
-  .newsletter-form input::placeholder { color: #666; }
-  .newsletter-form input:focus {
-    outline: none;
-    border-color: rgba(201,169,110,0.4);
+  .product-card-button:hover {
+    background: #4a5638;
   }
 
   /* ===================== FOOTER ===================== */
   .footer {
-    background: #080808;
-    padding: 56px 0 24px;
+    background: var(--color-darker);
+    color: var(--color-cream);
+    padding: 48px 0 24px;
+    margin-top: 60px;
     border-top: 1px solid var(--color-border);
   }
-  .footer-grid {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
-    gap: 36px;
-    margin-bottom: 44px;
-  }
-  .footer-brand .logo-name { font-size: 17px; }
-  .footer-brand p {
-    font-size: 12px; color: #666; line-height: 1.7;
-    margin-top: 14px; font-weight: 400;
-  }
-  .footer h4 {
+  .footer-content { display: grid; grid-template-columns: repeat(4, 1fr); gap: 48px; margin-bottom: 48px; }
+  .footer-section h4 {
     font-family: var(--font-heading);
-    font-size: 12px; font-weight: 500;
-    letter-spacing: 2.5px; text-transform: uppercase;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
     color: var(--color-tan);
-    margin-bottom: 18px;
   }
-  .footer ul { list-style: none; }
-  .footer ul li { margin-bottom: 10px; }
-  .footer ul li a {
-    font-size: 12px; color: #666;
+  .footer-section a {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 10px;
+    color: #aaa;
     transition: color var(--transition);
-    font-weight: 400;
   }
-  .footer ul li a:hover { color: var(--color-cream); }
+  .footer-section a:hover { color: var(--color-tan); }
   .footer-bottom {
-    border-top: 1px solid #1a1a1a;
+    border-top: 1px solid var(--color-border);
     padding-top: 24px;
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 12px;
-    font-size: 11px; color: #444;
-  }
-  .footer-payments { display: flex; gap: 8px; }
-  .payment-icon {
-    background: #151515; padding: 5px 12px; border-radius: 6px;
-    font-size: 10px; color: #555; font-weight: 600;
-    letter-spacing: 0.5px; border: 1px solid #1e1e1e;
+    text-align: center;
+    font-size: 12px;
+    color: #777;
   }
 
-  /* ===================== PRODUCT DETAIL MODAL ===================== */
-  .modal-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.88);
-    backdrop-filter: blur(6px);
-    z-index: 2000;
-    align-items: center; justify-content: center;
-    padding: 24px;
-  }
-  .modal-overlay.active { display: flex; }
+  /* ===================== MODAL ===================== */
   .modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal.active { display: flex; }
+  .modal-content {
     background: var(--color-surface);
     border-radius: var(--radius-lg);
-    max-width: 920px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    border: 1px solid var(--color-border-hover);
+    max-width: 600px;
+    width: 90%;
+    padding: 40px;
+    position: relative;
     box-shadow: var(--shadow-lg);
   }
   .modal-close {
-    float: right;
-    background: none; border: none; color: #666;
+    position: absolute;
+    top: 20px; right: 20px;
+    background: none; border: none;
     font-size: 24px; cursor: pointer;
-    padding: 18px 22px;
+    color: var(--color-text-dark);
     transition: color var(--transition);
   }
-  .modal-close:hover { color: white; }
-  .modal-body {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    padding: 32px;
-  }
-  .modal-image {
-    background: linear-gradient(145deg, #131313, #181818);
-    border-radius: var(--radius-lg);
-    height: 420px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 110px;
-    border: 1px solid var(--color-border);
-  }
-  .modal-details h1 {
+  .modal-close:hover { color: var(--color-olive); }
+  .modal-header {
     font-family: var(--font-heading);
-    font-size: 24px; font-weight: 600;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    margin-bottom: 20px;
     text-transform: uppercase;
-    margin-bottom: 6px;
     letter-spacing: 1px;
   }
-  .modal-details .product-brand { font-size: 11px; margin-bottom: 12px; }
-  .modal-details .product-rating { margin-bottom: 16px; }
-  .modal-details .product-price { margin-bottom: 22px; }
-  .modal-details .price-current { font-size: 30px; }
-  .modal-description {
-    font-size: 13px; color: #888; line-height: 1.8;
-    margin-bottom: 22px;
-    border-top: 1px solid var(--color-border); padding-top: 18px;
-    font-weight: 400;
+  .modal-body {
+    margin-bottom: 30px;
+    color: var(--color-text-body);
+    line-height: 1.6;
   }
-  .modal-options { margin-bottom: 22px; }
-  .modal-options label {
-    display: block; font-size: 11px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 1.5px;
-    color: #666; margin-bottom: 8px;
+  .modal-image {
+    width: 100%;
+    height: 300px;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .qty-control {
-    display: flex; align-items: center; gap: 0;
-    border: 1px solid var(--color-border); border-radius: var(--radius);
-    overflow: hidden; width: fit-content;
+  .modal-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
-  .qty-btn {
-    background: var(--color-surface-2); border: none; color: white;
-    width: 40px; height: 40px; font-size: 18px;
-    cursor: pointer; transition: background var(--transition);
+  .modal-footer {
+    display: flex;
+    gap: 12px;
   }
-  .qty-btn:hover { background: #333; }
-  .qty-val {
-    width: 54px; height: 40px;
-    background: var(--color-dark); border: none; color: white;
-    text-align: center; font-size: 14px;
-    font-family: var(--font-body);
+  .modal-button {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1px;
   }
-  .modal-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-  .modal-actions .btn { flex: 1; min-width: 150px; text-align: center; }
-  .modal-features {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 12px; margin-top: 24px;
-    padding-top: 18px;
-    border-top: 1px solid var(--color-border);
+  .modal-button.primary {
+    background: var(--color-olive);
+    color: white;
   }
-  .feature-item {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 11px; color: #666; font-weight: 400;
+  .modal-button.primary:hover {
+    background: #4a5638;
   }
-  .feature-item span:first-child { font-size: 15px; }
+  .modal-button.secondary {
+    background: var(--color-border);
+    color: var(--color-text-dark);
+  }
+  .modal-button.secondary:hover {
+    background: var(--color-border-hover);
+  }
 
   /* ===================== CART SIDEBAR ===================== */
-  .cart-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
-    z-index: 3000;
-  }
-  .cart-overlay.active { display: block; }
   .cart-sidebar {
-    position: fixed; top: 0; right: -440px; bottom: 0;
-    width: 420px; max-width: 92vw;
+    position: fixed;
+    right: -400px;
+    top: 0;
+    width: 400px;
+    height: 100vh;
     background: var(--color-surface);
-    z-index: 3001;
-    transition: right 0.35s cubic-bezier(0.4,0,0.2,1);
-    display: flex; flex-direction: column;
-    border-left: 1px solid var(--color-border);
-    box-shadow: -8px 0 40px rgba(0,0,0,0.4);
+    box-shadow: -4px 0 16px rgba(0,0,0,0.15);
+    z-index: 1500;
+    transition: right var(--transition);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
   }
-  .cart-sidebar.active { right: 0; }
+  .cart-sidebar.open { right: 0; }
   .cart-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 22px 24px;
+    padding: 24px;
     border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   .cart-header h2 {
     font-family: var(--font-heading);
-    font-size: 18px; font-weight: 500;
-    letter-spacing: 2.5px; text-transform: uppercase;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
   .cart-close {
-    background: none; border: none; color: #666;
-    font-size: 22px; cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--color-text-dark);
     transition: color var(--transition);
   }
-  .cart-close:hover { color: white; }
-  .cart-items { flex: 1; overflow-y: auto; padding: 18px 24px; }
-  .cart-empty {
-    text-align: center; padding: 60px 20px;
-    color: #666;
+  .cart-close:hover { color: var(--color-olive); }
+  .cart-items {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
   }
-  .cart-empty .icon { font-size: 44px; margin-bottom: 14px; opacity: 0.5; }
   .cart-item {
-    display: flex; gap: 16px; padding: 16px 0;
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
     border-bottom: 1px solid var(--color-border);
   }
   .cart-item-image {
-    width: 72px; height: 72px;
-    background: var(--color-dark); border-radius: var(--radius);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 32px; flex-shrink: 0;
-    border: 1px solid var(--color-border);
+    width: 60px;
+    height: 60px;
+    background: var(--color-bg);
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
   }
-  .cart-item-details { flex: 1; }
+  .cart-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .cart-item-details {
+    flex: 1;
+  }
   .cart-item-name {
     font-family: var(--font-heading);
-    font-size: 14px; font-weight: 400;
-    margin-bottom: 3px;
-  }
-  .cart-item-brand { font-size: 10px; color: var(--color-tan); letter-spacing: 0.5px; }
-  .cart-item-bottom {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    margin-bottom: 4px;
   }
   .cart-item-price {
-    font-family: var(--font-heading);
-    font-size: 16px; font-weight: 500;
+    font-size: 13px;
+    color: var(--color-olive);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .cart-item-qty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cart-item-qty button {
+    background: var(--color-border);
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    transition: all var(--transition);
+  }
+  .cart-item-qty button:hover {
+    background: var(--color-border-hover);
   }
   .cart-item-remove {
-    background: none; border: none; color: #555;
-    font-size: 11px; cursor: pointer;
+    background: none;
+    border: none;
+    color: var(--color-red);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
     transition: color var(--transition);
-    font-weight: 400;
   }
-  .cart-item-remove:hover { color: var(--color-red); }
+  .cart-item-remove:hover { color: #ff4444; }
   .cart-footer {
-    padding: 22px 24px;
+    padding: 24px;
     border-top: 1px solid var(--color-border);
-    background: var(--color-dark);
-  }
-  .cart-subtotal {
-    display: flex; justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 13px; color: #666;
   }
   .cart-total {
-    display: flex; justify-content: space-between;
-    font-family: var(--font-heading);
-    font-size: 22px; font-weight: 600;
-    margin-bottom: 18px; padding-top: 12px;
-    border-top: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-dark);
   }
-  .cart-footer .btn { width: 100%; text-align: center; margin-bottom: 8px; }
+  .cart-checkout {
+    width: 100%;
+    padding: 14px;
+    background: var(--color-olive);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+  .cart-checkout:hover {
+    background: #4a5638;
+  }
 
-  /* ===================== LISTING PAGE ===================== */
-  .page { display: none; }
-  .page.active { display: block; }
-  .breadcrumb {
-    padding: 18px 0;
-    font-size: 12px; color: #666; font-weight: 400;
+  /* ===================== BACK OFFICE PAGE ===================== */
+  .page {
+    display: none;
   }
-  .breadcrumb a {
-    color: var(--color-tan);
-    transition: color var(--transition);
+  .page.active {
+    display: block;
   }
-  .breadcrumb a:hover { color: var(--color-gold); }
-  .listing-layout {
-    display: grid;
-    grid-template-columns: 240px 1fr;
-    gap: 36px;
-    padding-bottom: 60px;
+
+  .backoffice-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    background: var(--color-bg);
+    min-height: 100vh;
   }
-  .sidebar {
-    padding-top: 12px;
-    padding-right: 20px;
-    border-right: 1px solid var(--color-border);
+
+  .backoffice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
   }
-  .filter-group { margin-bottom: 28px; }
-  .filter-group h4 {
+
+  .backoffice-title {
     font-family: var(--font-heading);
-    font-size: 12px; font-weight: 500;
-    letter-spacing: 2px; text-transform: uppercase;
-    color: var(--color-tan);
-    margin-bottom: 14px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--color-border);
-  }
-  .filter-option {
-    display: flex; align-items: center; gap: 10px;
-    padding: 5px 0; cursor: pointer;
-    font-size: 12px; color: #999;
-    transition: color var(--transition);
-    font-weight: 400;
-  }
-  .filter-option:hover { color: var(--color-cream); }
-  .filter-option input[type="checkbox"] {
-    accent-color: var(--color-olive);
-    width: 14px; height: 14px;
-  }
-  .price-range {
-    display: flex; gap: 8px; align-items: center;
-  }
-  .price-range input {
-    width: 80px; padding: 8px 10px;
-    background: var(--color-surface); border: 1px solid var(--color-border);
-    border-radius: var(--radius); color: white; font-size: 12px;
-    font-family: var(--font-body);
-  }
-  .listing-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
-  }
-  .listing-header h1 {
-    font-family: var(--font-heading);
-    font-size: 26px; font-weight: 600;
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--color-text-dark);
     text-transform: uppercase;
     letter-spacing: 2px;
   }
-  .listing-controls { display: flex; align-items: center; gap: 16px; }
-  .listing-controls select {
-    background: var(--color-surface); border: 1px solid var(--color-border);
-    color: #999; padding: 9px 14px; border-radius: var(--radius);
-    font-size: 12px; font-family: var(--font-body);
-    cursor: pointer;
+
+  .backoffice-actions {
+    display: flex;
+    gap: 12px;
   }
-  .results-count { font-size: 12px; color: #666; font-weight: 400; }
+
+  .btn-primary {
+    padding: 12px 24px;
+    background: var(--color-olive);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .btn-primary:hover {
+    background: #4a5638;
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    padding: 12px 24px;
+    background: var(--color-surface);
+    color: var(--color-text-dark);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .btn-secondary:hover {
+    background: var(--color-surface-2);
+    border-color: var(--color-border-hover);
+  }
+
+  .inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .inventory-table thead {
+    background: var(--color-surface-2);
+    border-bottom: 2px solid var(--color-border);
+  }
+
+  .inventory-table th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .inventory-table td {
+    padding: 16px;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-body);
+    font-size: 14px;
+  }
+
+  .inventory-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .inventory-table tbody tr:hover {
+    background: var(--color-surface-2);
+  }
+
+  .product-thumbnail {
+    width: 50px;
+    height: 50px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--color-bg);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .product-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .btn-upload {
+    padding: 6px 12px;
+    background: var(--color-gold);
+    color: var(--color-text-dark);
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-upload:hover {
+    background: #c99a4e;
+  }
+
+  .btn-edit {
+    padding: 6px 12px;
+    background: var(--color-olive);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 6px;
+  }
+
+  .btn-edit:hover {
+    background: #4a5638;
+  }
+
+  .btn-delete {
+    padding: 6px 12px;
+    background: var(--color-red);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-delete:hover {
+    background: #ff4444;
+  }
+
+  .backoffice-nav {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+
+  .backoffice-nav button {
+    padding: 10px 20px;
+    background: none;
+    border: 2px solid var(--color-border);
+    color: var(--color-text-dark);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all var(--transition);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .backoffice-nav button.active {
+    background: var(--color-olive);
+    color: white;
+    border-color: var(--color-olive);
+  }
+
+  .backoffice-nav button:hover {
+    border-color: var(--color-olive);
+  }
 
   /* ===================== RESPONSIVE ===================== */
-  @media (max-width: 900px) {
-    .hero { height: auto; padding: 50px 0; }
-    .hero-image-area { display: none; }
-    .hero h1 { font-size: 38px; }
-    .footer-grid { grid-template-columns: 1fr 1fr; }
-    .modal-body { grid-template-columns: 1fr; }
-    .listing-layout { grid-template-columns: 1fr; }
-    .sidebar { display: none; }
-    .section { padding: 44px 0; }
+  @media (max-width: 768px) {
+    .products-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .section-title {
+      font-size: 28px;
+    }
+    .footer-content {
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
   }
-  @media (max-width: 600px) {
-    .header .container { flex-wrap: wrap; }
-    .search-bar { order: 3; max-width: 100%; flex-basis: 100%; margin-top: 10px; }
-    .nav-item { padding: 11px 14px; font-size: 11px; letter-spacing: 1.5px; }
-    .hero h1 { font-size: 30px; }
-    .hero-content { padding: 0 20px; }
-    .footer-grid { grid-template-columns: 1fr; }
-    .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
-    .product-image { height: 180px; font-size: 56px; }
-    .product-info { padding: 14px; }
-    .container { padding: 0 16px; }
+
+  @media (max-width: 480px) {
+    .products-grid {
+      grid-template-columns: 1fr;
+    }
+    .cart-sidebar {
+      width: 100%;
+      right: -100%;
+    }
+    .footer-content {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 </head>
@@ -912,11 +884,10 @@
 <!-- TOP BAR -->
 <div class="top-bar">
   <div class="container">
-    <div>Free shipping on orders over $50 &bull; Easy 60-day returns</div>
-    <div>
-      <a href="#">Store Locator</a>
-      <a href="#">Gift Cards</a>
-      <a href="#">Order Status</a>
+    <div>🚚 FREE SHIPPING ON ORDERS OVER $100</div>
+    <div style="display: flex; gap: 20px;">
+      <a href="#help">Help & Support</a>
+      <a href="#track">Track Order</a>
     </div>
   </div>
 </div>
@@ -924,1023 +895,708 @@
 <!-- HEADER -->
 <header class="header">
   <div class="container">
-    <div class="logo" onclick="navigateTo('home')">
-      <div class="logo-icon">&#127967;</div>
-      <div class="logo-name">Blackhawk Creek</div>
-      <div class="logo-sub">Outfitters</div>
+    <div class="logo" onclick="goToStorefront()">
+      <div class="logo-icon">🏹</div>
+      <div class="logo-name">BLACKHAWK</div>
+      <div class="logo-sub">CREEK</div>
     </div>
     <div class="search-bar">
-      <input type="text" placeholder="Search for fishing rods, rifles, ammo, tackle...">
-      <button>&#128269;</button>
+      <input type="text" id="searchInput" placeholder="Search products...">
+      <button onclick="performSearch()">🔍</button>
     </div>
     <div class="header-actions">
-      <div class="header-action">
-        <div class="icon">&#128100;</div>
-        <span>Account</span>
+      <div class="header-action" onclick="showAdminLoginModal()">
+        <div class="icon">⚙️</div>
+        <div>Admin</div>
       </div>
-      <div class="header-action" onclick="toggleCart()">
-        <div class="icon cart-badge">
-          &#128722;
-          <span class="cart-count" id="cartCount">0</span>
-        </div>
-        <span>Cart</span>
+      <div class="header-action cart-badge" onclick="toggleCart()">
+        <div class="icon">🛒</div>
+        <div>Cart</div>
+        <div class="cart-count" id="cartCount">0</div>
       </div>
     </div>
   </div>
 </header>
 
-<!-- NAV -->
+<!-- MAIN NAV -->
 <nav class="main-nav">
-  <div class="container">
-    <div class="nav-item active" onclick="navigateTo('home')">Home</div>
-    <div class="nav-item" onclick="navigateTo('fishing')">Fishing</div>
-    <div class="nav-item" onclick="navigateTo('hunting')">Hunting</div>
-    <div class="nav-item" onclick="navigateTo('firearms')">Firearms & Ammo</div>
-    <div class="nav-item" onclick="navigateTo('apparel')">Apparel</div>
-    <div class="nav-item" onclick="navigateTo('optics')">Optics</div>
-    <div class="nav-item sale" onclick="navigateTo('sale')">&#128293; Sale</div>
+  <div class="container" id="navContainer">
+    <div class="nav-item active" onclick="showCategory('All')">ALL PRODUCTS</div>
   </div>
 </nav>
 
-<!-- =================== HOME PAGE =================== -->
-<div class="page active" id="page-home">
-
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-bg-pattern"></div>
-    <div class="hero-content">
-      <div class="hero-badge">Spring Season Sale</div>
-      <h1>Gear Up for the <span>Great Outdoors</span></h1>
-      <p>Premium fishing and hunting gear from the brands you trust. Whether you're on the water or in the woods, Blackhawk Creek Outfitters has you covered.</p>
-      <div class="hero-buttons">
-        <button class="btn btn-primary" onclick="navigateTo('fishing')">Shop Fishing</button>
-        <button class="btn btn-outline" onclick="navigateTo('hunting')">Shop Hunting</button>
-      </div>
+<!-- HERO (hidden by default) -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-text">
+      <div class="hero-eyebrow">EXPLORE OUR GEAR</div>
+      <h1 class="hero-headline">BUILT FOR ADVENTURE</h1>
+      <p class="hero-subheadline">Premium fishing and hunting equipment for the discerning outdoorsperson.</p>
+      <button class="hero-button" onclick="scrollToProducts()">SHOP NOW</button>
     </div>
-    <div class="hero-image-area">
-      <div class="hero-product-display">&#127907;</div>
-    </div>
-  </section>
-
-  <!-- PROMO BAR -->
-  <div class="promo-bar">
-    &#127919; <strong>Spring Blowout:</strong> Up to 40% Off Select Fishing Rods & Reels &mdash; While Supplies Last
   </div>
+</section>
 
-  <!-- CATEGORIES -->
-  <section class="section">
+<!-- MAIN CONTENT -->
+<div id="storefront" class="page active">
+  <!-- PRODUCTS SECTION -->
+  <section class="products-section">
     <div class="container">
       <div class="section-header">
-        <h2 class="section-title">Shop by Category</h2>
-        <span class="section-link">View All &#8250;</span>
-      </div>
-      <div class="category-grid">
-        <div class="category-card" onclick="navigateTo('fishing')">
-          <div class="category-card-bg cat-fishing">&#127907;</div>
-          <div class="category-card-content">
-            <h3>Fishing</h3>
-            <p>Rods, Reels, Tackle & More</p>
-          </div>
-        </div>
-        <div class="category-card" onclick="navigateTo('hunting')">
-          <div class="category-card-bg cat-hunting">&#127939;</div>
-          <div class="category-card-content">
-            <h3>Hunting</h3>
-            <p>Blinds, Calls, Decoys & Gear</p>
-          </div>
-        </div>
-        <div class="category-card" onclick="navigateTo('firearms')">
-          <div class="category-card-bg cat-firearms">&#128299;</div>
-          <div class="category-card-content">
-            <h3>Firearms & Ammo</h3>
-            <p>Rifles, Shotguns, Handguns</p>
-          </div>
-        </div>
-        <div class="category-card" onclick="navigateTo('apparel')">
-          <div class="category-card-bg cat-apparel">&#129509;</div>
-          <div class="category-card-content">
-            <h3>Apparel</h3>
-            <p>Camo, Waders, Outerwear</p>
-          </div>
-        </div>
-        <div class="category-card" onclick="navigateTo('optics')">
-          <div class="category-card-bg cat-optics">&#128269;</div>
-          <div class="category-card-content">
-            <h3>Optics</h3>
-            <p>Scopes, Binoculars, Rangefinders</p>
-          </div>
-        </div>
-        <div class="category-card" onclick="navigateTo('archery')">
-          <div class="category-card-bg cat-archery">&#127993;</div>
-          <div class="category-card-content">
-            <h3>Archery</h3>
-            <p>Bows, Arrows, Accessories</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FEATURED PRODUCTS -->
-  <section class="section" style="background: #181818; padding: 50px 0;">
-    <div class="container">
-      <div class="section-header">
+        <div class="section-eyebrow">PREMIUM GEAR</div>
         <h2 class="section-title">Featured Products</h2>
-        <span class="section-link">View All &#8250;</span>
+        <p class="section-subtitle">Handpicked equipment for fishing and hunting enthusiasts</p>
       </div>
-      <div class="product-grid" id="featuredProducts"></div>
-    </div>
-  </section>
-
-  <!-- BRANDS -->
-  <div class="brands-bar">
-    <div class="container">
-      <div class="brands-grid">
-        <div class="brand-logo">Shimano</div>
-        <div class="brand-logo">Remington</div>
-        <div class="brand-logo">Abu Garcia</div>
-        <div class="brand-logo">Winchester</div>
-        <div class="brand-logo">Mossy Oak</div>
-        <div class="brand-logo">Vortex</div>
-        <div class="brand-logo">Rapala</div>
-        <div class="brand-logo">Browning</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DEALS BANNER -->
-  <section class="deals-banner">
-    <div class="container">
-      <div class="deals-content">
-        <div class="deals-text">
-          <h2>Weekly <span>Doorbuster</span> Deals</h2>
-          <p>Jaw-dropping prices every week on top fishing &amp; hunting gear. Don't miss out.</p>
-        </div>
-        <button class="btn btn-primary">Shop Doorbusters &#8250;</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- BEST SELLERS -->
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Best Sellers</h2>
-        <span class="section-link">View All &#8250;</span>
-      </div>
-      <div class="product-grid" id="bestSellers"></div>
-    </div>
-  </section>
-
-  <!-- SERVICES -->
-  <section class="section" style="background: #151515;">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Why Blackhawk Creek?</h2>
-      </div>
-      <div class="services-grid">
-        <div class="service-card">
-          <div class="service-icon">&#128666;</div>
-          <h3>Free Shipping</h3>
-          <p>Free standard shipping on all orders over $50. Fast delivery straight to your door.</p>
-        </div>
-        <div class="service-card">
-          <div class="service-icon">&#128736;</div>
-          <h3>Expert Service</h3>
-          <p>Our team of outdoor experts is ready to help you find the right gear for any adventure.</p>
-        </div>
-        <div class="service-card">
-          <div class="service-icon">&#128176;</div>
-          <h3>Price Match</h3>
-          <p>Found it cheaper? We'll match any competitor's price on identical in-stock items.</p>
-        </div>
-        <div class="service-card">
-          <div class="service-icon">&#128260;</div>
-          <h3>Easy Returns</h3>
-          <p>Not satisfied? Return any item within 60 days for a full refund. No hassle, no questions.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEWSLETTER -->
-  <section class="newsletter">
-    <div class="container">
-      <div class="newsletter-content">
-        <div class="newsletter-text">
-          <h2>Join the Outfitters Club</h2>
-          <p>Get exclusive deals, pro tips, and early access to sales. Unsubscribe anytime.</p>
-        </div>
-        <div class="newsletter-form">
-          <input type="email" placeholder="Enter your email address">
-          <button class="btn btn-primary">Subscribe</button>
-        </div>
+      <div class="products-grid" id="productsGrid">
+        <!-- Products will be loaded here -->
       </div>
     </div>
   </section>
 </div>
 
-<!-- =================== LISTING PAGE =================== -->
-<div class="page" id="page-listing">
-  <div class="container">
-    <div class="breadcrumb">
-      <a href="#" onclick="navigateTo('home')">Home</a> &rsaquo; <span id="breadcrumbCategory">Fishing</span>
+<!-- BACKOFFICE PAGE -->
+<div id="backoffice" class="page">
+  <div class="backoffice-container">
+    <div class="backoffice-nav">
+      <button class="active" onclick="switchBackofficeTab('inventory')">Inventory</button>
+      <button onclick="switchBackofficeTab('add')">Add Product</button>
+      <button onclick="goToStorefront()">← Back to Store</button>
     </div>
-    <div class="listing-layout">
-      <aside class="sidebar">
-        <div class="filter-group">
-          <h4>Category</h4>
-          <label class="filter-option"><input type="checkbox" checked> Rods & Reels</label>
-          <label class="filter-option"><input type="checkbox"> Tackle & Lures</label>
-          <label class="filter-option"><input type="checkbox"> Line & Leader</label>
-          <label class="filter-option"><input type="checkbox"> Electronics</label>
-          <label class="filter-option"><input type="checkbox"> Accessories</label>
-        </div>
-        <div class="filter-group">
-          <h4>Brand</h4>
-          <label class="filter-option"><input type="checkbox"> Shimano</label>
-          <label class="filter-option"><input type="checkbox"> Abu Garcia</label>
-          <label class="filter-option"><input type="checkbox"> Rapala</label>
-          <label class="filter-option"><input type="checkbox"> Lew's</label>
-          <label class="filter-option"><input type="checkbox"> Daiwa</label>
-        </div>
-        <div class="filter-group">
-          <h4>Price Range</h4>
-          <div class="price-range">
-            <input type="text" placeholder="$0"> &mdash; <input type="text" placeholder="$500">
-          </div>
-        </div>
-        <div class="filter-group">
-          <h4>Rating</h4>
-          <label class="filter-option"><input type="checkbox"> &#9733;&#9733;&#9733;&#9733;&#9733; & Up</label>
-          <label class="filter-option"><input type="checkbox"> &#9733;&#9733;&#9733;&#9733; & Up</label>
-          <label class="filter-option"><input type="checkbox"> &#9733;&#9733;&#9733; & Up</label>
-        </div>
-        <button class="btn btn-green" style="width:100%;text-align:center;">Apply Filters</button>
-      </aside>
-      <div>
-        <div class="listing-header">
-          <h1 id="listingTitle">Fishing</h1>
-          <div class="listing-controls">
-            <span class="results-count" id="resultsCount">24 Products</span>
-            <select>
-              <option>Sort by: Featured</option>
-              <option>Price: Low to High</option>
-              <option>Price: High to Low</option>
-              <option>Best Selling</option>
-              <option>Highest Rated</option>
-              <option>Newest</option>
-            </select>
-          </div>
-        </div>
-        <div class="product-grid" id="listingProducts"></div>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- PRODUCT DETAIL MODAL -->
-<div class="modal-overlay" id="productModal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()">&times;</button>
-    <div class="modal-body">
-      <div class="modal-image" id="modalImage">&#127907;</div>
-      <div class="modal-details">
-        <div class="product-brand" id="modalBrand">Shimano</div>
-        <h1 id="modalName">Product Name</h1>
-        <div class="product-rating">
-          <span class="stars" id="modalStars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-          <span class="rating-count" id="modalReviews">(128)</span>
+    <div id="inventoryTab">
+      <div class="backoffice-header">
+        <h1 class="backoffice-title">Inventory Management</h1>
+        <div class="backoffice-actions">
+          <button class="btn-primary" onclick="showAddProductForm()">+ Add Product</button>
         </div>
-        <div class="product-price">
-          <span class="price-current" id="modalPrice">$199.99</span>
-          <span class="price-original" id="modalOriginal"></span>
-          <span class="price-save" id="modalSave"></span>
-        </div>
-        <div class="modal-description" id="modalDesc">Product description goes here.</div>
-        <div class="modal-options">
-          <label>Quantity</label>
-          <div class="qty-control">
-            <button class="qty-btn" onclick="changeQty(-1)">-</button>
-            <input class="qty-val" type="number" id="modalQty" value="1" min="1">
-            <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+      <table class="inventory-table" id="inventoryTable">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Brand</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="inventoryTableBody">
+          <!-- Rows will be populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <div id="addTab" style="display: none;">
+      <div class="backoffice-header">
+        <h1 class="backoffice-title">Add New Product</h1>
+      </div>
+      <div style="background: white; padding: 30px; border-radius: 10px; max-width: 600px;">
+        <form id="addProductForm" onsubmit="handleAddProduct(event)">
+          <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1a1a1a;">Product Name</label>
+            <input type="text" name="name" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: Inter;">
           </div>
-        </div>
-        <div class="modal-actions">
-          <button class="btn btn-primary" onclick="addToCartFromModal()">&#128722; Add to Cart</button>
-          <button class="btn btn-outline">&#9825; Wishlist</button>
-        </div>
-        <div class="modal-features">
-          <div class="feature-item"><span>&#128666;</span> Free Shipping</div>
-          <div class="feature-item"><span>&#128260;</span> 60-Day Returns</div>
-          <div class="feature-item"><span>&#9989;</span> In Stock</div>
-          <div class="feature-item"><span>&#128274;</span> Secure Checkout</div>
-        </div>
+          <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1a1a1a;">Brand</label>
+            <input type="text" name="brand" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: Inter;">
+          </div>
+          <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1a1a1a;">Category</label>
+            <input type="text" name="category" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: Inter;">
+          </div>
+          <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1a1a1a;">Price</label>
+            <input type="number" name="price" step="0.01" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: Inter;">
+          </div>
+          <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1a1a1a;">Stock</label>
+            <input type="number" name="stock" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: Inter;">
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%;">Add Product</button>
+        </form>
       </div>
     </div>
   </div>
 </div>
 
 <!-- CART SIDEBAR -->
-<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
 <div class="cart-sidebar" id="cartSidebar">
   <div class="cart-header">
-    <h2>&#128722; Your Cart</h2>
-    <button class="cart-close" onclick="toggleCart()">&times;</button>
+    <h2>Your Cart</h2>
+    <button class="cart-close" onclick="toggleCart()">×</button>
   </div>
   <div class="cart-items" id="cartItems">
-    <div class="cart-empty">
-      <div class="icon">&#128722;</div>
-      <p>Your cart is empty</p>
-      <p style="font-size:13px; margin-top:8px;">Start adding some gear!</p>
-    </div>
+    <!-- Cart items will be displayed here -->
   </div>
-  <div class="cart-footer" id="cartFooter" style="display:none;">
-    <div class="cart-subtotal">
-      <span>Subtotal</span>
-      <span id="cartSubtotal">$0.00</span>
-    </div>
-    <div class="cart-subtotal">
-      <span>Shipping</span>
-      <span style="color: var(--color-green-light);">FREE</span>
-    </div>
+  <div class="cart-footer">
     <div class="cart-total">
-      <span>Total</span>
+      <span>Total:</span>
       <span id="cartTotal">$0.00</span>
     </div>
-    <button class="btn btn-primary">Proceed to Checkout</button>
-    <button class="btn btn-outline" onclick="toggleCart()">Continue Shopping</button>
+    <button class="cart-checkout" onclick="checkout()">Checkout</button>
+  </div>
+</div>
+
+<!-- PRODUCT DETAIL MODAL -->
+<div class="modal" id="productModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeProductModal()">×</button>
+    <div class="modal-image" id="modalImage">
+      <!-- Product image -->
+    </div>
+    <div class="modal-header" id="modalTitle"></div>
+    <div class="modal-body" id="modalDescription"></div>
+    <div style="margin-bottom: 20px;">
+      <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 10px;">Quantity:</div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button style="width: 32px; height: 32px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-weight: 600;" onclick="decreaseQty()">−</button>
+        <span id="qtyDisplay" style="min-width: 30px; text-align: center; font-weight: 600;">1</span>
+        <button style="width: 32px; height: 32px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-weight: 600;" onclick="increaseQty()">+</button>
+      </div>
+    </div>
+    <div style="font-size: 18px; font-weight: 600; color: #3d4a2f; margin-bottom: 20px;">Price: <span id="modalPrice"></span></div>
+    <div class="modal-footer">
+      <button class="modal-button primary" onclick="addToCart()">Add to Cart</button>
+      <button class="modal-button secondary" onclick="closeProductModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="modal" id="adminLoginModal">
+  <div class="modal-content" style="max-width: 400px;">
+    <button class="modal-close" onclick="closeAdminModal()">×</button>
+    <div class="modal-header">Admin Access</div>
+    <div class="modal-body">Enter the admin password to access the inventory dashboard.</div>
+    <div style="margin-bottom: 20px;">
+      <input type="password" id="adminPassword" placeholder="Enter password" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+    </div>
+    <div class="modal-footer">
+      <button class="modal-button primary" onclick="submitAdminPassword()">Login</button>
+      <button class="modal-button secondary" onclick="closeAdminModal()">Cancel</button>
+    </div>
   </div>
 </div>
 
 <!-- FOOTER -->
 <footer class="footer">
   <div class="container">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <div class="logo-name" style="color: var(--color-tan);">Blackhawk Creek</div>
-        <div class="logo-sub" style="color: var(--color-gray); font-family: var(--font-heading); font-size: 10px; letter-spacing: 4px; text-transform: uppercase;">Outfitters</div>
-        <p>Your trusted source for premium fishing and hunting gear since 2024. We live the outdoor lifestyle and stand behind every product we sell.</p>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>About Us</h4>
+        <a href="#">Our Story</a>
+        <a href="#">Quality Promise</a>
+        <a href="#">Sustainability</a>
       </div>
-      <div>
-        <h4>Fishing</h4>
-        <ul>
-          <li><a href="#">Rods & Reels</a></li>
-          <li><a href="#">Tackle & Lures</a></li>
-          <li><a href="#">Fly Fishing</a></li>
-          <li><a href="#">Ice Fishing</a></li>
-          <li><a href="#">Fishing Line</a></li>
-          <li><a href="#">Fish Finders</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Hunting</h4>
-        <ul>
-          <li><a href="#">Firearms</a></li>
-          <li><a href="#">Ammunition</a></li>
-          <li><a href="#">Tree Stands</a></li>
-          <li><a href="#">Blinds & Decoys</a></li>
-          <li><a href="#">Game Calls</a></li>
-          <li><a href="#">Knives & Tools</a></li>
-        </ul>
-      </div>
-      <div>
+      <div class="footer-section">
         <h4>Customer Service</h4>
-        <ul>
-          <li><a href="#">Contact Us</a></li>
-          <li><a href="#">Shipping Info</a></li>
-          <li><a href="#">Returns & Exchanges</a></li>
-          <li><a href="#">Order Status</a></li>
-          <li><a href="#">Gift Cards</a></li>
-          <li><a href="#">FAQ</a></li>
-        </ul>
+        <a href="#">Contact Us</a>
+        <a href="#">Returns</a>
+        <a href="#">Shipping Info</a>
       </div>
-      <div>
-        <h4>Company</h4>
-        <ul>
-          <li><a href="#">About Us</a></li>
-          <li><a href="#">Careers</a></li>
-          <li><a href="#">Pro Staff</a></li>
-          <li><a href="#">Blog</a></li>
-          <li><a href="#">Store Locations</a></li>
-          <li><a href="#">Privacy Policy</a></li>
-        </ul>
+      <div class="footer-section">
+        <h4>Resources</h4>
+        <a href="#">Fishing Tips</a>
+        <a href="#">Gear Guide</a>
+        <a href="#">Blog</a>
+      </div>
+      <div class="footer-section">
+        <h4>Legal</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Accessibility</a>
       </div>
     </div>
     <div class="footer-bottom">
-      <div>&copy; 2026 Blackhawk Creek Outfitters. All rights reserved.</div>
-      <div class="footer-payments">
-        <span class="payment-icon">VISA</span>
-        <span class="payment-icon">MC</span>
-        <span class="payment-icon">AMEX</span>
-        <span class="payment-icon">PAYPAL</span>
-        <span class="payment-icon">APPLE PAY</span>
-      </div>
+      <p>&copy; 2024 Blackhawk Creek Outfitters. All rights reserved. | Synced with Clover POS</p>
     </div>
   </div>
 </footer>
 
 <script>
-// ===================== PRODUCT DATA =====================
-const products = {
-  fishing: [
-    { id: 1, name: "Stradic FL Spinning Reel", brand: "Shimano", price: 199.99, original: 249.99, rating: 4.8, reviews: 342, badge: "sale", icon: "&#127907;", desc: "The Shimano Stradic FL features HAGANE body construction for rigidity and reduced flex. Long-lasting, smooth performance with MicroModule II gearing and X-Ship technology." },
-    { id: 2, name: "Revo SX Baitcasting Reel", brand: "Abu Garcia", price: 129.99, original: null, rating: 4.6, reviews: 218, badge: "hot", icon: "&#127907;", desc: "Engineered with an X2-Craftic alloy frame for increased corrosion resistance. Features a compact bent handle and Infini II spool design for long, accurate casts." },
-    { id: 3, name: "Original Floating Minnow", brand: "Rapala", price: 8.99, original: null, rating: 4.9, reviews: 1024, badge: null, icon: "&#129416;", desc: "The lure that started it all. Handcrafted and tank-tested for a lifelike wounded minnow action that fish can't resist." },
-    { id: 4, name: "Tatula Elite Spinning Rod 7'", brand: "Daiwa", price: 179.99, original: 219.99, rating: 4.7, reviews: 156, badge: "sale", icon: "&#127907;", desc: "SVF Nanoplus blanks provide incredible sensitivity and strength with a lightweight, balanced feel. Premium Fuji K-Frame guides reduce line tangles." },
-    { id: 5, name: "Speed Spool LFS Baitcast Reel", brand: "Lew's", price: 99.99, original: null, rating: 4.5, reviews: 287, badge: "new", icon: "&#127907;", desc: "10 bearing system with premium stainless steel double-shielded bearings and a zero-reverse one-way clutch bearing for solid hooksets." },
-    { id: 6, name: "PowerPro Braided Line 300yd", brand: "Shimano", price: 24.99, original: 29.99, rating: 4.7, reviews: 890, badge: null, icon: "&#129526;", desc: "Ultra-strong, round, smooth, and sensitive. Enhanced Body Technology creates a rounder, smoother, more sensitive line with less vibration." },
-    { id: 7, name: "KastKing Royale Legend Rod", brand: "KastKing", price: 59.99, original: 79.99, rating: 4.4, reviews: 512, badge: "sale", icon: "&#127907;", desc: "Tournament quality carbon fiber blanks deliver explosive power with superior sensitivity. Fuji O-ring guides for smooth line flow." },
-    { id: 8, name: "Striker Plus 7sv Fish Finder", brand: "Garmin", price: 429.99, original: 499.99, rating: 4.8, reviews: 203, badge: "hot", icon: "&#128225;", desc: "Built-in GPS and CHIRP sonar with ClearVu and SideVu scanning sonar. Quickdraw Contours mapping software creates HD fishing maps." },
-  ],
-  hunting: [
-    { id: 9, name: "870 Express Pump Shotgun 12ga", brand: "Remington", price: 449.99, original: null, rating: 4.7, reviews: 1250, badge: null, icon: "&#128299;", desc: "The most popular pump-action shotgun in history. Rugged, reliable, and smooth. Twin action bars prevent binding and twisting for ultra-smooth operation." },
-    { id: 10, name: "Model 110 Ultralight .308 Win", brand: "Savage Arms", price: 899.99, original: 1049.99, rating: 4.9, reviews: 89, badge: "sale", icon: "&#128299;", desc: "Carbon fiber-wrapped stainless steel barrel with spiral fluted bolt and skeletonized receiver. AccuTrigger delivers a crisp, adjustable pull." },
-    { id: 11, name: "Obsession Camo Hunting Jacket", brand: "Mossy Oak", price: 89.99, original: null, rating: 4.5, reviews: 324, badge: "new", icon: "&#129509;", desc: "Advanced concealment technology with a quiet, windproof outer shell. Scent control technology and multiple pockets for gear organization." },
-    { id: 12, name: "Muddy Nexus 2-Person Treestand", brand: "Muddy", price: 249.99, original: 299.99, rating: 4.6, reviews: 176, badge: "sale", icon: "&#127795;", desc: "Spacious 2-person design with FlexTek seats. Oversized platform with Quiet-Glide cable system. Rated to 500 lbs." },
-    { id: 13, name: "Viper HD 10x42 Binoculars", brand: "Vortex", price: 329.99, original: 389.99, rating: 4.8, reviews: 567, badge: "hot", icon: "&#128269;", desc: "HD extra-low dispersion glass delivers stunning resolution and color fidelity. XR fully multi-coated lenses for maximum light transmission." },
-    { id: 14, name: "Accu-Fit Turkey Call Kit", brand: "Primos", price: 34.99, original: null, rating: 4.4, reviews: 445, badge: null, icon: "&#129414;", desc: "Complete turkey calling kit with pot call, box call, and 3 mouth calls. Realistic yelps, clucks, purrs, and gobbles." },
-    { id: 15, name: "Hunter Safety System Vest", brand: "HSS", price: 119.99, original: null, rating: 4.7, reviews: 210, badge: null, icon: "&#129509;", desc: "Elimishield scent control integrated harness vest. Fully adjustable and rated to 300 lbs. Includes tree strap and suspension relief device." },
-    { id: 16, name: "Federal Premium 12ga Turkey Load", brand: "Federal", price: 21.99, original: null, rating: 4.6, reviews: 380, badge: null, icon: "&#128299;", desc: "3rd Degree turkey load with a blend of three shot types. Lethal at close and long range with extremely tight patterns." },
-  ],
-  firearms: [
-    { id: 17, name: "M&P 15 Sport II 5.56 NATO", brand: "Smith & Wesson", price: 749.99, original: 849.99, rating: 4.7, reviews: 920, badge: "sale", icon: "&#128299;", desc: "Reliable gas-operated semi-auto rifle with 16\" barrel, 6-position collapsible stock, and Armornite durable corrosion-resistant finish." },
-    { id: 18, name: "Super Black Eagle 3 12ga", brand: "Benelli", price: 1799.99, original: null, rating: 4.9, reviews: 310, badge: "hot", icon: "&#128299;", desc: "The ultimate waterfowl shotgun. Inertia Driven system cycles everything from light target loads to 3.5\" magnums flawlessly." },
-    { id: 19, name: "Model 700 ADL .30-06", brand: "Remington", price: 549.99, original: 649.99, rating: 4.6, reviews: 780, badge: "sale", icon: "&#128299;", desc: "America's favorite bolt-action. Legendary accuracy, smooth bolt throw, and an adjustable trigger. Comes with factory-mounted 3-9x40 scope." },
-    { id: 20, name: "500 Combo Field/Deer 12ga", brand: "Mossberg", price: 399.99, original: null, rating: 4.5, reviews: 650, badge: null, icon: "&#128299;", desc: "Versatile combo with 28\" vent rib field barrel and 24\" rifled slug barrel. Ambidextrous top tang safety and dual extractors." },
-  ],
-  apparel: [
-    { id: 21, name: "Sitka Fanatic Jacket", brand: "Sitka", price: 429.99, original: 499.99, rating: 4.9, reviews: 156, badge: "sale", icon: "&#129509;", desc: "Gore Optifade Elevated II concealment pattern. Berber fleece insulation and GORE-TEX INFINIUM WINDSTOPPER membrane for silent warmth." },
-    { id: 22, name: "Irish Setter Vaprtrek 8\" Boot", brand: "Red Wing", price: 169.99, original: null, rating: 4.7, reviews: 445, badge: "hot", icon: "&#128094;", desc: "Ultra-light hunting boot with RPM composite sole technology. UltraDry waterproof system and ScentBan antimicrobial lining." },
-    { id: 23, name: "Alpha Warm Camo Hoodie", brand: "Under Armour", price: 79.99, original: null, rating: 4.5, reviews: 320, badge: null, icon: "&#129509;", desc: "ColdGear Reactor adaptive insulation. Real Tree Edge camo pattern with wind-resistant front panel and quiet construction." },
-    { id: 24, name: "Neoprene Chest Waders", brand: "Frogg Toggs", price: 99.99, original: 129.99, rating: 4.3, reviews: 280, badge: "sale", icon: "&#129509;", desc: "3.5mm neoprene with 600-gram Thinsulate insulated rubber boots. Adjustable neoprene suspenders and interior chest pocket." },
-  ],
-  optics: [
-    { id: 25, name: "Crossfire II 3-9x40 Riflescope", brand: "Vortex", price: 149.99, original: 179.99, rating: 4.6, reviews: 920, badge: "sale", icon: "&#128269;", desc: "Long eye relief, fast-focus eyepiece, and fully multi-coated lenses. Dead-Hold BDC reticle and capped reset turrets." },
-    { id: 26, name: "Fury HD 5000 AB Rangefinder", brand: "Vortex", price: 499.99, original: null, rating: 4.8, reviews: 178, badge: "new", icon: "&#128269;", desc: "Applied Ballistics solver built-in with Bluetooth. Ranges reflective targets to 5,000 yards. HD optical system with anti-reflective coatings." },
-    { id: 27, name: "Mark 4HD 4.5-18x52 Riflescope", brand: "Leupold", price: 1299.99, original: 1499.99, rating: 4.9, reviews: 86, badge: "hot", icon: "&#128269;", desc: "Elite optical system with Twilight Max HD Light Management System. Custom Dial System for precision long-range shooting. Made in USA." },
-    { id: 28, name: "EL 10x42 Swarovision Binoculars", brand: "Swarovski", price: 2349.99, original: null, rating: 5.0, reviews: 62, badge: null, icon: "&#128269;", desc: "The finest binoculars money can buy. Swarovision technology delivers edge-to-edge sharpness with natural color reproduction. Wrap-around grip." },
-  ]
-};
+const API_BASE = '';
+const ADMIN_PASSWORD = 'admin123';
 
-// Combine featured/best sellers from various categories
-const featured = [products.fishing[0], products.hunting[4], products.fishing[7], products.hunting[1], products.fishing[1], products.apparel[0], products.optics[0], products.firearms[0]];
-const bestSellers = [products.fishing[2], products.hunting[0], products.optics[2], products.hunting[3], products.fishing[4], products.hunting[5], products.apparel[1], products.optics[1]];
-
-// ===================== CART =====================
 let cart = [];
+let products = [];
+let selectedProduct = null;
+let selectedQty = 1;
+let allProducts = [];
+let currentCategory = 'All';
 
-function toggleCart() {
-  document.getElementById('cartOverlay').classList.toggle('active');
-  document.getElementById('cartSidebar').classList.toggle('active');
+// ============ INITIALIZATION ============
+async function initApp() {
+  loadCartFromStorage();
+  updateCartUI();
+  await loadProducts();
+  buildNavigation();
+  displayProducts(allProducts);
 }
 
-function updateCart() {
-  const countEl = document.getElementById('cartCount');
-  const itemsEl = document.getElementById('cartItems');
-  const footerEl = document.getElementById('cartFooter');
-  const subtotalEl = document.getElementById('cartSubtotal');
-  const totalEl = document.getElementById('cartTotal');
-  const count = cart.reduce((s, i) => s + i.qty, 0);
-  countEl.textContent = count;
-
-  if (cart.length === 0) {
-    itemsEl.innerHTML = '<div class="cart-empty"><div class="icon">&#128722;</div><p>Your cart is empty</p><p style="font-size:13px; margin-top:8px;">Start adding some gear!</p></div>';
-    footerEl.style.display = 'none';
-    return;
+async function loadProducts() {
+  try {
+    const response = await fetch(API_BASE + '/api/products/flat');
+    const data = await response.json();
+    allProducts = Array.isArray(data) ? data : [];
+    products = allProducts;
+  } catch (error) {
+    console.error('Error loading products:', error);
+    allProducts = [];
   }
-  footerEl.style.display = 'block';
-  let total = 0;
-  itemsEl.innerHTML = cart.map((item, idx) => {
-    const lineTotal = item.price * item.qty;
-    total += lineTotal;
-    return `<div class="cart-item">
-      <div class="cart-item-image">${item.icon}</div>
-      <div class="cart-item-details">
-        <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-brand">${item.brand} &bull; Qty: ${item.qty}</div>
-        <div class="cart-item-bottom">
-          <div class="cart-item-price">$${lineTotal.toFixed(2)}</div>
-          <button class="cart-item-remove" onclick="removeFromCart(${idx})">Remove</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-  subtotalEl.textContent = '$' + total.toFixed(2);
-  totalEl.textContent = '$' + total.toFixed(2);
 }
 
-function addToCart(product, qty = 1) {
-  const existing = cart.find(i => i.id === product.id);
-  if (existing) { existing.qty += qty; }
-  else { cart.push({ ...product, qty }); }
-  updateCart();
-  // flash the cart icon
-  const countEl = document.getElementById('cartCount');
-  countEl.style.transform = 'scale(1.4)';
-  setTimeout(() => countEl.style.transform = 'scale(1)', 200);
+function buildNavigation() {
+  const categories = new Set(['All']);
+  allProducts.forEach(product => {
+    if (product.category) categories.add(product.category);
+  });
+
+  const navContainer = document.getElementById('navContainer');
+  navContainer.innerHTML = '';
+  categories.forEach(cat => {
+    const item = document.createElement('div');
+    item.className = 'nav-item' + (cat === 'All' ? ' active' : '');
+    item.textContent = cat.toUpperCase();
+    item.onclick = function() { showCategory(cat, this); };
+    navContainer.appendChild(item);
+  });
 }
 
-function removeFromCart(idx) {
-  cart.splice(idx, 1);
-  updateCart();
+function showCategory(category, el) {
+  currentCategory = category;
+  const filtered = category === 'All'
+    ? allProducts
+    : allProducts.filter(p => p.category === category);
+  displayProducts(filtered);
+
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  if (el) el.classList.add('active');
 }
 
-function addToCartFromModal() {
-  const qty = parseInt(document.getElementById('modalQty').value) || 1;
-  addToCart(currentModalProduct, qty);
-  closeModal();
-  toggleCart();
-}
+function displayProducts(productsToShow) {
+  const grid = document.getElementById('productsGrid');
+  grid.innerHTML = '';
 
-// ===================== PRODUCT CARDS =====================
-function renderStars(rating) {
-  const full = Math.floor(rating);
-  const half = rating % 1 >= 0.5 ? 1 : 0;
-  return '&#9733;'.repeat(full) + (half ? '&#9734;' : '') + '&#9734;'.repeat(5 - full - half);
+  productsToShow.forEach(product => {
+    const card = createProductCard(product);
+    grid.appendChild(card);
+  });
 }
 
 function createProductCard(product) {
-  const badgeHtml = product.badge ? `<div class="product-badge badge-${product.badge}">${product.badge === 'sale' ? 'SALE' : product.badge === 'new' ? 'NEW' : 'HOT'}</div>` : '';
-  const originalHtml = product.original ? `<span class="price-original">$${product.original.toFixed(2)}</span>` : '';
-  const saveHtml = product.original ? `<span class="price-save">Save $${(product.original - product.price).toFixed(2)}</span>` : '';
-  return `<div class="product-card" onclick="openProductModal(${product.id})">
-    <div class="product-image">
-      ${badgeHtml}
-      <div class="product-wishlist">&#9825;</div>
-      ${product.icon}
-    </div>
-    <div class="product-info">
-      <div class="product-brand">${product.brand}</div>
+  const card = document.createElement('div');
+  card.className = 'product-card';
+
+  let imageHTML = '';
+  if (product.imageUrl) {
+    imageHTML = `
+      <div class="product-card-image">
+        <img src="${product.imageUrl}" alt="${product.name}">
+      </div>
+    `;
+  } else {
+    imageHTML = '<div class="product-card-image"></div>';
+  }
+
+  const brandHTML = product.brand ? `<div class="product-brand">${product.brand}</div>` : '';
+
+  card.innerHTML = `
+    ${imageHTML}
+    <div class="product-card-content">
+      ${brandHTML}
       <div class="product-name">${product.name}</div>
-      <div class="product-rating">
-        <span class="stars">${renderStars(product.rating)}</span>
-        <span class="rating-count">(${product.reviews})</span>
-      </div>
-      <div class="product-price">
-        <span class="price-current">$${product.price.toFixed(2)}</span>
-        ${originalHtml}
-        ${saveHtml}
-      </div>
-      <button class="btn btn-green" onclick="event.stopPropagation(); addToCart(findProduct(${product.id})); toggleCart();">Add to Cart</button>
+      <div class="product-price">$${(product.price || 0).toFixed(2)}</div>
+      <button class="product-card-button" onclick="openProductModal(${product.id})">View Details</button>
     </div>
-  </div>`;
+  `;
+
+  return card;
 }
 
-function findProduct(id) {
-  for (const cat of Object.values(products)) {
-    const p = cat.find(i => i.id === id);
-    if (p) return p;
+// ============ PRODUCT MODAL ============
+function openProductModal(productId) {
+  selectedProduct = allProducts.find(p => p.id === productId);
+  if (!selectedProduct) return;
+
+  selectedQty = 1;
+
+  const imageContainer = document.getElementById('modalImage');
+  if (selectedProduct.imageUrl) {
+    imageContainer.innerHTML = `<img src="${selectedProduct.imageUrl}" alt="${selectedProduct.name}">`;
+  } else {
+    imageContainer.innerHTML = '';
   }
-  return null;
-}
 
-// ===================== MODAL =====================
-let currentModalProduct = null;
-function openProductModal(id) {
-  const p = findProduct(id);
-  if (!p) return;
-  currentModalProduct = p;
-  document.getElementById('modalImage').innerHTML = p.icon;
-  document.getElementById('modalBrand').textContent = p.brand;
-  document.getElementById('modalName').textContent = p.name;
-  document.getElementById('modalStars').innerHTML = renderStars(p.rating);
-  document.getElementById('modalReviews').textContent = `(${p.reviews} reviews)`;
-  document.getElementById('modalPrice').textContent = `$${p.price.toFixed(2)}`;
-  document.getElementById('modalOriginal').textContent = p.original ? `$${p.original.toFixed(2)}` : '';
-  document.getElementById('modalSave').textContent = p.original ? `Save $${(p.original - p.price).toFixed(2)}` : '';
-  document.getElementById('modalDesc').textContent = p.desc;
-  document.getElementById('modalQty').value = 1;
+  document.getElementById('modalTitle').textContent = selectedProduct.name;
+  document.getElementById('modalDescription').textContent = selectedProduct.description || 'A premium product from Blackhawk Creek Outfitters.';
+  document.getElementById('modalPrice').textContent = '$' + (selectedProduct.price || 0).toFixed(2);
+  document.getElementById('qtyDisplay').textContent = '1';
+
   document.getElementById('productModal').classList.add('active');
-  document.body.style.overflow = 'hidden';
 }
 
-function closeModal() {
+function closeProductModal() {
   document.getElementById('productModal').classList.remove('active');
-  document.body.style.overflow = '';
+  selectedProduct = null;
 }
 
-function changeQty(delta) {
-  const el = document.getElementById('modalQty');
-  const v = Math.max(1, parseInt(el.value) + delta);
-  el.value = v;
+function increaseQty() {
+  selectedQty++;
+  document.getElementById('qtyDisplay').textContent = selectedQty;
 }
 
-// ===================== NAVIGATION =====================
-function navigateTo(page) {
-  // Reset nav active states
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-
-  if (page === 'home') {
-    document.getElementById('page-home').classList.add('active');
-    document.getElementById('page-listing').classList.remove('active');
-    document.querySelectorAll('.nav-item')[0].classList.add('active');
-    window.scrollTo(0, 0);
-    return;
-  }
-
-  // Handle "sale" — show all sale items across categories
-  if (page === 'sale') {
-    const saleItems = [];
-    for (const cat of Object.values(products)) {
-      saleItems.push(...cat.filter(p => p.badge === 'sale'));
-    }
-    document.getElementById('page-home').classList.remove('active');
-    document.getElementById('page-listing').classList.add('active');
-    document.getElementById('breadcrumbCategory').textContent = 'Sale';
-    document.getElementById('listingTitle').textContent = 'Sale Items';
-    document.getElementById('resultsCount').textContent = saleItems.length + ' Products';
-    document.getElementById('listingProducts').innerHTML = saleItems.length > 0
-      ? saleItems.map(p => createProductCard(p)).join('')
-      : '<p style="color:#888;">No sale items right now. Check back soon!</p>';
-    window.scrollTo(0, 0);
-    return;
-  }
-
-  // Find and highlight the active nav item dynamically
-  const navItem = document.querySelector(`.nav-item[data-cat="${page}"]`);
-  if (navItem) navItem.classList.add('active');
-
-  // Get display name from category metadata, or format the key
-  const displayName = cloverCategoryMeta[page]?.name
-    || page.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-
-  document.getElementById('page-home').classList.remove('active');
-  document.getElementById('page-listing').classList.add('active');
-  document.getElementById('breadcrumbCategory').textContent = displayName;
-  document.getElementById('listingTitle').textContent = displayName;
-
-  const items = products[page] || [];
-  document.getElementById('resultsCount').textContent = items.length + ' Products';
-  document.getElementById('listingProducts').innerHTML = items.length > 0
-    ? items.map(p => createProductCard(p)).join('')
-    : '<p style="color:#888;">No products in this category yet.</p>';
-
-  // Update sidebar filters dynamically based on the products in this category
-  updateSidebarFilters(items, displayName);
-
-  window.scrollTo(0, 0);
+function decreaseQty() {
+  if (selectedQty > 1) selectedQty--;
+  document.getElementById('qtyDisplay').textContent = selectedQty;
 }
 
-function updateSidebarFilters(items, categoryName) {
-  const sidebar = document.querySelector('.sidebar');
-  if (!sidebar) return;
+function addToCart() {
+  if (!selectedProduct) return;
 
-  // Get unique brands in this category
-  const brands = [...new Set(items.map(p => p.brand))].sort();
-  // Get unique Clover subcategories
-  const subCats = [...new Set(items.map(p => p.cloverCategory).filter(Boolean))].sort();
-
-  let html = '';
-
-  if (subCats.length > 1) {
-    html += '<div class="filter-group"><h4>Subcategory</h4>';
-    subCats.forEach(sc => {
-      const count = items.filter(p => p.cloverCategory === sc).length;
-      html += `<label class="filter-option"><input type="checkbox" checked> ${sc} (${count})</label>`;
+  const existingItem = cart.find(item => item.id === selectedProduct.id);
+  if (existingItem) {
+    existingItem.quantity += selectedQty;
+  } else {
+    cart.push({
+      id: selectedProduct.id,
+      name: selectedProduct.name,
+      price: selectedProduct.price,
+      quantity: selectedQty,
+      imageUrl: selectedProduct.imageUrl,
+      brand: selectedProduct.brand
     });
-    html += '</div>';
   }
 
-  if (brands.length > 0) {
-    html += '<div class="filter-group"><h4>Brand</h4>';
-    brands.forEach(b => {
-      const count = items.filter(p => p.brand === b).length;
-      html += `<label class="filter-option"><input type="checkbox"> ${b} (${count})</label>`;
-    });
-    html += '</div>';
-  }
-
-  html += `<div class="filter-group"><h4>Price Range</h4>
-    <div class="price-range">
-      <input type="text" placeholder="$0"> &mdash; <input type="text" placeholder="$${Math.ceil(Math.max(...items.map(p => p.price), 100))}">
-    </div></div>`;
-
-  html += `<div class="filter-group"><h4>Availability</h4>
-    <label class="filter-option"><input type="checkbox" checked> In Stock (${items.filter(p => p.inStock).length})</label>
-  </div>`;
-
-  html += '<button class="btn btn-green" style="width:100%;text-align:center;">Apply Filters</button>';
-
-  sidebar.innerHTML = html;
+  saveCartToStorage();
+  updateCartUI();
+  closeProductModal();
+  alert('Added to cart!');
 }
 
-// ===================== INIT =====================
-document.getElementById('featuredProducts').innerHTML = featured.map(p => createProductCard(p)).join('');
-document.getElementById('bestSellers').innerHTML = bestSellers.map(p => createProductCard(p)).join('');
-
-// Close modal on overlay click
-document.getElementById('productModal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-
-// Keyboard shortcuts
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    closeModal();
-    if (document.getElementById('cartSidebar').classList.contains('active')) toggleCart();
-    closeAdmin();
-  }
-});
-
-// ===================== CLOVER POS SYNC =====================
-const API_BASE = '';  // Same server, use relative paths
-
-let adminOpen = false;
-function toggleAdmin() {
-  adminOpen = !adminOpen;
-  document.getElementById('adminPanel').classList.toggle('active', adminOpen);
-  if (adminOpen) checkSyncStatus();
-}
-function closeAdmin() {
-  adminOpen = false;
-  document.getElementById('adminPanel').classList.remove('active');
+// ============ CART MANAGEMENT ============
+function toggleCart() {
+  document.getElementById('cartSidebar').classList.toggle('open');
 }
 
-async function checkSyncStatus() {
-  const statusEl = document.getElementById('syncStatus');
-  try {
-    const res = await fetch(`${API_BASE}/api/sync-status`);
-    const data = await res.json();
-    if (data.configured) {
-      document.getElementById('cloverStatus').innerHTML = '&#9989; Clover Connected';
-      document.getElementById('cloverStatus').style.color = '#5e7442';
-    } else {
-      document.getElementById('cloverStatus').innerHTML = '&#9888; Not Configured';
-      document.getElementById('cloverStatus').style.color = '#e67e22';
-    }
-    if (data.lastSync) {
-      const ago = timeSince(new Date(data.lastSync));
-      statusEl.innerHTML = `Last sync: <strong>${ago} ago</strong> &bull; ${data.itemCount} products`;
-      if (data.categories) {
-        document.getElementById('syncCategories').innerHTML = data.categories.map(c =>
-          `<span class="sync-cat-badge">${c.name}: ${c.count}</span>`
-        ).join('');
+function updateCartUI() {
+  const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+  document.getElementById('cartCount').textContent = count;
+
+  const cartItemsContainer = document.getElementById('cartItems');
+  cartItemsContainer.innerHTML = '';
+
+  if (cart.length === 0) {
+    cartItemsContainer.innerHTML = '<p style="padding: 20px; color: #999;">Your cart is empty</p>';
+  } else {
+    cart.forEach((item, index) => {
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'cart-item';
+
+      let imageHTML = '';
+      if (item.imageUrl) {
+        imageHTML = `<div class="cart-item-image"><img src="${item.imageUrl}" alt="${item.name}"></div>`;
+      } else {
+        imageHTML = '<div class="cart-item-image"></div>';
       }
-    } else {
-      statusEl.innerHTML = 'No sync yet — click <strong>Sync Now</strong> to pull products from Clover';
+
+      itemDiv.innerHTML = `
+        ${imageHTML}
+        <div class="cart-item-details">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+          <div class="cart-item-qty">
+            <button onclick="decreaseCartQty(${index})">−</button>
+            <span>${item.quantity}</span>
+            <button onclick="increaseCartQty(${index})">+</button>
+            <button class="cart-item-remove" onclick="removeFromCart(${index})">Remove</button>
+          </div>
+        </div>
+      `;
+      cartItemsContainer.appendChild(itemDiv);
+    });
+  }
+
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  document.getElementById('cartTotal').textContent = '$' + total.toFixed(2);
+}
+
+function increaseCartQty(index) {
+  cart[index].quantity++;
+  saveCartToStorage();
+  updateCartUI();
+}
+
+function decreaseCartQty(index) {
+  if (cart[index].quantity > 1) {
+    cart[index].quantity--;
+  } else {
+    removeFromCart(index);
+  }
+  saveCartToStorage();
+  updateCartUI();
+}
+
+function removeFromCart(index) {
+  cart.splice(index, 1);
+  saveCartToStorage();
+  updateCartUI();
+}
+
+function saveCartToStorage() {
+  localStorage.setItem('blackhawkcart', JSON.stringify(cart));
+}
+
+function loadCartFromStorage() {
+  const saved = localStorage.getItem('blackhawkcart');
+  if (saved) {
+    try {
+      cart = JSON.parse(saved);
+    } catch (e) {
+      cart = [];
     }
-  } catch (err) {
-    statusEl.innerHTML = '&#10060; Cannot reach sync server. Is it running on localhost:3000?';
-    document.getElementById('cloverStatus').innerHTML = '&#10060; Server Offline';
-    document.getElementById('cloverStatus').style.color = '#c0392b';
   }
 }
 
-async function runSync() {
-  const pw = document.getElementById('adminPassword').value;
-  if (!pw) { alert('Enter your admin password'); return; }
-  const btn = document.getElementById('syncBtn');
-  const log = document.getElementById('syncLog');
-  btn.disabled = true;
-  btn.textContent = 'SYNCING...';
-  log.textContent = 'Connecting to Clover POS...';
-  log.style.display = 'block';
+function checkout() {
+  if (cart.length === 0) {
+    alert('Your cart is empty!');
+    return;
+  }
+  alert('Checkout functionality would be integrated with a payment gateway.');
+  cart = [];
+  saveCartToStorage();
+  updateCartUI();
+  toggleCart();
+}
 
+// ============ SEARCH & FILTER ============
+function performSearch() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  if (!query) {
+    displayProducts(allProducts);
+    return;
+  }
+  const filtered = allProducts.filter(p =>
+    p.name.toLowerCase().includes(query) ||
+    (p.brand && p.brand.toLowerCase().includes(query)) ||
+    (p.category && p.category.toLowerCase().includes(query))
+  );
+  displayProducts(filtered);
+}
+
+function scrollToProducts() {
+  document.querySelector('.products-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ============ ADMIN INTERFACE ============
+function showAdminLoginModal() {
+  document.getElementById('adminLoginModal').classList.add('active');
+}
+
+function closeAdminModal() {
+  document.getElementById('adminLoginModal').classList.remove('active');
+  document.getElementById('adminPassword').value = '';
+}
+
+function submitAdminPassword() {
+  const pwd = document.getElementById('adminPassword').value;
+  if (pwd === ADMIN_PASSWORD) {
+    closeAdminModal();
+    goToBackoffice();
+  } else {
+    alert('Incorrect password');
+  }
+}
+
+function goToBackoffice() {
+  document.getElementById('storefront').classList.remove('active');
+  document.getElementById('backoffice').classList.add('active');
+  loadInventoryTable();
+}
+
+function goToStorefront() {
+  document.getElementById('backoffice').classList.remove('active');
+  document.getElementById('storefront').classList.add('active');
+}
+
+function switchBackofficeTab(tab) {
+  document.getElementById('inventoryTab').style.display = tab === 'inventory' ? 'block' : 'none';
+  document.getElementById('addTab').style.display = tab === 'add' ? 'block' : 'none';
+
+  document.querySelectorAll('.backoffice-nav button').forEach((btn, idx) => {
+    btn.classList.remove('active');
+    if ((idx === 0 && tab === 'inventory') || (idx === 1 && tab === 'add')) {
+      btn.classList.add('active');
+    }
+  });
+}
+
+function loadInventoryTable() {
+  const tbody = document.getElementById('inventoryTableBody');
+  tbody.innerHTML = '';
+
+  allProducts.forEach(product => {
+    const row = document.createElement('tr');
+    let imageHTML = '';
+    if (product.imageUrl) {
+      imageHTML = `<div class="product-thumbnail"><img src="${product.imageUrl}" alt="${product.name}"></div>`;
+    } else {
+      imageHTML = '<div class="product-thumbnail"></div>';
+    }
+
+    row.innerHTML = `
+      <td>${imageHTML}</td>
+      <td>${product.name}</td>
+      <td>${product.brand || '—'}</td>
+      <td>${product.category || '—'}</td>
+      <td>$${(product.price || 0).toFixed(2)}</td>
+      <td>${product.stockCount || product.stock || 0}</td>
+      <td>
+        <button class="btn-upload" onclick="triggerImageUpload(${product.id})">Upload</button>
+        <button class="btn-edit" onclick="editProduct(${product.id})">Edit</button>
+        <button class="btn-delete" onclick="deleteProduct(${product.id})">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function triggerImageUpload(productId) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        uploadProductImage(productId, event.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  input.click();
+}
+
+async function uploadProductImage(productId, base64Data) {
   try {
-    const res = await fetch(`${API_BASE}/api/sync`, {
+    const response = await fetch(API_BASE + '/api/products/' + productId + '/image', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pw })
+      body: JSON.stringify({ imageUrl: base64Data })
     });
-    const data = await res.json();
-    if (data.success) {
-      log.textContent = `✅ ${data.message}\n\nCategories synced:\n` +
-        data.categories.map(c => `  • ${c.name}: ${c.count} products`).join('\n');
-      // Reload products into the website
-      await loadCloverProducts();
-      checkSyncStatus();
+    if (response.ok) {
+      alert('Image uploaded successfully');
+      await loadProducts();
+      loadInventoryTable();
     } else {
-      log.textContent = `❌ ${data.error}\n${data.details || data.help || ''}`;
+      alert('Failed to upload image');
     }
-  } catch (err) {
-    log.textContent = `❌ Cannot reach server: ${err.message}\n\nMake sure the sync server is running:\n  cd blackhawk-creek-clover-sync\n  npm install\n  npm start`;
+  } catch (error) {
+    console.error('Upload error:', error);
+    alert('Error uploading image: ' + error.message);
   }
-  btn.disabled = false;
-  btn.textContent = '🔄 SYNC NOW';
 }
 
-// Store category metadata from Clover
-let cloverCategoryMeta = {};
+function editProduct(productId) {
+  const product = allProducts.find(p => p.id === productId);
+  if (!product) return;
 
-async function loadCloverProducts() {
+  const newName = prompt('Product Name:', product.name);
+  if (newName === null) return;
+  const newBrand = prompt('Brand:', product.brand || '');
+  if (newBrand === null) return;
+  const newPrice = prompt('Price:', product.price);
+  if (newPrice === null) return;
+  const newStock = prompt('Stock:', product.stockCount || product.stock || 0);
+  if (newStock === null) return;
+
+  fetch(API_BASE + '/api/products/' + productId, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: newName,
+      brand: newBrand,
+      price: parseFloat(newPrice),
+      stock: parseInt(newStock)
+    })
+  }).then(res => {
+    if (res.ok) {
+      alert('Product updated');
+      loadProducts().then(() => {
+        buildNavigation();
+        displayProducts(allProducts);
+        loadInventoryTable();
+      });
+    } else {
+      alert('Failed to update product');
+    }
+  }).catch(err => alert('Error: ' + err.message));
+}
+
+async function deleteProduct(productId) {
+  if (!confirm('Are you sure you want to delete this product?')) return;
+
   try {
-    const res = await fetch(`${API_BASE}/api/products`);
-    const data = await res.json();
-    if (data.products && Object.keys(data.products).length > 0) {
-      // Replace product data with Clover data
-      // Keep demo data as fallback for categories not in Clover
-      const cloverKeys = Object.keys(data.products);
-      for (const [category, items] of Object.entries(data.products)) {
-        products[category] = items;
-      }
-
-      // Store category metadata
-      if (data.categoryMeta) {
-        cloverCategoryMeta = data.categoryMeta;
-      }
-
-      // Dynamically rebuild navigation from Clover categories
-      rebuildNavigation(data.categories || []);
-
-      // Dynamically rebuild category cards on homepage
-      rebuildCategoryCards(data.categories || []);
-
-      // Rebuild featured & best sellers from all Clover products
-      const allProducts = [];
-      for (const cat of Object.values(data.products)) {
-        allProducts.push(...cat);
-      }
-
-      // Featured = newest/sale items first, then fill with others
-      const saleItems = allProducts.filter(p => p.badge === 'sale' || p.badge === 'new');
-      const otherItems = allProducts.filter(p => !p.badge);
-      const featuredList = [...saleItems, ...otherItems].slice(0, 8);
-
-      // Best sellers = rest of the products
-      const featuredIds = new Set(featuredList.map(p => p.id));
-      const bestSellerList = allProducts.filter(p => !featuredIds.has(p.id)).slice(0, 8);
-
-      document.getElementById('featuredProducts').innerHTML =
-        featuredList.map(p => createProductCard(p)).join('') || '<p style="color:#888;">No products yet. Sync from Clover to populate.</p>';
-      document.getElementById('bestSellers').innerHTML =
-        bestSellerList.map(p => createProductCard(p)).join('') || '';
-
-      // Hide best sellers section if not enough products
-      const bestSellersSection = document.getElementById('bestSellers').closest('.section');
-      if (bestSellerList.length === 0 && bestSellersSection) {
-        bestSellersSection.style.display = 'none';
-      }
-
-      console.log('✅ Website updated with ' + allProducts.length + ' Clover products across ' + cloverKeys.length + ' categories');
+    const res = await fetch(API_BASE + '/api/products/' + productId, { method: 'DELETE' });
+    if (res.ok) {
+      alert('Product deleted');
+      await loadProducts();
+      buildNavigation();
+      displayProducts(allProducts);
+      loadInventoryTable();
+    } else {
+      alert('Failed to delete product');
     }
   } catch (err) {
-    console.log('ℹ️ Running with built-in demo products (sync server not available)');
+    alert('Error: ' + err.message);
   }
 }
 
-function rebuildNavigation(categories) {
-  const navContainer = document.querySelector('.main-nav .container');
-  if (!navContainer || categories.length === 0) return;
-
-  // Build new nav: Home + each Clover category + Sale
-  let navHTML = '<div class="nav-item active" onclick="navigateTo(\'home\')">Home</div>';
-  for (const cat of categories) {
-    navHTML += `<div class="nav-item" onclick="navigateTo('${cat.key}')" data-cat="${cat.key}">${cat.name}</div>`;
-  }
-  navHTML += '<div class="nav-item sale" onclick="navigateTo(\'sale\')">&#128293; Sale</div>';
-  navContainer.innerHTML = navHTML;
+function showAddProductForm() {
+  switchBackofficeTab('add');
 }
 
-function rebuildCategoryCards(categories) {
-  const grid = document.querySelector('.category-grid');
-  if (!grid || categories.length === 0) return;
+async function handleAddProduct(event) {
+  event.preventDefault();
+  const formData = new FormData(event.target);
+  const productData = {
+    name: formData.get('name'),
+    brand: formData.get('brand'),
+    category: formData.get('category'),
+    price: parseFloat(formData.get('price')),
+    stock: parseInt(formData.get('stock'))
+  };
 
-  grid.innerHTML = categories.map(cat => {
-    const gradient = cat.gradient || ['#2a2a2a', '#151515'];
-    const icon = cat.icon || '&#127967;';
-    return `<div class="category-card" onclick="navigateTo('${cat.key}')">
-      <div class="category-card-bg" style="background: linear-gradient(145deg, ${gradient[0]}, ${gradient[1]});">${icon}</div>
-      <div class="category-card-content">
-        <h3>${cat.name}</h3>
-        <p>${cat.count} Product${cat.count !== 1 ? 's' : ''}</p>
-      </div>
-    </div>`;
-  }).join('');
+  try {
+    const response = await fetch(API_BASE + '/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(productData)
+    });
+    if (response.ok) {
+      alert('Product added successfully');
+      document.getElementById('addProductForm').reset();
+      await loadProducts();
+      buildNavigation();
+      displayProducts(allProducts);
+      switchBackofficeTab('inventory');
+      loadInventoryTable();
+    } else {
+      alert('Failed to add product');
+    }
+  } catch (error) {
+    console.error('Add product error:', error);
+    alert('Error adding product: ' + error.message);
+  }
 }
 
-function timeSince(date) {
-  const seconds = Math.floor((new Date() - date) / 1000);
-  if (seconds < 60) return seconds + 's';
-  if (seconds < 3600) return Math.floor(seconds / 60) + 'm';
-  if (seconds < 86400) return Math.floor(seconds / 3600) + 'h';
-  return Math.floor(seconds / 86400) + 'd';
-}
-
-// Try loading Clover data on page load (falls back silently to demo products)
-loadCloverProducts();
-</script>
-
-<!-- ADMIN SYNC PANEL (triggered by keyboard shortcut Ctrl+Shift+A) -->
-<style>
-  .admin-panel {
-    display: none; position: fixed; top: 0; right: -480px; bottom: 0;
-    width: 460px; max-width: 95vw;
-    background: #141414; border-left: 3px solid var(--color-gold);
-    z-index: 5000; transition: right 0.35s ease;
-    flex-direction: column; overflow-y: auto;
-  }
-  .admin-panel.active { display: flex; right: 0; }
-  .admin-header {
-    padding: 20px; border-bottom: 1px solid #333;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .admin-header h2 {
-    font-family: var(--font-heading); font-size: 18px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase; color: var(--color-gold);
-  }
-  .admin-close { background: none; border: none; color: #999; font-size: 24px; cursor: pointer; }
-  .admin-close:hover { color: white; }
-  .admin-body { padding: 24px; flex: 1; }
-  .admin-section { margin-bottom: 28px; }
-  .admin-section h3 {
-    font-family: var(--font-heading); font-size: 14px; font-weight: 600;
-    letter-spacing: 1.5px; text-transform: uppercase; color: var(--color-tan);
-    margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #2a2a2a;
-  }
-  .admin-field { margin-bottom: 14px; }
-  .admin-field label {
-    display: block; font-size: 12px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 4px;
-  }
-  .admin-field input {
-    width: 100%; padding: 10px 14px; background: #222; border: 1px solid #444;
-    border-radius: 4px; color: white; font-size: 14px; font-family: var(--font-body);
-  }
-  .admin-field input:focus { outline: none; border-color: var(--color-gold); }
-  .sync-status-box {
-    background: #1a1a1a; border: 1px solid #333; border-radius: 6px; padding: 16px;
-    font-size: 13px; color: #aaa; line-height: 1.6;
-  }
-  #cloverStatus { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
-  .sync-cat-badge {
-    display: inline-block; background: #2a2a2a; border: 1px solid #444;
-    border-radius: 3px; padding: 2px 10px; margin: 3px 4px 3px 0;
-    font-size: 11px; color: var(--color-lightgray);
-  }
-  #syncLog {
-    display: none; margin-top: 14px; padding: 14px; background: #0d0d0d;
-    border: 1px solid #333; border-radius: 4px; font-family: monospace;
-    font-size: 12px; color: #aaa; white-space: pre-wrap; line-height: 1.5;
-    max-height: 250px; overflow-y: auto;
-  }
-  .admin-hint {
-    font-size: 11px; color: #555; margin-top: 20px; line-height: 1.5;
-    border-top: 1px solid #222; padding-top: 14px;
-  }
-  .admin-trigger {
-    position: fixed; bottom: 14px; right: 14px; z-index: 4999;
-    background: rgba(30,30,30,0.9); border: 1px solid #444; border-radius: 6px;
-    padding: 8px 14px; font-size: 11px; color: #666; cursor: pointer;
-    font-family: var(--font-body); transition: all 0.2s;
-  }
-  .admin-trigger:hover { color: var(--color-gold); border-color: var(--color-gold); }
-</style>
-
-<div class="admin-panel" id="adminPanel">
-  <div class="admin-header">
-    <h2>&#9881; Admin — Clover Sync</h2>
-    <button class="admin-close" onclick="closeAdmin()">&times;</button>
-  </div>
-  <div class="admin-body">
-    <div class="admin-section">
-      <h3>Connection Status</h3>
-      <div class="sync-status-box">
-        <div id="cloverStatus">Checking...</div>
-        <div id="syncStatus">Loading status...</div>
-        <div id="syncCategories" style="margin-top:8px;"></div>
-      </div>
-    </div>
-
-    <div class="admin-section">
-      <h3>Sync Products from Clover</h3>
-      <div class="admin-field">
-        <label>Admin Password</label>
-        <input type="password" id="adminPassword" placeholder="Enter admin password">
-      </div>
-      <button class="btn btn-primary" id="syncBtn" onclick="runSync()" style="width:100%;text-align:center;">
-        &#128260; SYNC NOW
-      </button>
-      <div id="syncLog"></div>
-    </div>
-
-    <div class="admin-section">
-      <h3>How It Works</h3>
-      <div style="font-size:13px; color:#888; line-height:1.7;">
-        <p><strong style="color:var(--color-tan);">1.</strong> Products, prices, and categories are pulled from your Clover POS inventory</p>
-        <p style="margin-top:8px;"><strong style="color:var(--color-tan);">2.</strong> Clover categories are auto-mapped to website sections (Fishing, Hunting, Firearms, etc.)</p>
-        <p style="margin-top:8px;"><strong style="color:var(--color-tan);">3.</strong> Product data is cached on the server so your website loads fast</p>
-        <p style="margin-top:8px;"><strong style="color:var(--color-tan);">4.</strong> Click <strong>Sync Now</strong> anytime to refresh with the latest data from Clover</p>
-      </div>
-    </div>
-
-    <div class="admin-hint">
-      Keyboard shortcut: <strong>Ctrl + Shift + A</strong> to toggle this panel.<br>
-      Server must be running at <strong>localhost:3000</strong> for sync to work.
-    </div>
-  </div>
-</div>
-
-<button class="admin-trigger" onclick="toggleAdmin()">&#9881; Admin</button>
-
-<script>
-// Ctrl+Shift+A to toggle admin panel
-document.addEventListener('keydown', function(e) {
-  if (e.ctrlKey && e.shiftKey && e.key === 'A') {
-    e.preventDefault();
-    toggleAdmin();
-  }
-});
+// ============ STARTUP ============
+document.addEventListener('DOMContentLoaded', initApp);
 </script>
 
 </body>

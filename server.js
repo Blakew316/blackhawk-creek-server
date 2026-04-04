@@ -21,7 +21,7 @@ const path = require('path');
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(__dirname));
 
 // ─── Config ──────────────────────────────────────────────
 const MERCHANT_ID = process.env.CLOVER_MERCHANT_ID;

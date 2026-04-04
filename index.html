@@ -3027,6 +3027,38 @@ async function initApp() {
   goToHomepage();
 }
 
+// Auto-categorize products by name keywords
+function autoCategorize(name) {
+  const n = (name || '').toLowerCase();
+  // Soft Plastics
+  if (/railworm|tapout|twitch\s?\d|fw shad|crappie dapper|tiny shad|boosa|ridge lizard|crappie strobe|strobe minnow|ribbon tail|creature|worm\s?\d|shad\s?\d|minnow\s?\d|grub|craw|tube|swimbait|soft plastic/i.test(n)) return 'Soft Plastics';
+  // Hardbaits / Crankbaits
+  if (/pressure series|pd\d|crankbait|jerkbait|topwater|popper|walking|rattl/i.test(n)) return 'Hardbaits';
+  // Spinnerbaits
+  if (/spinnerbait|spinner bait/i.test(n)) return 'Spinnerbaits';
+  // Bladed Jigs
+  if (/flock blade|bladed jig|chatterbait|blade\s/i.test(n)) return 'Bladed Jigs';
+  // Swim Jigs
+  if (/swim jig/i.test(n)) return 'Swim Jigs';
+  // Frogs
+  if (/frog|hush frog|vega frog|vega hush/i.test(n)) return 'Frogs';
+  // Hooks
+  if (/hook|jugular|catfish hook|minnow hook|bluegill.*hook|sunfish.*hook/i.test(n)) return 'Hooks';
+  // Jigheads
+  if (/jighead|jig head|ned head/i.test(n)) return 'Jigheads';
+  // Weights & Sinkers
+  if (/weight|sinker|split shot|worm weight|lead\s/i.test(n)) return 'Weights & Sinkers';
+  // Reel Care
+  if (/reel butter|reel oil|reel grease|reel care|lubricant/i.test(n)) return 'Reel Care';
+  // Rod & Reel Combos
+  if (/rod|reel|combo/i.test(n)) return 'Rod & Reel Combos';
+  // Apparel & Accessories
+  if (/hat|shirt|hoodie|cap|apparel|banner|sticker|decal|patch|koozie/i.test(n)) return 'Apparel & Accessories';
+  // Cleaning Products
+  if (/clean|soap|wash/i.test(n)) return 'Cleaning Products';
+  return 'General';
+}
+
 async function loadProducts(retries = 3) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
@@ -3037,6 +3069,12 @@ async function loadProducts(retries = 3) {
       }
       const data = await response.json();
       allProducts = Array.isArray(data) ? data : [];
+      // Auto-categorize products by name if they have no category or are "General"
+      allProducts.forEach(p => {
+        if (!p.category || p.category === 'General') {
+          p.category = autoCategorize(p.name);
+        }
+      });
       products = allProducts;
       return;
     } catch (error) {

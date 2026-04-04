@@ -37,9 +37,17 @@ const ENVIRONMENT = process.env.CLOVER_ENVIRONMENT || 'sandbox';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'changeme123';
 const PORT = process.env.PORT || 3000;
 
+// Clover Ecommerce Payment Keys
+const CLOVER_ECOM_PRIVATE_KEY = process.env.CLOVER_ECOM_PRIVATE_KEY;
+const CLOVER_ECOM_PUBLIC_KEY = process.env.CLOVER_ECOM_PUBLIC_KEY;
+
 const BASE_URL = ENVIRONMENT === 'production'
   ? 'https://api.clover.com'
   : 'https://sandbox.dev.clover.com';
+
+const ECOM_BASE_URL = ENVIRONMENT === 'production'
+  ? 'https://scl.clover.com'
+  : 'https://scl-sandbox.dev.clover.com';
 
 // Cached product data file
 const DATA_FILE = path.join(__dirname, 'data', 'products.json');
@@ -742,6 +750,133 @@ app.delete('/api/products/:id', (req, res) => {
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── Clover Ecommerce: Get public key for frontend ─────────
+app.get('/api/checkout/config', (req, res) => {
+  res.json({
+    publicKey: CLOVER_ECOM_PUBLIC_KEY || '',
+    merchantId: MERCHANT_ID || '',
+    environment: ENVIRONMENT
+  });
+});
+
+// ─── Clover Ecommerce: Process a payment ────────────────────
+app.post('/api/checkout', async (req, res) => {
+  try {
+    const { token, amount, items, shipping, billing, email } = req.body;
+
+    if (!token) return res.status(400).json({ error: 'Payment token is required' });
+    if (!amount || amount <= 0) return res.status(400).json({ error: 'Invalid amount' });
+    if (!CLOVER_ECOM_PRIVATE_KEY) return res.status(500).json({ error: 'Payment processing not configured' });
+
+    const amountInCents = Math.round(amount * 100);
+    const taxRate = 0.0825; // Texas 8.25%
+    const taxInCents = Math.round(amountInCents * taxRate);
+    const totalInCents = amountInCents + taxInCents;
+
+    // Create charge via Clover Ecommerce API
+    const chargePayload = {
+      amount: totalInCents,
+      currency: 'usd',
+      source: token,
+      description: 'Blackhawk Creek Outfitters — Online Order',
+      receipt_email: email || undefined,
+      metadata: {
+        shipping_name: shipping ? `${shipping.firstName} ${shipping.lastName}` : '',
+        shipping_address: shipping ? `${shipping.address}, ${shipping.city}, ${shipping.state} ${shipping.zip}` : ''
+      }
+    };
+
+    console.log('💳 Processing Clover payment — $' + (totalInCents / 100).toFixed(2));
+
+    const chargeResponse = await fetch(`${ECOM_BASE_URL}/v1/charges`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${CLOVER_ECOM_PRIVATE_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(chargePayload)
+    });
+
+    const chargeData = await chargeResponse.json();
+
+    if (!chargeResponse.ok) {
+      console.error('❌ Clover charge failed:', chargeData);
+      const errorMsg = chargeData.error?.message || chargeData.message || 'Payment was declined';
+      return res.status(400).json({ error: errorMsg });
+    }
+
+    console.log('✅ Payment successful — Charge ID:', chargeData.id);
+
+    // Record the sale in our system
+    const salesData = loadSalesData();
+    const productData = loadProductData();
+
+    const subtotal = amount;
+    const tax = Math.round(amount * taxRate * 100) / 100;
+    const total = Math.round((subtotal + tax) * 100) / 100;
+
+    const order = {
+      id: salesData.nextOrderId++,
+      cloverChargeId: chargeData.id,
+      timestamp: new Date().toISOString(),
+      items: (items || []).map(i => ({
+        productId: i.id,
+        name: i.name,
+        brand: i.brand || '',
+        category: i.category || '',
+        sku: i.sku || '',
+        price: i.price,
+        quantity: i.quantity,
+        lineTotal: i.price * i.quantity
+      })),
+      subtotal,
+      discount: 0,
+      tax,
+      total,
+      paymentMethod: 'card',
+      cardLast4: chargeData.source?.last4 || '',
+      cardBrand: chargeData.source?.brand || '',
+      customerName: shipping ? `${shipping.firstName} ${shipping.lastName}` : '',
+      customerEmail: email || '',
+      shippingAddress: shipping || null,
+      billingAddress: billing || null,
+      itemCount: (items || []).reduce((s, i) => s + i.quantity, 0),
+      status: 'completed',
+      source: 'online'
+    };
+
+    salesData.orders.push(order);
+    saveSalesData(salesData);
+
+    // Update stock counts
+    for (const orderItem of order.items) {
+      if (orderItem.productId) {
+        for (const catItems of Object.values(productData.products)) {
+          const prod = catItems.find(p => p.id === orderItem.productId);
+          if (prod && prod.stockCount !== null && prod.stockCount !== undefined) {
+            prod.stockCount = Math.max(0, prod.stockCount - orderItem.quantity);
+            prod.inStock = prod.stockCount > 0;
+          }
+        }
+      }
+    }
+    saveProductData(productData);
+
+    res.json({
+      success: true,
+      orderId: order.id,
+      chargeId: chargeData.id,
+      total: order.total,
+      last4: order.cardLast4,
+      brand: order.cardBrand
+    });
+
+  } catch (err) {
+    console.error('❌ Checkout error:', err.message);
+    res.status(500).json({ error: 'Payment processing failed. Please try again.' });
   }
 });
 

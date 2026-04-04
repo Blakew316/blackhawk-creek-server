@@ -1594,7 +1594,7 @@
     font-size: 11px;
     font-weight: 600;
     color: #6b7280;
-    margin-bottom: 3px;
+    margin-bottom: 4px;
     letter-spacing: 0.2px;
   }
   .checkout-field input,
@@ -1609,11 +1609,11 @@
     background: white;
     transition: border-color 0.15s, box-shadow 0.15s;
     box-sizing: border-box;
-    height: 40px;
-    line-height: 40px;
+    height: 38px;
   }
   .checkout-field select {
     padding: 0 8px;
+    height: 38px;
   }
   .checkout-field input:focus,
   .checkout-field select:focus {
@@ -1629,16 +1629,17 @@
     gap: 10px;
   }
 
-  /* Clover iframe fields */
+  /* Clover iframe fields — hard lock at 38px to match inputs */
   .clover-iframe-field {
     border: 1px solid #d1d5db;
     border-radius: 6px;
     background: white;
-    margin-bottom: 10px;
     transition: border-color 0.15s, box-shadow 0.15s;
-    height: 40px;
-    max-height: 40px;
-    overflow: hidden;
+    height: 38px !important;
+    max-height: 38px !important;
+    overflow: hidden !important;
+    box-sizing: border-box;
+    margin-bottom: 0;
   }
   .clover-iframe-field.focused {
     border-color: var(--color-olive);
@@ -1648,18 +1649,17 @@
     border-color: #dc2626;
     box-shadow: 0 0 0 2px rgba(220,38,38,0.08);
   }
+  .clover-iframe-field * {
+    max-height: 38px !important;
+  }
   .clover-iframe-field iframe {
     width: 100% !important;
-    height: 40px !important;
-    max-height: 40px !important;
+    height: 36px !important;
+    max-height: 36px !important;
     border: none !important;
     display: block !important;
     margin: 0 !important;
     padding: 0 !important;
-  }
-  .clover-iframe-field div {
-    height: 40px !important;
-    max-height: 40px !important;
   }
 
   .payment-card-wrap {
@@ -1670,78 +1670,77 @@
   }
   .payment-card-icons {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     margin-bottom: 14px;
     align-items: center;
   }
+  /* All card badges: exact same box, only colors differ */
   .card-brand {
+    width: 48px;
+    height: 30px;
+    border-radius: 4px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 26px;
-    padding: 0 8px;
-    border-radius: 4px;
-    font-size: 10px;
     font-weight: 800;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     letter-spacing: 0.5px;
-    border: 1px solid rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.08);
+    box-sizing: border-box;
+    flex-shrink: 0;
+    overflow: hidden;
+    position: relative;
   }
   .card-brand.visa {
     background: #1a1f71;
     color: #fff;
     font-style: italic;
-    font-size: 13px;
-    letter-spacing: 1px;
-    padding: 0 7px;
+    font-size: 12px;
+    letter-spacing: 0.5px;
   }
   .card-brand.mastercard {
-    background: #000;
-    color: #fff;
-    font-size: 8px;
-    letter-spacing: 0.3px;
-    gap: 4px;
-    padding: 0 6px;
+    background: #252525;
+    padding: 0;
   }
-  .card-brand.mastercard::before {
+  .mc-circles {
+    position: relative;
+    width: 30px;
+    height: 18px;
+  }
+  .mc-circles::before,
+  .mc-circles::after {
     content: '';
-    width: 14px;
-    height: 14px;
+    position: absolute;
+    top: 0;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
+  }
+  .mc-circles::before {
+    left: 0;
     background: #eb001b;
-    display: inline-block;
-    margin-right: -5px;
-    position: relative;
-    z-index: 1;
   }
-  .card-brand.mastercard::after {
-    content: '';
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
+  .mc-circles::after {
+    left: 12px;
     background: #f79e1b;
-    display: inline-block;
-    position: relative;
-    z-index: 0;
-    opacity: 0.85;
   }
   .card-brand.amex {
     background: #2e77bc;
     color: #fff;
-    font-size: 8.5px;
-    letter-spacing: 0.5px;
+    font-size: 9px;
+    letter-spacing: 0.3px;
   }
   .card-brand.discover {
     background: #fff;
     color: #231f20;
-    font-size: 8.5px;
-    letter-spacing: 0.3px;
-    border-color: #e0e0e0;
+    font-size: 7px;
+    letter-spacing: 0.2px;
+    border-color: #ddd;
   }
-  .card-brand.discover .disc-dot {
+  .disc-dot {
     display: inline-block;
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: #f47216;
     margin: 0 1px;
@@ -2450,7 +2449,7 @@
           <div class="payment-card-wrap">
             <div class="payment-card-icons">
               <span class="card-brand visa">VISA</span>
-              <span class="card-brand mastercard"></span>
+              <span class="card-brand mastercard"><span class="mc-circles"></span></span>
               <span class="card-brand amex">AMEX</span>
               <span class="card-brand discover">DISC<span class="disc-dot"></span>VER</span>
             </div>
@@ -3472,15 +3471,18 @@ async function initCloverTokenizer() {
       document.getElementById(id).innerHTML = '';
     });
 
-    // Style overrides for Clover iframe inputs
+    // Style overrides for Clover iframe inputs — match 38px input height
     const fieldStyle = {
       input: {
         fontSize: '14px',
         padding: '0 10px',
-        height: '40px',
-        lineHeight: '40px',
+        height: '36px',
+        lineHeight: '36px',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        color: '#111827'
+        color: '#111827',
+        margin: '0',
+        border: 'none',
+        outline: 'none'
       },
       'input::placeholder': {
         color: '#b0b5be'

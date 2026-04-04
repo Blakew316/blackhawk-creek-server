@@ -29,11 +29,33 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(__dirname));
 
-// Serve uploaded images (uses persistent data dir if available)
-const IMAGES_DIR = path.join(process.env.RENDER_DISK_PATH || path.join(__dirname, 'data'), 'images');
-if (!fs.existsSync(IMAGES_DIR)) {
-  fs.mkdirSync(IMAGES_DIR, { recursive: true });
+// Determine writable data directory
+function resolveDataDir() {
+  const diskPath = process.env.RENDER_DISK_PATH;
+  if (diskPath) {
+    try {
+      if (!fs.existsSync(diskPath)) fs.mkdirSync(diskPath, { recursive: true });
+      // Test write access
+      const testFile = path.join(diskPath, '.write-test');
+      fs.writeFileSync(testFile, 'ok');
+      fs.unlinkSync(testFile);
+      console.log('✅ Using persistent disk at:', diskPath);
+      return diskPath;
+    } catch (e) {
+      console.warn('⚠️ RENDER_DISK_PATH not writable (' + diskPath + '):', e.message);
+      console.warn('   Falling back to local data/ directory (ephemeral)');
+    }
+  }
+  const localDir = path.join(__dirname, 'data');
+  if (!fs.existsSync(localDir)) fs.mkdirSync(localDir, { recursive: true });
+  return localDir;
 }
+
+const PERSISTENT_DATA_DIR = resolveDataDir();
+
+// Serve uploaded images
+const IMAGES_DIR = path.join(PERSISTENT_DATA_DIR, 'images');
+if (!fs.existsSync(IMAGES_DIR)) fs.mkdirSync(IMAGES_DIR, { recursive: true });
 app.use('/images', express.static(IMAGES_DIR));
 
 // ─── Config ──────────────────────────────────────────────
@@ -55,18 +77,11 @@ const ECOM_BASE_URL = ENVIRONMENT === 'production'
   ? 'https://scl.clover.com'
   : 'https://scl-sandbox.dev.clover.com';
 
-// Persistent data directory — use RENDER_DISK_PATH env var if a Render Disk is mounted,
-// otherwise fall back to local data/ (ephemeral on Render free tier)
-const DATA_DIR = process.env.RENDER_DISK_PATH || path.join(__dirname, 'data');
+// Data files use the resolved persistent directory
+const DATA_DIR = PERSISTENT_DATA_DIR;
 const DATA_FILE = path.join(DATA_DIR, 'products.json');
 const SALES_FILE = path.join(DATA_DIR, 'sales.json');
 
-// Ensure data directory exists
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-
-// Log data directory on startup so you can verify persistence
 console.log('📁 Data directory:', DATA_DIR);
 console.log('   Products file:', DATA_FILE);
 console.log('   Sales file:', SALES_FILE);

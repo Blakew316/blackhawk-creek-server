@@ -694,11 +694,46 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
   }
   .product-card-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.3s;
+  }
+  .product-card:hover .product-card-image img { transform: scale(1.05); }
+
+  /* Quick Add-to-Cart overlay on hover */
+  .quick-add-btn {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(17,24,39,0.88);
+    color: white;
+    border: none;
+    padding: 11px 0;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transform: translateY(100%);
+    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+    font-family: inherit;
+    z-index: 2;
+  }
+  .quick-add-btn svg { width: 15px; height: 15px; }
+  .product-card:hover .quick-add-btn { transform: translateY(0); }
+  .quick-add-btn:hover { background: rgba(61,74,47,0.95); }
+  .quick-add-btn.added {
+    background: rgba(5,150,105,0.9);
+    pointer-events: none;
   }
 
   .product-card-content {
@@ -737,12 +772,12 @@
 
   .product-card-button {
     width: 100%;
-    padding: 10px 16px;
-    background: var(--color-olive);
-    color: white;
-    border: none;
+    padding: 9px 16px;
+    background: transparent;
+    color: var(--color-olive);
+    border: 1.5px solid var(--color-olive);
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -750,7 +785,8 @@
     transition: all var(--transition);
   }
   .product-card-button:hover {
-    background: #4a5638;
+    background: var(--color-olive);
+    color: white;
   }
 
   /* ===================== FOOTER ===================== */
@@ -1617,20 +1653,21 @@
   }
   .payment-card-icons {
     display: flex;
-    gap: 6px;
+    gap: 8px;
     margin-bottom: 14px;
   }
   .card-icon {
-    font-size: 9px;
-    font-weight: 800;
-    padding: 4px 10px;
+    width: 42px;
+    height: 28px;
     border-radius: 4px;
-    letter-spacing: 0.5px;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    overflow: hidden;
   }
-  .card-icon.visa { background: #1a1f71; color: white; }
-  .card-icon.mc { background: #eb001b; color: white; }
-  .card-icon.amex { background: #006fcf; color: white; }
-  .card-icon.disc { background: #ff6000; color: white; }
+  .card-icon svg { width: 34px; height: 22px; }
 
   .place-order-btn {
     width: 100%;
@@ -2333,10 +2370,18 @@
           <h3 class="checkout-section-title"><span class="section-num">3</span> Payment</h3>
           <div class="payment-card-wrap">
             <div class="payment-card-icons">
-              <span class="card-icon visa">VISA</span>
-              <span class="card-icon mc">MC</span>
-              <span class="card-icon amex">AMEX</span>
-              <span class="card-icon disc">DISC</span>
+              <span class="card-icon" title="Visa">
+                <svg viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="32" rx="4" fill="#1A1F71"/><path d="M20.3 21.2h-2.8l1.7-10.4h2.8L20.3 21.2zm11.6-10.1c-.6-.2-1.4-.4-2.5-.4-2.8 0-4.7 1.4-4.7 3.5 0 1.5 1.4 2.3 2.5 2.8 1.1.5 1.5.9 1.5 1.3 0 .7-.9 1-1.7 1-1.1 0-1.8-.2-2.7-.6l-.4-.2-.4 2.4c.7.3 1.9.6 3.2.6 2.9 0 4.8-1.4 4.9-3.6 0-1.2-.7-2.1-2.4-2.9-1-.5-1.6-.8-1.6-1.3 0-.4.5-.9 1.6-.9.9 0 1.6.2 2.1.4l.3.1.4-2.2zm7.1 0h-2.2c-.7 0-1.2.2-1.5.9l-4.2 9.6h2.9l.6-1.6h3.6l.3 1.6h2.6L37 11.1zm-3.5 6.7l1.5-3.8.4-1.1.2 1 .9 3.9h-3zm-20.8-6.7l-2.6 7.1-.3-1.4c-.5-1.6-2-3.4-3.7-4.3l2.5 9h3l4.5-10.4h-3.4z" fill="#fff"/><path d="M13.3 10.8H9l-.1.3c3.5.9 5.9 3 6.8 5.5l-1-4.8c-.2-.7-.7-.9-1.4-1z" fill="#F9A533"/></svg>
+              </span>
+              <span class="card-icon" title="Mastercard">
+                <svg viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="32" rx="4" fill="#252525"/><circle cx="19" cy="16" r="8" fill="#EB001B"/><circle cx="29" cy="16" r="8" fill="#F79E1B"/><path d="M24 10.3a8 8 0 0 1 3 5.7 8 8 0 0 1-3 5.7 8 8 0 0 1-3-5.7 8 8 0 0 1 3-5.7z" fill="#FF5F00"/></svg>
+              </span>
+              <span class="card-icon" title="American Express">
+                <svg viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="32" rx="4" fill="#006FCF"/><path d="M7 15l2.5-5.5h3l1.4 3.2 1.4-3.2h3L20.8 15l-2.5 5.5h-2.8l-1.5-3.4-1.5 3.4H9.7L7 15zm17.5-5.5h8.3l1.4 1.7 1.5-1.7h3l-3.2 3.5 3.2 3.5-3.2-3.5-3.2 3.5h-3l-1.5-1.7-1.4 1.7h-2.8l3-3.5-3-3.5zm1.2 2h5.6m-5.6 3h5.6" stroke="#fff" stroke-width="0.5" fill="none"/><text x="24" y="18" text-anchor="middle" fill="white" font-family="sans-serif" font-size="6.5" font-weight="700">AMEX</text></svg>
+              </span>
+              <span class="card-icon" title="Discover">
+                <svg viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="32" rx="4" fill="#fff"/><path d="M0 20c12 4 36 4 48 0v8a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4v-8z" fill="#F48120"/><circle cx="28" cy="16" r="5" fill="#F48120"/><text x="14" y="18" fill="#231F20" font-family="sans-serif" font-size="6" font-weight="700">DISC</text><text x="34" y="18" fill="#231F20" font-family="sans-serif" font-size="5" font-weight="600">VER</text></svg>
+              </span>
             </div>
             <!-- Clover iframe tokenizer mounts here -->
             <div id="clover-card-number" class="clover-iframe-field"></div>
@@ -3014,29 +3059,65 @@ function createProductCard(product) {
 
   const placeholderSVG = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect fill="#f0f0f0" width="200" height="200"/><text x="100" y="90" text-anchor="middle" fill="#999" font-family="sans-serif" font-size="14">No Image</text><text x="100" y="115" text-anchor="middle" fill="#bbb" font-family="sans-serif" font-size="11">Available</text></svg>')}`;
   let imageHTML = '';
-  if (product.imageUrl) {
-    imageHTML = `
-      <div class="product-card-image">
-        <img src="${product.imageUrl}" alt="${product.name}" onerror="this.onerror=null;this.src='${placeholderSVG}';" loading="lazy">
-      </div>
-    `;
-  } else {
-    imageHTML = `<div class="product-card-image"><img src="${placeholderSVG}" alt="No image available"></div>`;
-  }
+  const imgSrc = product.imageUrl || placeholderSVG;
+  const onerrorAttr = product.imageUrl ? ` onerror="this.onerror=null;this.src='${placeholderSVG}';"` : '';
+
+  imageHTML = `
+    <div class="product-card-image">
+      <img src="${imgSrc}" alt="${product.name}"${onerrorAttr} loading="lazy">
+      <button class="quick-add-btn" onclick="event.stopPropagation();quickAddToCart(${product.id}, this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Add to Cart
+      </button>
+    </div>
+  `;
 
   const brandHTML = product.brand ? `<div class="product-brand">${product.brand}</div>` : '';
+  const outOfStock = product.stockCount !== null && product.stockCount !== undefined && product.stockCount <= 0;
 
   card.innerHTML = `
     ${imageHTML}
-    <div class="product-card-content">
+    <div class="product-card-content" onclick="openProductModal(${product.id})">
       ${brandHTML}
       <div class="product-name">${product.name}</div>
       <div class="product-price">$${(product.price || 0).toFixed(2)}</div>
-      <button class="product-card-button" onclick="openProductModal(${product.id})">View Details</button>
+      <button class="product-card-button" onclick="event.stopPropagation();openProductModal(${product.id})">View Details</button>
     </div>
   `;
 
   return card;
+}
+
+function quickAddToCart(productId, btnEl) {
+  const product = allProducts.find(p => p.id === productId);
+  if (!product) return;
+
+  const existingItem = cart.find(item => item.id === product.id);
+  if (existingItem) {
+    existingItem.quantity += 1;
+  } else {
+    cart.push({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+      imageUrl: product.imageUrl,
+      brand: product.brand
+    });
+  }
+
+  saveCartToStorage();
+  updateCartUI();
+
+  // Visual feedback
+  if (btnEl) {
+    btnEl.classList.add('added');
+    btnEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><polyline points="20 6 9 17 4 12"/></svg> Added!';
+    setTimeout(() => {
+      btnEl.classList.remove('added');
+      btnEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Add to Cart';
+    }, 1200);
+  }
 }
 
 // ============ PRODUCT MODAL ============

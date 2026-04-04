@@ -759,13 +759,60 @@ app.delete('/api/products/:id', (req, res) => {
   }
 });
 
-// ─── Clover Ecommerce: Get public key for frontend ─────────
-app.get('/api/checkout/config', (req, res) => {
-  res.json({
-    publicKey: CLOVER_ECOM_PUBLIC_KEY || '',
-    merchantId: MERCHANT_ID || '',
-    environment: ENVIRONMENT
-  });
+// ─── Clover Ecommerce: Get PAKMS key for frontend ──────────
+// Fetches the real PAKMS apiAccessKey from Clover's API
+let cachedPakmsKey = null;
+let pakmsKeyFetchedAt = 0;
+
+app.get('/api/checkout/config', async (req, res) => {
+  try {
+    // Try to fetch the real PAKMS key from Clover (cache for 1 hour)
+    const now = Date.now();
+    if (!cachedPakmsKey || (now - pakmsKeyFetchedAt) > 3600000) {
+      if (CLOVER_ECOM_PRIVATE_KEY && MERCHANT_ID) {
+        try {
+          const pakmsUrl = `${BASE_URL}/pakms/apikey`;
+          console.log('🔑 Fetching PAKMS key from:', pakmsUrl);
+          const pakmsRes = await fetch(pakmsUrl, {
+            headers: {
+              'Authorization': `Bearer ${CLOVER_ECOM_PRIVATE_KEY}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          if (pakmsRes.ok) {
+            const pakmsData = await pakmsRes.json();
+            if (pakmsData.apiAccessKey) {
+              cachedPakmsKey = pakmsData.apiAccessKey;
+              pakmsKeyFetchedAt = now;
+              console.log('✅ PAKMS key fetched:', cachedPakmsKey.substring(0, 12) + '...');
+            } else {
+              console.warn('⚠️ PAKMS response missing apiAccessKey:', JSON.stringify(pakmsData));
+            }
+          } else {
+            const errText = await pakmsRes.text();
+            console.warn('⚠️ PAKMS fetch failed:', pakmsRes.status, errText);
+          }
+        } catch (pakmsErr) {
+          console.warn('⚠️ PAKMS fetch error:', pakmsErr.message);
+        }
+      }
+    }
+
+    // Use PAKMS key if available, otherwise fall back to env var
+    const publicKey = cachedPakmsKey || CLOVER_ECOM_PUBLIC_KEY || '';
+
+    res.json({
+      publicKey,
+      merchantId: MERCHANT_ID || '',
+      environment: ENVIRONMENT
+    });
+  } catch (err) {
+    res.json({
+      publicKey: CLOVER_ECOM_PUBLIC_KEY || '',
+      merchantId: MERCHANT_ID || '',
+      environment: ENVIRONMENT
+    });
+  }
 });
 
 // ─── Clover Ecommerce: Process a payment ────────────────────

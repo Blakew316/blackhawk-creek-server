@@ -3223,8 +3223,10 @@ async function checkout() {
     alert('Your cart is empty!');
     return;
   }
-  // Close cart sidebar and navigate to checkout page
+  // Close cart sidebar + overlay and navigate to checkout page
   document.getElementById('cartSidebar').classList.remove('open');
+  document.getElementById('cartOverlay').classList.remove('open');
+  document.body.style.overflow = '';
   goToCheckoutPage();
 }
 
@@ -3241,6 +3243,8 @@ function goBackToCart() {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('storefront').classList.add('active');
   document.getElementById('cartSidebar').classList.add('open');
+  document.getElementById('cartOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
 function populateCheckoutSummary() {

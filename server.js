@@ -116,6 +116,25 @@ function categoryToKey(name) {
     .replace(/^-|-$/g, '');
 }
 
+// Auto-categorize products by name keywords (server-side version)
+function autoCategorizeServer(name) {
+  const n = (name || '').toLowerCase();
+  if (/railworm|tapout|twitch\s?\d|fw shad|crappie dapper|tiny shad|boosa|ridge lizard|crappie strobe|strobe minnow|ribbon tail|hogwalla|nedfry|bamboosa|crappie shindo|creature|worm\s?\d|shad\s?\d|minnow\s?\d|grub|craw|tube|swimbait|soft plastic/i.test(n)) return 'Soft Plastics';
+  if (/pressure series|pd\d|crankbait|jerkbait|topwater|popper|walking|rattl|quake|duke\s*\d|splashback/i.test(n)) return 'Hardbaits';
+  if (/spinnerbait|spinner bait/i.test(n)) return 'Spinnerbaits';
+  if (/flock blade|bladed jig|chatterbait|blade\s/i.test(n)) return 'Bladed Jigs';
+  if (/swim jig/i.test(n)) return 'Swim Jigs';
+  if (/frog|hush frog|vega frog|vega hush/i.test(n)) return 'Frogs';
+  if (/hook|jugular|catfish hook|minnow hook|bluegill.*hook|sunfish.*hook/i.test(n)) return 'Hooks';
+  if (/jighead|jig head|ned head|juggle head|panorama axle|pecos underspin|finesse minnow/i.test(n)) return 'Jigheads';
+  if (/weight|sinker|split shot|worm weight|lead\s/i.test(n)) return 'Weights & Sinkers';
+  if (/reel butter|reel oil|reel grease|reel care|lubricant|lubrication/i.test(n)) return 'Reel Care';
+  if (/combo/i.test(n)) return 'Rod & Reel Combos';
+  if (/hat|shirt|hoodie|cap|apparel|banner|sticker|decal|patch|koozie/i.test(n)) return 'Apparel & Accessories';
+  if (/clean|soap|wash|d-funk|funk/i.test(n)) return 'Cleaning Products';
+  return null; // Return null to use Clover's category
+}
+
 // ─── Choose an emoji icon based on category keywords ─────────────
 function getCategoryIcon(categoryName) {
   const name = categoryName.toLowerCase();
@@ -159,10 +178,159 @@ function getCategoryGradient(categoryName) {
   return ['#2a2a2a', '#151515'];
 }
 
+// ─── Auto-resolve product images from manufacturer Shopify stores ──────
+// Fetches product catalogs from 6th Sense, Bass Assassin, and Ardent
+// then matches by product name to find the correct CDN image URL
+let _imageCache = null;
+async function buildImageCache() {
+  if (_imageCache) return _imageCache;
+  console.log('🖼️  Building product image cache from manufacturer stores...');
+  const cache = {};
+
+  async function fetchShopify(storeUrl) {
+    try {
+      const resp = await fetch(storeUrl + '/products.json?limit=250');
+      const data = await resp.json();
+      const map = {};
+      (data.products || []).forEach(p => {
+        const title = p.title.toLowerCase();
+        const img = p.images && p.images[0] ? p.images[0].src.split('?')[0] : null;
+        if (img) {
+          map[title] = img;
+          if (p.variants) p.variants.forEach(v => {
+            const vImg = v.featured_image ? v.featured_image.src.split('?')[0] : img;
+            map[(title + ' - ' + (v.title || '')).toLowerCase()] = vImg;
+          });
+        }
+      });
+      return map;
+    } catch (e) {
+      console.warn('   ⚠️ Failed to fetch ' + storeUrl + ':', e.message);
+      return {};
+    }
+  }
+
+  try {
+    const [s6, ba, ard] = await Promise.all([
+      fetchShopify('https://6thsensefishing.com'),
+      fetchShopify('https://bassassassin.com'),
+      fetchShopify('https://ardentoutdoors.com')
+    ]);
+
+    function findImg(store, storeKeys, searchKey, color) {
+      const c = (color || '').toLowerCase().trim();
+      if (c) {
+        const m1 = storeKeys.find(k => k.includes(searchKey) && k.includes(c) && !k.includes('/'));
+        if (m1) return store[m1];
+        const m2 = storeKeys.find(k => k.includes(searchKey) && k.includes(c));
+        if (m2) return store[m2];
+      }
+      const base = storeKeys.filter(k => k === searchKey || (k.startsWith(searchKey) && k.split(' - ').length <= 2));
+      if (base.length) { base.sort((a, b) => a.length - b.length); return store[base[0]]; }
+      const any = storeKeys.find(k => k.includes(searchKey));
+      return any ? store[any] : null;
+    }
+
+    const s6k = Object.keys(s6), bak = Object.keys(ba), ardk = Object.keys(ard);
+
+    // Matching rules: [regex, store, storeKeys, searchKey]
+    const rules = [
+      // 6th Sense products
+      [/divine spinnerbait/i, s6, s6k, 'divine spinnerbait'],
+      [/divine swim jig/i, s6, s6k, 'divine swim jig'],
+      [/flock blade/i, s6, s6k, 'flock blade series'],
+      [/vega hush frog/i, s6, s6k, 'vega hush frog'],
+      [/vega frog/i, s6, s6k, 'vega frog'],
+      [/boosa/i, s6, s6k, 'boosa'],
+      [/ridge lizard/i, s6, s6k, 'ridge lizard 5.7'],
+      [/crappie strobe/i, s6, s6k, 'crappie strobe'],
+      [/strobe minnow/i, s6, s6k, 'strobe minnow'],
+      [/pressure series/i, s6, s6k, 'pressure series'],
+      [/jugular h/i, s6, s6k, 'jugular hybrid hook'],
+      [/catfish hook/i, s6, s6k, 'catfish hook'],
+      [/live minnow hook/i, s6, s6k, 'live minnow hook'],
+      [/bluegill.*hook|sunfish.*hook/i, s6, s6k, 'bluegill and sunfish hook'],
+      [/lead split shot/i, s6, s6k, 'splitball'],
+      [/lead worm weight/i, s6, s6k, 'divine worm weights'],
+      [/6th sense banner/i, s6, s6k, '6th sense club banner'],
+      [/duke\s*\d/i, s6, s6k, 'duke'],
+      [/hogwalla/i, s6, s6k, 'hogwalla 5.8'],
+      [/nedfry/i, s6, s6k, 'nedfry 4.6'],
+      [/bamboosa/i, s6, s6k, 'bamboosa 5.3'],
+      [/crappie shindo/i, s6, s6k, 'the crappie shindo 2.2'],
+      [/panorama axle/i, s6, s6k, 'panorama axle jighead'],
+      [/quake/i, s6, s6k, 'quake'],
+      [/splashback/i, s6, s6k, 'splashback popper'],
+      [/pecos underspin/i, s6, s6k, 'pecos underspin jighead'],
+      [/juggle head/i, s6, s6k, 'masterclass juggle head'],
+      [/finesse minnow/i, s6, s6k, 'finesse minnow jighead'],
+      [/6th sense hat/i, s6, s6k, 'sobro capsule hat'],
+      // Bass Assassin products
+      [/railworm|rail worm/i, ba, bak, '7" rail worm'],
+      [/tapout/i, ba, bak, '7.5" tapout'],
+      [/twitch\s*\d/i, ba, bak, '6" twitch'],
+      [/fw shad/i, ba, bak, '5" fw shad'],
+      [/crappie dapper/i, ba, bak, '2" crappie dapper'],
+      [/tiny shad/i, ba, bak, '2" pro tiny shad'],
+      // Ardent products
+      [/reel butter oil/i, ard, ardk, 'reel butter oil'],
+      [/reel butter grease/i, ard, ardk, 'reel butter grease'],
+      [/ardent reel care/i, ard, ardk, 'reel care'],
+      [/lubrication kit/i, ard, ardk, 'reel butter lubrication pack'],
+      [/reel kleen/i, ard, ardk, 'reel kleen cleaning kit'],
+      [/cooler-d-funk.*wipe/i, ard, ardk, 'cooler d-funk wipes'],
+      [/cooler-d-funk/i, ard, ardk, 'cooler d-funk 16 oz bottle'],
+      [/fish-d-funk.*wipe/i, ard, ardk, 'fish d-funk wipes'],
+      [/fish-d-funk/i, ard, ardk, 'fish-d-funk 8oz. spray'],
+      [/combo.*finesse/i, ard, ardk, 'finesse ultra-light combo'],
+      [/combo.*big water/i, ard, ardk, 'big water comfort grip combos'],
+      [/combo.*super duty/i, ard, ardk, 'super duty spinning combo'],
+      [/combo.*primo/i, ard, ardk, 'comfort grip combo - primo'],
+      [/combo.*vario|combo.*hd|combo.*pink/i, ard, ardk, 'finesse ultra-light combo'],
+    ];
+
+    cache._rules = rules;
+    cache._findImg = findImg;
+    console.log(`   ✅ Image cache built: ${s6k.length} 6thSense + ${bak.length} BassAssassin + ${ardk.length} Ardent entries`);
+  } catch (e) {
+    console.warn('   ⚠️ Image cache build failed:', e.message);
+  }
+
+  _imageCache = cache;
+  return cache;
+}
+
+function resolveProductImage(productName) {
+  if (!_imageCache || !_imageCache._rules) return null;
+  const rules = _imageCache._rules;
+  const findImg = _imageCache._findImg;
+
+  // Extract color from product name
+  const parts = productName.split(/\s*-\s*/);
+  let color = '';
+  for (let i = 1; i < parts.length; i++) {
+    const p = parts[i].trim().toLowerCase();
+    if (p && !/^\d/.test(p) && !/(oz|hook|pk|ct|dc|\d+\s*(ct|pk))$/i.test(p) && p.length > 1) {
+      color = p;
+      break;
+    }
+  }
+
+  for (const [regex, store, storeKeys, searchKey] of rules) {
+    if (regex.test(productName)) {
+      return findImg(store, storeKeys, searchKey, color);
+    }
+  }
+  return null;
+}
+
 // ─── Sync products from Clover ──────────────────────────
 async function syncFromClover() {
   console.log('\n🔄 Starting Clover sync...');
   const startTime = Date.now();
+
+  // 0. Build image cache from manufacturer Shopify stores
+  await buildImageCache();
 
   // 1. Fetch all categories
   console.log('📂 Fetching categories...');
@@ -257,6 +425,14 @@ async function syncFromClover() {
       categoryDisplayName = firstCategory.name || 'General';
       categoryKey = categoryToKey(categoryDisplayName);
     }
+    // If still "General", try auto-categorize by product name
+    if (categoryKey === 'general') {
+      const autoCategory = autoCategorizeServer(item.name);
+      if (autoCategory) {
+        categoryDisplayName = autoCategory;
+        categoryKey = categoryToKey(autoCategory);
+      }
+    }
 
     // Convert Clover price (in cents) to dollars
     const priceInDollars = item.price ? item.price / 100 : 0;
@@ -290,7 +466,10 @@ async function syncFromClover() {
       existing.badge = item.tags?.elements?.some(t => t.name?.toLowerCase() === 'sale') ? 'sale'
            : item.tags?.elements?.some(t => t.name?.toLowerCase() === 'new') ? 'new'
            : existing.badge;
-      // Preserve imageUrl — don't overwrite manual uploads
+      // Resolve imageUrl if missing (don't overwrite manual uploads)
+      if (!existing.imageUrl && !manualEdits?.image) {
+        existing.imageUrl = resolveProductImage(item.name) || null;
+      }
       // Preserve brand if manually edited (only set if currently default)
       const cloverBrand = extractBrand(item.name);
       if (!manualEdits.brand && cloverBrand && (!existing.brand || existing.brand === 'Blackhawk Creek')) {
@@ -331,7 +510,7 @@ async function syncFromClover() {
         inStock: !item.stockCount || item.stockCount > 0,
         stockCount: item.stockCount || null,
         cloverCategory: categoryDisplayName,
-        imageUrl: null,
+        imageUrl: resolveProductImage(item.name) || null,
       };
 
       if (!products[categoryKey]) products[categoryKey] = [];

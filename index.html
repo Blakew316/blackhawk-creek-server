@@ -3031,9 +3031,9 @@ async function initApp() {
 function autoCategorize(name) {
   const n = (name || '').toLowerCase();
   // Soft Plastics
-  if (/railworm|tapout|twitch\s?\d|fw shad|crappie dapper|tiny shad|boosa|ridge lizard|crappie strobe|strobe minnow|ribbon tail|creature|worm\s?\d|shad\s?\d|minnow\s?\d|grub|craw|tube|swimbait|soft plastic/i.test(n)) return 'Soft Plastics';
+  if (/railworm|tapout|twitch\s?\d|fw shad|crappie dapper|tiny shad|boosa|ridge lizard|crappie strobe|strobe minnow|ribbon tail|hogwalla|nedfry|bamboosa|crappie shindo|creature|worm\s?\d|shad\s?\d|minnow\s?\d|grub|craw|tube|swimbait|soft plastic/i.test(n)) return 'Soft Plastics';
   // Hardbaits / Crankbaits
-  if (/pressure series|pd\d|crankbait|jerkbait|topwater|popper|walking|rattl/i.test(n)) return 'Hardbaits';
+  if (/pressure series|pd\d|crankbait|jerkbait|topwater|popper|walking|rattl|quake|duke\s*\d|splashback/i.test(n)) return 'Hardbaits';
   // Spinnerbaits
   if (/spinnerbait|spinner bait/i.test(n)) return 'Spinnerbaits';
   // Bladed Jigs
@@ -3045,17 +3045,17 @@ function autoCategorize(name) {
   // Hooks
   if (/hook|jugular|catfish hook|minnow hook|bluegill.*hook|sunfish.*hook/i.test(n)) return 'Hooks';
   // Jigheads
-  if (/jighead|jig head|ned head/i.test(n)) return 'Jigheads';
+  if (/jighead|jig head|ned head|juggle head|panorama axle|pecos underspin|finesse minnow/i.test(n)) return 'Jigheads';
   // Weights & Sinkers
   if (/weight|sinker|split shot|worm weight|lead\s/i.test(n)) return 'Weights & Sinkers';
   // Reel Care
-  if (/reel butter|reel oil|reel grease|reel care|lubricant/i.test(n)) return 'Reel Care';
+  if (/reel butter|reel oil|reel grease|reel care|lubricant|lubrication/i.test(n)) return 'Reel Care';
   // Rod & Reel Combos
-  if (/rod|reel|combo/i.test(n)) return 'Rod & Reel Combos';
+  if (/combo/i.test(n)) return 'Rod & Reel Combos';
   // Apparel & Accessories
   if (/hat|shirt|hoodie|cap|apparel|banner|sticker|decal|patch|koozie/i.test(n)) return 'Apparel & Accessories';
   // Cleaning Products
-  if (/clean|soap|wash/i.test(n)) return 'Cleaning Products';
+  if (/clean|soap|wash|d-funk|funk/i.test(n)) return 'Cleaning Products';
   return 'General';
 }
 

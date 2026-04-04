@@ -3738,6 +3738,8 @@ function goToShop() {
       allProductsItem.classList.add('active');
     }
   }
+  displayProducts(currentCategory === 'All' ? allProducts : allProducts.filter(p => p.category === currentCategory));
+  window.scrollTo(0, 0);
 }
 
 function goToStorefront() {

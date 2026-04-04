@@ -159,6 +159,20 @@ async function syncFromClover() {
   const products = {};
   let idCounter = 1;
 
+  // Load existing image URLs so we preserve them during sync
+  let existingImageMap = {};
+  if (fs.existsSync(DATA_FILE)) {
+    try {
+      const existingData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+      for (const existingItems of Object.values(existingData.products || {})) {
+        for (const p of existingItems) {
+          if (p.sku && p.imageUrl) existingImageMap[p.sku] = p.imageUrl;
+        }
+      }
+      console.log(`   📸 Preserving ${Object.keys(existingImageMap).length} existing product images`);
+    } catch(e) { /* ignore */ }
+  }
+
   for (const item of itemsData.elements) {
     // Skip hidden/deleted items
     if (item.hidden || item.isDeleted) continue;
@@ -194,6 +208,7 @@ async function syncFromClover() {
       inStock: !item.stockCount || item.stockCount > 0,
       stockCount: item.stockCount || null,
       cloverCategory: categoryDisplayName,
+      imageUrl: (item.sku && existingImageMap[item.sku]) ? existingImageMap[item.sku] : null,
     };
 
     // Check for sale price via alternate name or tags

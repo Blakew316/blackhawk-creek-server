@@ -1600,16 +1600,20 @@
   .checkout-field input,
   .checkout-field select {
     width: 100%;
-    padding: 8px 10px;
+    padding: 0 10px;
     border: 1px solid #d1d5db;
     border-radius: 6px;
-    font-size: 13px;
+    font-size: 14px;
     font-family: inherit;
     color: #111827;
     background: white;
     transition: border-color 0.15s, box-shadow 0.15s;
     box-sizing: border-box;
-    height: 36px;
+    height: 40px;
+    line-height: 40px;
+  }
+  .checkout-field select {
+    padding: 0 8px;
   }
   .checkout-field input:focus,
   .checkout-field select:focus {
@@ -1618,8 +1622,7 @@
     box-shadow: 0 0 0 2px rgba(61,74,47,0.08);
   }
   .checkout-field input::placeholder {
-    color: #c0c4cc;
-    font-size: 12px;
+    color: #b0b5be;
   }
   .checkout-row {
     display: flex;
@@ -1633,9 +1636,9 @@
     background: white;
     margin-bottom: 10px;
     transition: border-color 0.15s, box-shadow 0.15s;
-    height: 38px;
+    height: 40px;
+    max-height: 40px;
     overflow: hidden;
-    position: relative;
   }
   .clover-iframe-field.focused {
     border-color: var(--color-olive);
@@ -1647,37 +1650,102 @@
   }
   .clover-iframe-field iframe {
     width: 100% !important;
-    height: 38px !important;
+    height: 40px !important;
+    max-height: 40px !important;
     border: none !important;
     display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .clover-iframe-field div {
+    height: 40px !important;
+    max-height: 40px !important;
   }
 
   .payment-card-wrap {
     background: #f9fafb;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
-    padding: 14px;
+    padding: 16px;
   }
   .payment-card-icons {
     display: flex;
     gap: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     align-items: center;
   }
-  .card-icon {
-    width: 46px;
-    height: 30px;
-    border-radius: 5px;
-    border: 1px solid #e0e0e0;
-    display: flex;
+  .card-brand {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: white;
-    overflow: hidden;
-    flex-shrink: 0;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 800;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(0,0,0,0.06);
   }
-  .card-icon svg {
-    display: block;
+  .card-brand.visa {
+    background: #1a1f71;
+    color: #fff;
+    font-style: italic;
+    font-size: 13px;
+    letter-spacing: 1px;
+    padding: 0 7px;
+  }
+  .card-brand.mastercard {
+    background: #000;
+    color: #fff;
+    font-size: 8px;
+    letter-spacing: 0.3px;
+    gap: 4px;
+    padding: 0 6px;
+  }
+  .card-brand.mastercard::before {
+    content: '';
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #eb001b;
+    display: inline-block;
+    margin-right: -5px;
+    position: relative;
+    z-index: 1;
+  }
+  .card-brand.mastercard::after {
+    content: '';
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #f79e1b;
+    display: inline-block;
+    position: relative;
+    z-index: 0;
+    opacity: 0.85;
+  }
+  .card-brand.amex {
+    background: #2e77bc;
+    color: #fff;
+    font-size: 8.5px;
+    letter-spacing: 0.5px;
+  }
+  .card-brand.discover {
+    background: #fff;
+    color: #231f20;
+    font-size: 8.5px;
+    letter-spacing: 0.3px;
+    border-color: #e0e0e0;
+  }
+  .card-brand.discover .disc-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #f47216;
+    margin: 0 1px;
+    vertical-align: middle;
   }
 
   .place-order-btn {
@@ -2381,24 +2449,26 @@
           <h3 class="checkout-section-title"><span class="section-num">3</span> Payment</h3>
           <div class="payment-card-wrap">
             <div class="payment-card-icons">
-              <span class="card-icon" title="Visa"><svg width="38" height="24" viewBox="0 0 38 24" fill="none"><rect width="38" height="24" rx="3" fill="#1434CB"/><path fill="#fff" d="M16.1 16.2h-2.3L15.2 8h2.3l-1.4 8.2Zm6.6-7.9c-.5-.2-1.2-.3-2.1-.3-2.3 0-3.9 1.1-3.9 2.8 0 1.2 1.2 1.9 2.1 2.3.9.4 1.2.7 1.2 1.1 0 .6-.7.8-1.4.8-.9 0-1.4-.1-2.2-.5l-.3-.1-.3 1.9c.5.2 1.5.4 2.6.4 2.4 0 4-1.1 4-2.9 0-1-.6-1.7-2-2.3-.8-.4-1.3-.6-1.3-1 0-.4.4-.7 1.3-.7.7 0 1.3.1 1.7.3l.2.1.4-1.9ZM29 8.3h-1.8c-.5 0-1 .2-1.2.7l-3.3 7.2h2.4l.5-1.3h2.9l.3 1.3H31L29 8.3Zm-2.8 5.3 1-2.8.3-.8.2.8.6 2.8h-2.1ZM13.5 8.3l-2.2 5.6-.2-1c-.4-1.3-1.7-2.6-3.2-3.3l2.1 7.2H12.4l3.5-8.5h-2.4Z"/><path fill="#F9A533" d="M9.8 8.3H6.2v.2c2.8.7 4.7 2.3 5.4 4.1L10.8 9c-.2-1-.8-1.4-1-1.4v.7Z"/></svg></span>
-              <span class="card-icon" title="Mastercard"><svg width="38" height="24" viewBox="0 0 38 24" fill="none"><rect width="38" height="24" rx="3" fill="#252525"/><circle cx="15" cy="12" r="7" fill="#EB001B"/><circle cx="23" cy="12" r="7" fill="#F79E1B"/><path fill="#FF5F00" d="M19 6.7a7 7 0 0 1 2.6 5.3 7 7 0 0 1-2.6 5.3 7 7 0 0 1-2.6-5.3A7 7 0 0 1 19 6.7Z"/></svg></span>
-              <span class="card-icon" title="American Express"><svg width="38" height="24" viewBox="0 0 38 24" fill="none"><rect width="38" height="24" rx="3" fill="#2557D6"/><path fill="#fff" d="M4.8 15.5V9.2h3l.9 2 .9-2h3v6.3h-2.1V10.8L9.2 13.5H8l-1.3-2.7v4.7H4.8Zm9.3 0 2.8-6.3h2.5l2.8 6.3h-2.3l-.5-1.2h-2.6l-.5 1.2h-2.2Zm3-2.6h1.6l-.8-2-.8 2Zm5.4 2.6V9.2h3l2 3.9V9.2h2.1v6.3h-2.8l-2.2-4.3v4.3h-2.1Z"/></svg></span>
-              <span class="card-icon" title="Discover"><svg width="38" height="24" viewBox="0 0 38 24" fill="none"><rect x=".5" y=".5" width="37" height="23" rx="2.5" fill="#fff" stroke="#ddd"/><path d="M0 15.5c9 4.5 29 4.5 38 0V21a3 3 0 0 1-3 3H3a3 3 0 0 1-3-3v-5.5Z" fill="#F47216"/><circle cx="23.5" cy="11.5" r="4" fill="#F47216"/><path fill="#231F20" d="M4.5 14V9.2h1.8c1.7 0 2.8 1 2.8 2.4S8 14 6.3 14H4.5Zm1.4-1h.4c.9 0 1.4-.6 1.4-1.4s-.5-1.4-1.4-1.4h-.4v2.8ZM10 14V9.2h1.4V14H10Zm2.1-1.3c.4.3.9.5 1.5.5.5 0 .8-.2.8-.5 0-.3-.2-.4-.8-.5-.9-.2-1.6-.5-1.6-1.3 0-.8.7-1.3 1.7-1.3.6 0 1.1.1 1.5.4l-.5.9c-.3-.2-.7-.3-1-.3-.4 0-.7.2-.7.4 0 .3.3.4.9.5.9.2 1.5.5 1.5 1.3 0 .9-.7 1.4-1.8 1.4-.7 0-1.3-.2-1.7-.5l.2-1.2Zm3.7-1.1c0-1.4 1-2.5 2.5-2.5.6 0 1.1.2 1.5.5l-.6.9c-.3-.2-.5-.3-.9-.3-.7 0-1.1.6-1.1 1.3 0 .8.5 1.3 1.1 1.3.4 0 .7-.1.9-.3l.6.9c-.4.3-.9.5-1.5.5-1.5.1-2.5-.9-2.5-2.3Z"/><path fill="#F47216" d="M26.6 14.1c-1.4 0-2.5-1.1-2.5-2.5s1.1-2.5 2.5-2.5 2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5Z"/><path fill="#231F20" d="M29.9 9.2h1.4l.9 3.1.9-3.1h1.4l-1.7 4.9h-1.3l-1.6-4.9Z"/><path fill="#231F20" d="M34.2 14V9.2h2.8v1h-1.4v.9h1.4v1h-1.4v.9h1.4v1h-2.8Z"/></svg></span>
+              <span class="card-brand visa">VISA</span>
+              <span class="card-brand mastercard"></span>
+              <span class="card-brand amex">AMEX</span>
+              <span class="card-brand discover">DISC<span class="disc-dot"></span>VER</span>
             </div>
             <!-- Clover iframe tokenizer mounts here -->
-            <label style="display:block;font-size:11px;font-weight:600;color:#6b7280;margin-bottom:3px;">Card Number</label>
-            <div id="clover-card-number" class="clover-iframe-field"></div>
+            <div class="checkout-field" style="margin-bottom:10px;">
+              <label>Card Number</label>
+              <div id="clover-card-number" class="clover-iframe-field"></div>
+            </div>
             <div class="checkout-row">
-              <div style="flex:1;">
-                <label style="display:block;font-size:11px;font-weight:600;color:#6b7280;margin-bottom:3px;">Expiration</label>
+              <div class="checkout-field">
+                <label>Expiration</label>
                 <div id="clover-card-exp" class="clover-iframe-field"></div>
               </div>
-              <div style="flex:1;">
-                <label style="display:block;font-size:11px;font-weight:600;color:#6b7280;margin-bottom:3px;">CVV</label>
+              <div class="checkout-field">
+                <label>CVV</label>
                 <div id="clover-card-cvv" class="clover-iframe-field"></div>
               </div>
-              <div class="checkout-field" style="flex:1;margin-bottom:0;"><label>ZIP (Billing)</label><input type="text" id="billZip" maxlength="10" required></div>
+              <div class="checkout-field"><label>ZIP (Billing)</label><input type="text" id="billZip" maxlength="10" required></div>
             </div>
           </div>
           <div id="paymentError" style="color: #dc2626; font-size: 13px; margin-top: 8px; display: none;"></div>
@@ -3405,10 +3475,15 @@ async function initCloverTokenizer() {
     // Style overrides for Clover iframe inputs
     const fieldStyle = {
       input: {
-        fontSize: '13px',
-        padding: '6px 8px',
-        height: '36px',
-        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+        fontSize: '14px',
+        padding: '0 10px',
+        height: '40px',
+        lineHeight: '40px',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        color: '#111827'
+      },
+      'input::placeholder': {
+        color: '#b0b5be'
       }
     };
 

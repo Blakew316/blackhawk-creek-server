@@ -230,10 +230,11 @@
   }
 
   /* ===================== HOMEPAGE HERO ===================== */
+  /* ===================== HERO HOME ===================== */
   .hero-home {
     position: relative;
-    height: 400px;
-    background: linear-gradient(135deg, #3d4a2f 0%, #465a33 40%, #2d3a1f 100%);
+    height: 600px;
+    background: url('https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1920&q=80&auto=format') center center / cover no-repeat;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -243,45 +244,287 @@
     color: var(--color-cream);
     padding: 60px 40px;
   }
+  .hero-home::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(29,29,29,0.55) 0%, rgba(61,74,47,0.65) 100%);
+    z-index: 1;
+  }
+  .hero-home * { position: relative; z-index: 2; }
   .hero-home h1 {
     font-family: var(--font-heading);
-    font-size: 48px;
-    font-weight: 600;
-    line-height: 1.2;
-    margin-bottom: 12px;
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 16px;
     text-transform: uppercase;
-    letter-spacing: 3px;
+    letter-spacing: 4px;
+    text-shadow: 0 3px 20px rgba(0,0,0,0.5);
   }
-  .hero-home p {
-    font-size: 18px;
-    margin-bottom: 30px;
+  .hero-home .hero-tagline {
+    font-size: 20px;
+    margin-bottom: 36px;
     opacity: 0.95;
-    max-width: 600px;
+    max-width: 650px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    line-height: 1.6;
   }
   .hero-home-button {
     display: inline-block;
-    padding: 16px 40px;
+    padding: 18px 48px;
     background: var(--color-gold);
     color: var(--color-darker);
     font-family: var(--font-heading);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     text-transform: uppercase;
     border: none;
     border-radius: var(--radius);
     cursor: pointer;
     transition: all var(--transition);
+    box-shadow: 0 4px 20px rgba(218,178,78,0.3);
   }
   .hero-home-button:hover {
     background: #c99a4e;
     transform: translateY(-2px);
+    box-shadow: 0 6px 28px rgba(218,178,78,0.4);
+  }
+
+  /* ===================== CATEGORY CARDS ===================== */
+  .home-categories {
+    padding: 80px 40px;
+    background: var(--color-bg);
+  }
+  .home-categories .section-title {
+    font-family: var(--font-heading);
+    font-size: 36px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--color-text-dark);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .home-categories .section-subtitle {
+    text-align: center;
+    color: var(--color-text-body);
+    font-size: 16px;
+    margin-bottom: 50px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .category-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    max-width: 1340px;
+    margin: 0 auto;
+  }
+  .cat-card {
+    position: relative;
+    height: 380px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+  }
+  .cat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  }
+  .cat-card img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+  .cat-card:hover img { transform: scale(1.08); }
+  .cat-card .card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.05) 55%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 28px;
+    transition: background 0.4s ease;
+  }
+  .cat-card:hover .card-overlay {
+    background: linear-gradient(to top, rgba(61,74,47,0.85) 0%, rgba(0,0,0,0.1) 55%);
+  }
+  .cat-card .card-label {
+    font-family: var(--font-heading);
+    font-size: 26px;
+    font-weight: 600;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .cat-card .card-desc {
+    font-size: 14px;
+    color: rgba(255,255,255,0.85);
+    font-weight: 300;
+  }
+
+  /* ===================== PROMO BANNER ===================== */
+  .promo-banner {
+    position: relative;
+    height: 360px;
+    background: url('https://images.unsplash.com/photo-1511497584788-876760111969?w=1920&q=80&auto=format') center center / cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    overflow: hidden;
+  }
+  .promo-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(61,74,47,0.8) 0%, rgba(30,30,30,0.7) 100%);
+    z-index: 1;
+  }
+  .promo-banner * { position: relative; z-index: 2; }
+  .promo-content { max-width: 700px; padding: 40px; }
+  .promo-content h2 {
+    font-family: var(--font-heading);
+    font-size: 40px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+    text-shadow: 0 3px 15px rgba(0,0,0,0.4);
+  }
+  .promo-content p {
+    font-size: 17px;
+    margin-bottom: 30px;
+    opacity: 0.95;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .promo-btn {
+    display: inline-block;
+    padding: 14px 38px;
+    border: 2px solid var(--color-gold);
+    color: var(--color-gold);
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-radius: var(--radius);
+    cursor: pointer;
+    background: transparent;
+    transition: all var(--transition);
+  }
+  .promo-btn:hover {
+    background: var(--color-gold);
+    color: var(--color-darker);
+  }
+
+  /* ===================== WHY SHOP WITH US ===================== */
+  .why-us {
+    padding: 80px 40px;
+    background: var(--color-surface);
+  }
+  .why-us .section-title {
+    font-family: var(--font-heading);
+    font-size: 36px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--color-text-dark);
+    margin-bottom: 50px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+    max-width: 1340px;
+    margin: 0 auto;
+  }
+  .why-card {
+    text-align: center;
+    padding: 32px 20px;
+  }
+  .why-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 20px;
+    background: var(--color-olive);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .why-icon svg {
+    width: 28px; height: 28px;
+    stroke: var(--color-gold);
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .why-card h4 {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-text-dark);
+    margin-bottom: 10px;
+  }
+  .why-card p {
+    font-size: 14px;
+    color: var(--color-text-body);
+    line-height: 1.7;
+  }
+
+  /* ===================== LIFESTYLE BANNER ===================== */
+  .lifestyle-banner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 400px;
+  }
+  .lifestyle-img {
+    background: url('https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=960&q=80&auto=format') center center / cover no-repeat;
+    min-height: 400px;
+  }
+  .lifestyle-text {
+    background: var(--color-olive);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px;
+    color: var(--color-cream);
+  }
+  .lifestyle-text h2 {
+    font-family: var(--font-heading);
+    font-size: 36px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    line-height: 1.2;
+  }
+  .lifestyle-text p {
+    font-size: 16px;
+    line-height: 1.8;
+    opacity: 0.9;
+    margin-bottom: 30px;
   }
 
   /* ===================== STORE INFO ===================== */
   .store-info {
     background: var(--color-surface);
-    padding: 60px 40px;
+    padding: 80px 40px;
   }
   .store-info-container {
     max-width: 1340px;
@@ -289,11 +532,13 @@
   }
   .store-info h2 {
     font-family: var(--font-heading);
-    font-size: 32px;
+    font-size: 36px;
     font-weight: 600;
-    margin-bottom: 40px;
+    margin-bottom: 50px;
     color: var(--color-text-dark);
     text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
   }
   .info-grid {
     display: grid;
@@ -333,14 +578,37 @@
       gap: 30px;
     }
     .hero-home {
-      height: 300px;
+      height: 450px;
       padding: 40px 24px;
     }
     .hero-home h1 {
       font-size: 32px;
+      letter-spacing: 2px;
     }
-    .hero-home p {
+    .hero-home .hero-tagline {
       font-size: 16px;
+    }
+    .category-cards {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .cat-card { height: 280px; }
+    .why-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .promo-banner { height: 300px; }
+    .promo-content h2 { font-size: 28px; }
+    .lifestyle-banner {
+      grid-template-columns: 1fr;
+    }
+    .lifestyle-img { min-height: 280px; }
+    .lifestyle-text { padding: 40px 24px; }
+    .lifestyle-text h2 { font-size: 28px; }
+  }
+  @media (max-width: 480px) {
+    .why-grid {
+      grid-template-columns: 1fr;
     }
   }
 
@@ -1046,9 +1314,92 @@
 <div id="homepage" class="page">
   <!-- HERO SECTION -->
   <section class="hero-home">
-    <h1>BLACKHAWK CREEK OUTFITTERS</h1>
-    <p>Your Local Destination for Premium Fishing & Hunting Gear</p>
-    <button class="hero-home-button" onclick="goToShop()">SHOP NOW</button>
+    <h1>BLACKHAWK CREEK<br>OUTFITTERS</h1>
+    <p class="hero-tagline">East Texas's premier destination for fishing, hunting, and outdoor gear. Locally owned, expertly stocked.</p>
+    <button class="hero-home-button" onclick="goToShop()">EXPLORE OUR GEAR</button>
+  </section>
+
+  <!-- CATEGORY CARDS -->
+  <section class="home-categories">
+    <h2 class="section-title">Shop By Category</h2>
+    <p class="section-subtitle">From rod and reel to rifle and scope — we've got everything for your next adventure.</p>
+    <div class="category-cards">
+      <div class="cat-card" onclick="showCategory('Fishing')">
+        <img src="https://images.unsplash.com/photo-1514924013411-cbf25faa35bb?w=640&q=80&auto=format" alt="Fishing Gear" loading="lazy">
+        <div class="card-overlay">
+          <div class="card-label">Fishing</div>
+          <div class="card-desc">Rods, reels, tackle, and everything you need on the water</div>
+        </div>
+      </div>
+      <div class="cat-card" onclick="showCategory('Hunting')">
+        <img src="https://images.unsplash.com/photo-1516571748831-5d81767b788d?w=640&q=80&auto=format" alt="Hunting Gear" loading="lazy">
+        <div class="card-overlay">
+          <div class="card-label">Hunting</div>
+          <div class="card-desc">Firearms, ammo, optics, and field-tested hunting essentials</div>
+        </div>
+      </div>
+      <div class="cat-card" onclick="showCategory('Outdoor')">
+        <img src="https://images.unsplash.com/photo-1530541930197-dc37bda32a24?w=640&q=80&auto=format" alt="Outdoor Gear" loading="lazy">
+        <div class="card-overlay">
+          <div class="card-label">Outdoor Gear</div>
+          <div class="card-desc">Apparel, camping supplies, and gear built for the wild</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROMO BANNER -->
+  <section class="promo-banner">
+    <div class="promo-content">
+      <h2>Gear Up For Every Season</h2>
+      <p>Whether you're casting at dawn or heading to the deer stand, we carry trusted brands that perform when it matters most.</p>
+      <button class="promo-btn" onclick="goToShop()">BROWSE ALL PRODUCTS</button>
+    </div>
+  </section>
+
+  <!-- WHY SHOP WITH US -->
+  <section class="why-us">
+    <h2 class="section-title">Why Shop With Us</h2>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h4>Trusted Brands</h4>
+        <p>We stock only proven, field-tested gear from brands that serious outdoorsmen rely on.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <h4>Expert Staff</h4>
+        <p>Our team are avid hunters and anglers who know the local waters and woodlands inside out.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">
+          <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        </div>
+        <h4>Free Shipping</h4>
+        <p>Enjoy free shipping on all orders over $100 — delivered right to your door.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <h4>Local Roots</h4>
+        <p>Proudly serving the East Texas community from our Whitehouse location.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIFESTYLE BANNER -->
+  <section class="lifestyle-banner">
+    <div class="lifestyle-img"></div>
+    <div class="lifestyle-text">
+      <h2>Born On The Water.<br>Built For The Field.</h2>
+      <p>At Blackhawk Creek Outfitters, we live the lifestyle we sell. Every product on our shelves has been vetted by our team of passionate outdoorsmen. Whether you're a seasoned pro or just getting started, we're here to help you make the most of your time outdoors.</p>
+      <button class="promo-btn" onclick="goToShop()">SHOP THE COLLECTION</button>
+    </div>
   </section>
 
   <!-- STORE INFO SECTION -->

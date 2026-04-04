@@ -2222,25 +2222,25 @@
     <h2 class="section-title">Shop By Category</h2>
     <p class="section-subtitle">From rod and reel to rifle and scope — we've got everything for your next adventure.</p>
     <div class="category-cards">
-      <div class="cat-card" onclick="goToShop(); showCategory('Soft Plastics')">
+      <div class="cat-card" onclick="goToShop(); showCategoryGroup('lures')">
         <img src="https://images.pexels.com/photos/7805768/pexels-photo-7805768.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Man holding fish while kayaking on a lake" loading="lazy">
         <div class="card-overlay">
-          <div class="card-label">Fishing</div>
-          <div class="card-desc">Soft plastics, hardbaits, jigs, and everything you need on the water</div>
+          <div class="card-label">Lures & Baits</div>
+          <div class="card-desc">Soft plastics, hardbaits, spinnerbaits, jigs, frogs, and more</div>
         </div>
       </div>
-      <div class="cat-card" onclick="goToShop(); showCategory('Rod & Reel Combos')">
-        <img src="https://images.pexels.com/photos/6204825/pexels-photo-6204825.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Rod and reel combos for fishing" loading="lazy">
+      <div class="cat-card" onclick="goToShop(); showCategoryGroup('tackle')">
+        <img src="https://images.pexels.com/photos/6204825/pexels-photo-6204825.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Fishing tackle and terminal gear" loading="lazy">
         <div class="card-overlay">
-          <div class="card-label">Rods & Reels</div>
-          <div class="card-desc">Premium rod and reel combos built for performance</div>
+          <div class="card-label">Terminal Tackle</div>
+          <div class="card-desc">Hooks, jigheads, weights, sinkers, and rigging essentials</div>
         </div>
       </div>
-      <div class="cat-card" onclick="goToShop(); showCategory('Apparel & Accessories')">
-        <img src="https://images.pexels.com/photos/712067/pexels-photo-712067.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Outdoor apparel and accessories" loading="lazy">
+      <div class="cat-card" onclick="goToShop(); showCategoryGroup('gear')">
+        <img src="https://images.pexels.com/photos/712067/pexels-photo-712067.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Rods reels and outdoor gear" loading="lazy">
         <div class="card-overlay">
-          <div class="card-label">Apparel & Gear</div>
-          <div class="card-desc">Apparel, accessories, and gear built for the wild</div>
+          <div class="card-label">Rods, Reels & Gear</div>
+          <div class="card-desc">Rod & reel combos, apparel, reel care, and accessories</div>
         </div>
       </div>
     </div>
@@ -3105,6 +3105,24 @@ function showCategory(category, el) {
     );
     if (match) match.classList.add('active');
   }
+}
+
+// Homepage category groups — maps broad groups to multiple Clover categories
+const categoryGroups = {
+  lures: ['Soft Plastics', 'Hardbaits', 'Spinnerbaits', 'Bladed Jigs', 'Swim Jigs', 'Frogs'],
+  tackle: ['Hooks', 'Jigheads', 'Weights & Sinkers'],
+  gear: ['Rod & Reel Combos', 'Reel Care', 'Cleaning Products', 'Apparel & Accessories']
+};
+
+function showCategoryGroup(group) {
+  const cats = categoryGroups[group] || [];
+  const filtered = allProducts.filter(p => cats.some(c => p.category === c));
+  displayProducts(filtered);
+  // Highlight ALL PRODUCTS in nav since this is a cross-category filter
+  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+  const allNav = Array.from(document.querySelectorAll('.nav-item')).find(item => item.textContent === 'ALL PRODUCTS');
+  if (allNav) allNav.classList.add('active');
+  window.scrollTo(0, 0);
 }
 
 function displayProducts(productsToShow) {

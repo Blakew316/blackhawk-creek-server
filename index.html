@@ -2263,21 +2263,21 @@
     <h2 class="section-title">Shop By Category</h2>
     <p class="section-subtitle">From rod and reel to rifle and scope — we've got everything for your next adventure.</p>
     <div class="category-cards">
-      <div class="cat-card" onclick="showCategory('Fishing')">
+      <div class="cat-card" onclick="goToShop(); showCategory('Fishing')">
         <img src="https://images.pexels.com/photos/7805768/pexels-photo-7805768.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Man holding fish while kayaking on a lake" loading="lazy">
         <div class="card-overlay">
           <div class="card-label">Fishing</div>
           <div class="card-desc">Rods, reels, tackle, and everything you need on the water</div>
         </div>
       </div>
-      <div class="cat-card" onclick="showCategory('Hunting')">
+      <div class="cat-card" onclick="goToShop(); showCategory('Hunting')">
         <img src="https://images.pexels.com/photos/6204825/pexels-photo-6204825.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Two hunters in camouflage walking through forest with rifles" loading="lazy">
         <div class="card-overlay">
           <div class="card-label">Hunting</div>
           <div class="card-desc">Firearms, ammo, optics, and field-tested hunting essentials</div>
         </div>
       </div>
-      <div class="cat-card" onclick="showCategory('Outdoor')">
+      <div class="cat-card" onclick="goToShop(); showCategory('Outdoor')">
         <img src="https://images.pexels.com/photos/712067/pexels-photo-712067.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Camping under starry night sky with glowing tent and campfire" loading="lazy">
         <div class="card-overlay">
           <div class="card-label">Outdoor Gear</div>
@@ -3138,7 +3138,15 @@ function showCategory(category, el) {
   document.querySelectorAll('.nav-item').forEach(item => {
     item.classList.remove('active');
   });
-  if (el) el.classList.add('active');
+  if (el) {
+    el.classList.add('active');
+  } else {
+    // Find matching nav item by text
+    const match = Array.from(document.querySelectorAll('.nav-item')).find(item =>
+      item.textContent === (category === 'All' ? 'ALL PRODUCTS' : category.toUpperCase())
+    );
+    if (match) match.classList.add('active');
+  }
 }
 
 function displayProducts(productsToShow) {

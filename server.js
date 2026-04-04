@@ -20,8 +20,15 @@ const path = require('path');
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static(__dirname));
+
+// Serve uploaded images
+const IMAGES_DIR = path.join(__dirname, 'data', 'images');
+if (!fs.existsSync(IMAGES_DIR)) {
+  fs.mkdirSync(IMAGES_DIR, { recursive: true });
+}
+app.use('/images', express.static(IMAGES_DIR));
 
 // ─── Config ──────────────────────────────────────────────
 const MERCHANT_ID = process.env.CLOVER_MERCHANT_ID;
@@ -322,6 +329,211 @@ app.get('/api/sync-status', (req, res) => {
         configured: !!(MERCHANT_ID && API_TOKEN && MERCHANT_ID !== 'YOUR_MERCHANT_ID_HERE')
       });
     }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── Helper: Load & Save product data ───────────────────
+function loadProductData() {
+  if (fs.existsSync(DATA_FILE)) {
+    return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+  }
+  return { products: {}, syncedAt: null, itemCount: 0, categoryMeta: {}, categories: [] };
+}
+
+function saveProductData(data) {
+  // Recalculate counts
+  data.itemCount = Object.values(data.products).reduce((sum, arr) => sum + arr.length, 0);
+  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+}
+
+// ─── GET /api/products/flat — Returns a flat array for the frontend ────
+app.get('/api/products/flat', (req, res) => {
+  try {
+    const data = loadProductData();
+    const flat = [];
+    for (const [categoryKey, items] of Object.entries(data.products)) {
+      const catMeta = data.categoryMeta?.[categoryKey];
+      const categoryName = catMeta?.name || categoryKey;
+      for (const item of items) {
+        flat.push({ ...item, category: categoryName });
+      }
+    }
+    res.json(flat);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── POST /api/products/:id/image — Upload a product image ─────────
+app.post('/api/products/:id/image', (req, res) => {
+  try {
+    const productId = parseInt(req.params.id);
+    const { imageUrl } = req.body;
+
+    if (!imageUrl) {
+      return res.status(400).json({ error: 'No image data provided' });
+    }
+
+    const data = loadProductData();
+    let found = false;
+
+    // If it's a base64 data URL, save as a file
+    let savedUrl = imageUrl;
+    if (imageUrl.startsWith('data:image')) {
+      const matches = imageUrl.match(/^data:image\/(\w+);base64,(.+)$/);
+      if (matches) {
+        const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+        const buffer = Buffer.from(matches[2], 'base64');
+        const filename = `product-${productId}-${Date.now()}.${ext}`;
+        fs.writeFileSync(path.join(IMAGES_DIR, filename), buffer);
+        savedUrl = `/images/${filename}`;
+      }
+    }
+
+    for (const categoryKey of Object.keys(data.products)) {
+      for (const item of data.products[categoryKey]) {
+        if (item.id === productId) {
+          item.imageUrl = savedUrl;
+          found = true;
+          break;
+        }
+      }
+      if (found) break;
+    }
+
+    if (!found) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    saveProductData(data);
+    res.json({ success: true, imageUrl: savedUrl });
+  } catch (err) {
+    console.error('Image upload error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── POST /api/products — Add a new product ────────────────────────
+app.post('/api/products', (req, res) => {
+  try {
+    const { name, brand, category, price, stock, description } = req.body;
+    if (!name) return res.status(400).json({ error: 'Product name is required' });
+
+    const data = loadProductData();
+
+    // Find the highest existing ID
+    let maxId = 0;
+    for (const items of Object.values(data.products)) {
+      for (const item of items) {
+        if (item.id > maxId) maxId = item.id;
+      }
+    }
+
+    const categoryKey = category ? categoryToKey(category) : 'general';
+    const categoryName = category || 'General';
+
+    const newProduct = {
+      id: maxId + 1,
+      cloverId: null,
+      name,
+      brand: brand || 'Blackhawk Creek',
+      price: parseFloat(price) || 0,
+      original: null,
+      rating: 0,
+      reviews: 0,
+      badge: null,
+      icon: getCategoryIcon(categoryName),
+      desc: description || `${name} — available at Blackhawk Creek Outfitters.`,
+      sku: '',
+      inStock: true,
+      stockCount: parseInt(stock) || 0,
+      cloverCategory: categoryName,
+      imageUrl: null
+    };
+
+    if (!data.products[categoryKey]) data.products[categoryKey] = [];
+    data.products[categoryKey].push(newProduct);
+
+    // Update category metadata
+    if (!data.categoryMeta) data.categoryMeta = {};
+    const gradient = getCategoryGradient(categoryName);
+    data.categoryMeta[categoryKey] = {
+      key: categoryKey,
+      name: categoryName,
+      count: data.products[categoryKey].length,
+      icon: getCategoryIcon(categoryName),
+      gradient
+    };
+    data.categories = Object.values(data.categoryMeta);
+
+    saveProductData(data);
+    res.json({ success: true, product: newProduct });
+  } catch (err) {
+    console.error('Add product error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── PUT /api/products/:id — Update a product ──────────────────────
+app.put('/api/products/:id', (req, res) => {
+  try {
+    const productId = parseInt(req.params.id);
+    const updates = req.body;
+    const data = loadProductData();
+    let found = false;
+
+    for (const categoryKey of Object.keys(data.products)) {
+      for (const item of data.products[categoryKey]) {
+        if (item.id === productId) {
+          if (updates.name !== undefined) item.name = updates.name;
+          if (updates.brand !== undefined) item.brand = updates.brand;
+          if (updates.price !== undefined) item.price = parseFloat(updates.price);
+          if (updates.stock !== undefined) item.stockCount = parseInt(updates.stock);
+          if (updates.description !== undefined) item.desc = updates.description;
+          found = true;
+          break;
+        }
+      }
+      if (found) break;
+    }
+
+    if (!found) return res.status(404).json({ error: 'Product not found' });
+
+    saveProductData(data);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── DELETE /api/products/:id — Remove a product ────────────────────
+app.delete('/api/products/:id', (req, res) => {
+  try {
+    const productId = parseInt(req.params.id);
+    const data = loadProductData();
+    let found = false;
+
+    for (const categoryKey of Object.keys(data.products)) {
+      const index = data.products[categoryKey].findIndex(p => p.id === productId);
+      if (index !== -1) {
+        data.products[categoryKey].splice(index, 1);
+        // Remove empty categories
+        if (data.products[categoryKey].length === 0) {
+          delete data.products[categoryKey];
+          if (data.categoryMeta) delete data.categoryMeta[categoryKey];
+          data.categories = Object.values(data.categoryMeta || {});
+        }
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) return res.status(404).json({ error: 'Product not found' });
+
+    saveProductData(data);
+    res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

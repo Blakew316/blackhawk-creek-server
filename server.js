@@ -1298,6 +1298,46 @@ app.get('/api/sales/export/csv', (req, res) => {
   }
 });
 
+// ─── Footer Pages ───────────────────────────────────────
+const FOOTER_PAGES_FILE = path.join(__dirname, 'data', 'footer-pages.json');
+
+function loadFooterPages() {
+  try {
+    if (fs.existsSync(FOOTER_PAGES_FILE)) {
+      return JSON.parse(fs.readFileSync(FOOTER_PAGES_FILE, 'utf8'));
+    }
+  } catch (e) { console.error('Error loading footer pages:', e.message); }
+  return null;
+}
+
+function saveFooterPages(data) {
+  const dir = path.dirname(FOOTER_PAGES_FILE);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(FOOTER_PAGES_FILE, JSON.stringify(data, null, 2));
+}
+
+app.get('/api/footer-pages', (req, res) => {
+  const data = loadFooterPages();
+  if (data) {
+    res.json(data);
+  } else {
+    res.json([]);
+  }
+});
+
+app.post('/api/footer-pages', (req, res) => {
+  try {
+    const data = req.body;
+    if (!Array.isArray(data)) {
+      return res.status(400).json({ error: 'Expected an array of footer sections' });
+    }
+    saveFooterPages(data);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ─── Start Server ───────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`

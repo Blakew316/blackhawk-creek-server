@@ -865,10 +865,25 @@ app.post('/api/checkout', async (req, res) => {
     }
     saveProductData(productData);
 
+    // ─── Sync order to Clover POS as a paid order ───
+    let cloverOrderId = null;
+    try {
+      cloverOrderId = await syncOrderToClover(order, productData);
+      if (cloverOrderId) {
+        order.cloverOrderId = cloverOrderId;
+        saveSalesData(salesData);
+        console.log('✅ Order synced to Clover — Order ID:', cloverOrderId);
+      }
+    } catch (syncErr) {
+      // Don't fail the customer checkout if Clover sync fails
+      console.error('⚠️ Clover order sync failed (non-blocking):', syncErr.message);
+    }
+
     res.json({
       success: true,
       orderId: order.id,
       chargeId: chargeData.id,
+      cloverOrderId: cloverOrderId || null,
       total: order.total,
       last4: order.cardLast4,
       brand: order.cardBrand
@@ -879,6 +894,125 @@ app.post('/api/checkout', async (req, res) => {
     res.status(500).json({ error: 'Payment processing failed. Please try again.' });
   }
 });
+
+// ─── Sync Online Order to Clover POS ─────────────────────────
+async function syncOrderToClover(order, productData) {
+  if (!MERCHANT_ID || !API_TOKEN) {
+    console.log('⚠️ Clover POS credentials not set — skipping order sync');
+    return null;
+  }
+
+  const cloverAPI = `${BASE_URL}/v3/merchants/${MERCHANT_ID}`;
+  const headers = {
+    'Authorization': `Bearer ${API_TOKEN}`,
+    'Content-Type': 'application/json'
+  };
+
+  // 1. Create the order
+  const createOrderRes = await fetch(`${cloverAPI}/orders`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      state: 'locked',
+      title: `Online Order #${order.id}`,
+      note: `Website order — ${order.customerName || 'Guest'} (${order.customerEmail || 'no email'})`,
+      orderType: { id: 'online' }
+    })
+  });
+
+  if (!createOrderRes.ok) {
+    const errText = await createOrderRes.text();
+    throw new Error(`Create order failed: ${createOrderRes.status} ${errText}`);
+  }
+
+  const cloverOrder = await createOrderRes.json();
+  const cloverOrderId = cloverOrder.id;
+
+  // 2. Add line items to the order
+  for (const item of order.items) {
+    // Try to find the Clover inventory item ID
+    let cloverItemId = null;
+    for (const catItems of Object.values(productData.products)) {
+      const prod = catItems.find(p => p.id === item.productId);
+      if (prod && prod.cloverId) {
+        cloverItemId = prod.cloverId;
+        break;
+      }
+    }
+
+    if (cloverItemId) {
+      // Add the existing Clover inventory item
+      await fetch(`${cloverAPI}/orders/${cloverOrderId}/line_items`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          item: { id: cloverItemId },
+          unitQty: item.quantity
+        })
+      });
+    } else {
+      // Create a custom line item (for products not synced from Clover)
+      await fetch(`${cloverAPI}/orders/${cloverOrderId}/line_items`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          name: item.name,
+          price: Math.round(item.price * 100),
+          unitQty: item.quantity
+        })
+      });
+    }
+  }
+
+  // 3. Apply the tax
+  if (order.tax > 0) {
+    const taxInCents = Math.round(order.tax * 100);
+    // Add manually-applied tax
+    await fetch(`${cloverAPI}/orders/${cloverOrderId}`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        manualTransaction: true,
+        total: Math.round(order.total * 100)
+      })
+    });
+  }
+
+  // 4. Record payment against the order so it shows as PAID
+  const paymentPayload = {
+    order: { id: cloverOrderId },
+    amount: Math.round(order.total * 100),
+    taxAmount: Math.round(order.tax * 100),
+    result: 'SUCCESS',
+    externalPaymentId: order.cloverChargeId || `web-${order.id}-${Date.now()}`,
+    note: 'Paid online via Clover Ecommerce',
+    tender: {
+      labelKey: 'com.clover.tender.credit_card',
+      label: 'Credit Card',
+      opensCashDrawer: false
+    },
+    cardTransaction: {
+      last4: order.cardLast4 || '0000',
+      cardType: (order.cardBrand || 'VISA').toUpperCase(),
+      type: 'AUTH_CAPTURE',
+      state: 'CLOSED',
+      referenceId: order.cloverChargeId || ''
+    }
+  };
+
+  const paymentRes = await fetch(`${cloverAPI}/orders/${cloverOrderId}/payments`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(paymentPayload)
+  });
+
+  if (!paymentRes.ok) {
+    const errText = await paymentRes.text();
+    console.warn('⚠️ Payment sync partial — order created but payment record failed:', paymentRes.status, errText);
+  }
+
+  return cloverOrderId;
+}
 
 // ─── Sales Data Helpers ────────────────────────────────────
 function loadSalesData() {

@@ -18,6 +18,12 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 
+// Use node-fetch for Node < 18, native fetch for Node 18+
+if (!globalThis.fetch) {
+  const nodeFetch = require('node-fetch');
+  globalThis.fetch = nodeFetch;
+}
+
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));

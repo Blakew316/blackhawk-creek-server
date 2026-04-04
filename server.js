@@ -62,6 +62,311 @@ async function cloverFetch(endpoint) {
   return response.json();
 }
 
+// ─── Use Clover's actual category names as website sections ──────────
+// Converts "Fishing Rods & Reels" → "fishing-rods-reels" (URL-safe key)
+// and keeps the original display name
+function categoryToKey(name) {
+  return name.toLowerCase()
+    .replace(/&/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+// ─── Choose an emoji icon based on category keywords ─────────────
+function getCategoryIcon(categoryName) {
+  const name = categoryName.toLowerCase();
+  const iconMap = [
+    [['fish', 'rod', 'reel', 'tackle', 'lure', 'bait', 'angl'], '&#127907;'],
+    [['hunt', 'blind', 'decoy', 'call', 'tree stand', 'game', 'deer', 'duck', 'turkey'], '&#127939;'],
+    [['gun', 'firearm', 'rifle', 'shotgun', 'handgun', 'pistol', 'ammo', 'ammunition'], '&#128299;'],
+    [['apparel', 'cloth', 'boot', 'wader', 'jacket', 'camo', 'shirt', 'pant', 'hat', 'glove', 'vest', 'wear'], '&#129509;'],
+    [['optic', 'scope', 'binocular', 'rangefind', 'sight', 'monocular'], '&#128269;'],
+    [['archer', 'bow', 'arrow', 'crossbow', 'quiver', 'broadhead'], '&#127993;'],
+    [['boat', 'kayak', 'canoe', 'marine', 'paddle'], '&#128674;'],
+    [['camp', 'tent', 'sleep', 'cook', 'lantern', 'stove'], '&#9978;'],
+    [['knife', 'knives', 'tool', 'multi-tool', 'axe', 'hatchet'], '&#128296;'],
+    [['electronic', 'gps', 'finder', 'radio', 'camera', 'trail cam'], '&#128225;'],
+    [['dog', 'pet', 'collar', 'kennel'], '&#128054;'],
+    [['food', 'snack', 'jerky', 'drink', 'cooler'], '&#127860;'],
+  ];
+  for (const [keywords, icon] of iconMap) {
+    if (keywords.some(k => name.includes(k))) return icon;
+  }
+  return '&#127967;';
+}
+
+// ─── Pick a gradient background for category cards ──────
+function getCategoryGradient(categoryName) {
+  const name = categoryName.toLowerCase();
+  const gradientMap = [
+    [['fish', 'rod', 'reel', 'tackle', 'lure', 'bait'], ['#1a3a2a', '#0d1f15']],
+    [['hunt', 'blind', 'decoy', 'deer', 'duck', 'turkey'], ['#3a2a1a', '#1f150d']],
+    [['gun', 'firearm', 'rifle', 'shotgun', 'ammo'], ['#2a2a2a', '#151515']],
+    [['apparel', 'cloth', 'boot', 'wear', 'camo'], ['#2a331a', '#15190d']],
+    [['optic', 'scope', 'binocular'], ['#1a2a3a', '#0d151f']],
+    [['archer', 'bow', 'arrow', 'crossbow'], ['#3a1a2a', '#1f0d15']],
+    [['boat', 'kayak', 'marine'], ['#1a2a3a', '#0d1520']],
+    [['camp', 'tent', 'outdoor'], ['#2a3320', '#151a0d']],
+    [['knife', 'tool'], ['#33291a', '#1a150d']],
+  ];
+  for (const [keywords, colors] of gradientMap) {
+    if (keywords.some(k => name.includes(k))) return colors;
+  }
+  return ['#2a2a2a', '#151515'];
+}
+
+// ─── Sync products from Clover ──────────────────────────
+async function syncFromClover() {
+  console.log('\n🔄 Starting Clover sync...');
+  const startTime = Date.now();
+
+  // 1. Fetch all categories
+  console.log('📂 Fetching categories...');
+  const categoriesData = await cloverFetch('/categories?limit=100');
+  const categoriesMap = {};
+  if (categoriesData.elements) {
+    for (const cat of categoriesData.elements) {
+      categoriesMap[cat.id] = cat;
+    }
+  }
+  console.log(`   Found ${Object.keys(categoriesMap).length} categories`);
+
+  // 2. Fetch all items with their category associations
+  console.log('📦 Fetching items...');
+  const itemsData = await cloverFetch('/items?expand=categories,tags,modifierGroups&limit=500');
+
+  if (!itemsData.elements || itemsData.elements.length === 0) {
+    console.log('   ⚠️  No items found in Clover inventory');
+    return { products: {}, syncedAt: new Date().toISOString(), itemCount: 0 };
+  }
+
+  console.log(`   Found ${itemsData.elements.length} items`);
+
+  // 3. Transform Clover items into website product format
+  const products = {};
+  let idCounter = 1;
+
+  for (const item of itemsData.elements) {
+    // Skip hidden/deleted items
+    if (item.hidden || item.isDeleted) continue;
+
+    // Use Clover's actual category names directly
+    let categoryKey = 'general';
+    let categoryDisplayName = 'General';
+    if (item.categories && item.categories.elements && item.categories.elements.length > 0) {
+      const firstCategory = item.categories.elements[0];
+      categoryDisplayName = firstCategory.name || 'General';
+      categoryKey = categoryToKey(categoryDisplayName);
+    }
+
+    // Convert Clover price (in cents) to dollars
+    const priceInDollars = item.price ? item.price / 100 : 0;
+
+    // Build the product object
+    const product = {
+      id: idCounter++,
+      cloverId: item.id,
+      name: item.name,
+      brand: extractBrand(item.name) || 'Blackhawk Creek',
+      price: priceInDollars,
+      original: null,
+      rating: 4.5,
+      reviews: 0,
+      badge: item.tags?.elements?.some(t => t.name?.toLowerCase() === 'sale') ? 'sale'
+           : item.tags?.elements?.some(t => t.name?.toLowerCase() === 'new') ? 'new'
+           : null,
+      icon: getCategoryIcon(categoryDisplayName),
+      desc: item.description || `${item.name} — available at Blackhawk Creek Outfitters.`,
+      sku: item.sku || '',
+      inStock: !item.stockCount || item.stockCount > 0,
+      stockCount: item.stockCount || null,
+      cloverCategory: categoryDisplayName,
+    };
+
+    // Check for sale price via alternate name or tags
+    if (item.alternateName && item.alternateName.match(/^\d+\.?\d*$/)) {
+      product.original = priceInDollars;
+      product.price = parseFloat(item.alternateName);
+    }
+
+    // Group into category using Clover's actual name
+    if (!products[categoryKey]) products[categoryKey] = [];
+    products[categoryKey].push(product);
+  }
+
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+  const totalItems = Object.values(products).reduce((sum, arr) => sum + arr.length, 0);
+  console.log(`✅ Sync complete in ${elapsed}s — ${totalItems} products across ${Object.keys(products).length} categories\n`);
+
+  // Build category metadata with icons and gradients for the website
+  const categoryMeta = {};
+  for (const [key, items] of Object.entries(products)) {
+    const displayName = items[0]?.cloverCategory || key;
+    const gradient = getCategoryGradient(displayName);
+    categoryMeta[key] = {
+      key,
+      name: displayName,
+      count: items.length,
+      icon: getCategoryIcon(displayName),
+      gradient: gradient
+    };
+  }
+
+  const result = {
+    products,
+    syncedAt: new Date().toISOString(),
+    itemCount: totalItems,
+    categoryMeta,
+    categories: Object.values(categoryMeta)
+  };
+
+  // Save to disk for persistence
+  fs.writeFileSync(DATA_FILE, JSON.stringify(result, null, 2));
+
+  return result;
+}
+
+// ─── Try to extract brand from product name ─────────────
+function extractBrand(name) {
+  // Common outdoor brands to look for at the start of product names
+  const brands = [
+    'Shimano', 'Abu Garcia', 'Rapala', 'Daiwa', "Lew's", 'KastKing', 'Garmin',
+    'Remington', 'Savage Arms', 'Mossy Oak', 'Muddy', 'Vortex', 'Primos',
+    'Smith & Wesson', 'Benelli', 'Mossberg', 'Browning', 'Winchester',
+    'Sitka', 'Under Armour', 'Frogg Toggs', 'Leupold', 'Swarovski',
+    'Federal', 'Hornady', 'HSS', 'Red Wing', 'Mathews', 'Hoyt', 'Bear',
+    'PSE', 'Berkley', 'Strike King', 'Yo-Zuri', 'Storm', 'Mepps',
+  ];
+
+  for (const brand of brands) {
+    if (name.toLowerCase().startsWith(brand.toLowerCase())) {
+      return brand;
+    }
+  }
+  return null;
+}
+
+// ─── API Routes ─────────────────────────────────────────
+
+// Clover webhook verification & callback endpoint
+// Clover sends a GET to verify the URL exists, and POSTs when events happen
+app.get('/webhook', (req, res) => {
+  console.log('✅ Clover webhook verification received');
+  res.status(200).send('OK');
+});
+
+app.post('/webhook', (req, res) => {
+  console.log('📨 Clover webhook event received:', JSON.stringify(req.body));
+  // You could trigger an auto-sync here in the future
+  res.status(200).send('OK');
+});
+
+// GET /api/products — Returns cached product data for the website
+app.get('/api/products', (req, res) => {
+  try {
+    if (fs.existsSync(DATA_FILE)) {
+      const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+      res.json(data);
+    } else {
+      res.json({ products: {}, syncedAt: null, itemCount: 0, message: 'No data yet. Run a sync first.' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to read product data', details: err.message });
+  }
+});
+
+// POST /api/sync — Pull fresh data from Clover (password protected)
+app.post('/api/sync', async (req, res) => {
+  const { password } = req.body;
+
+  if (password !== ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Invalid admin password' });
+  }
+
+  if (!MERCHANT_ID || !API_TOKEN || MERCHANT_ID === 'YOUR_MERCHANT_ID_HERE') {
+    return res.status(400).json({
+      error: 'Clover credentials not configured',
+      help: 'Copy .env.example to .env and add your Merchant ID and API Token'
+    });
+  }
+
+  try {
+    const result = await syncFromClover();
+    res.json({
+      success: true,
+      message: `Synced ${result.itemCount} products from Clover`,
+      syncedAt: result.syncedAt,
+      categories: result.categories
+    });
+  } catch (err) {
+    console.error('❌ Sync failed:', err.message);
+    res.status(500).json({ error: 'Sync failed', details: err.message });
+  }
+});
+
+// GET /api/sync-status — Check last sync time
+app.get('/api/sync-status', (req, res) => {
+  try {
+    if (fs.existsSync(DATA_FILE)) {
+      const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+      res.json({
+        lastSync: data.syncedAt,
+        itemCount: data.itemCount,
+        categories: data.categories,
+        configured: !!(MERCHANT_ID && API_TOKEN && MERCHANT_ID !== 'YOUR_MERCHANT_ID_HERE')
+      });
+    } else {
+      res.json({
+        lastSync: null,
+        itemCount: 0,
+        configured: !!(MERCHANT_ID && API_TOKEN && MERCHANT_ID !== 'YOUR_MERCHANT_ID_HERE')
+      });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── Start Server ───────────────────────────────────────
+app.listen(PORT, () => {
+  console.log(`
+  ┌─────────────────────────────────────────────┐
+  │  🏔️  Blackhawk Creek Outfitters             │
+  │     Clover POS Sync Server                  │
+  │                                             │
+  │  Local:  http://localhost:${PORT}              │
+  │  Env:    ${ENVIRONMENT.padEnd(12)}                    │
+  │  Status: ${MERCHANT_ID && MERCHANT_ID !== 'YOUR_MERCHANT_ID_HERE' ? '✅ Clover configured' : '⚠️  Needs .env setup'}           │
+  └─────────────────────────────────────────────┘
+  `);
+});// Cached product data file
+const DATA_FILE = path.join(__dirname, 'data', 'products.json');
+
+// Ensure data directory exists
+if (!fs.existsSync(path.join(__dirname, 'data'))) {
+  fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
+}
+
+// ─── Clover API Helper ──────────────────────────────────
+async function cloverFetch(endpoint) {
+  const url = `${BASE_URL}/v3/merchants/${MERCHANT_ID}${endpoint}`;
+  console.log(`  ↳ Fetching: ${url}`);
+
+  const response = await fetch(url, {
+    headers: {
+      'Authorization': `Bearer ${API_TOKEN}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Clover API error ${response.status}: ${errorText}`);
+  }
+
+  return response.json();
+}
+
 // ─── Map Clover categories to website sections ──────────
 function mapCategory(cloverCategory) {
   if (!cloverCategory) return 'general';

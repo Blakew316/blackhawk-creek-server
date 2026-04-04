@@ -29,8 +29,8 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(__dirname));
 
-// Serve uploaded images
-const IMAGES_DIR = path.join(__dirname, 'data', 'images');
+// Serve uploaded images (uses persistent data dir if available)
+const IMAGES_DIR = path.join(process.env.RENDER_DISK_PATH || path.join(__dirname, 'data'), 'images');
 if (!fs.existsSync(IMAGES_DIR)) {
   fs.mkdirSync(IMAGES_DIR, { recursive: true });
 }
@@ -55,14 +55,21 @@ const ECOM_BASE_URL = ENVIRONMENT === 'production'
   ? 'https://scl.clover.com'
   : 'https://scl-sandbox.dev.clover.com';
 
-// Cached product data file
-const DATA_FILE = path.join(__dirname, 'data', 'products.json');
-const SALES_FILE = path.join(__dirname, 'data', 'sales.json');
+// Persistent data directory — use RENDER_DISK_PATH env var if a Render Disk is mounted,
+// otherwise fall back to local data/ (ephemeral on Render free tier)
+const DATA_DIR = process.env.RENDER_DISK_PATH || path.join(__dirname, 'data');
+const DATA_FILE = path.join(DATA_DIR, 'products.json');
+const SALES_FILE = path.join(DATA_DIR, 'sales.json');
 
 // Ensure data directory exists
-if (!fs.existsSync(path.join(__dirname, 'data'))) {
-  fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
 }
+
+// Log data directory on startup so you can verify persistence
+console.log('📁 Data directory:', DATA_DIR);
+console.log('   Products file:', DATA_FILE);
+console.log('   Sales file:', SALES_FILE);
 
 // ─── Clover API Helper ──────────────────────────────────
 async function cloverFetch(endpoint) {
@@ -223,26 +230,29 @@ async function syncFromClover() {
     const existingMatch = existingByClover[item.id] || (item.sku ? existingBySku[item.sku] : null);
 
     if (existingMatch) {
-      // UPDATE existing item — only update Clover-sourced fields, preserve manual edits
+      // UPDATE existing item — preserve any manually edited fields
       const existing = existingMatch.item;
       const oldCatKey = existingMatch.categoryKey;
+      const manualEdits = existing._manualEdits || {};
 
-      // Update fields from Clover (these are Clover's source of truth)
+      // Update fields from Clover ONLY if not manually edited
       existing.cloverId = item.id;
-      existing.name = item.name;
+      if (!manualEdits.name) existing.name = item.name;
       existing.sku = item.sku || existing.sku;
-      existing.price = salePrice || priceInDollars;
-      existing.original = salePrice ? priceInDollars : null;
+      if (!manualEdits.price) {
+        existing.price = salePrice || priceInDollars;
+        existing.original = salePrice ? priceInDollars : null;
+      }
       existing.inStock = !item.stockCount || item.stockCount > 0;
-      existing.stockCount = item.stockCount || existing.stockCount;
-      existing.desc = item.description || existing.desc;
+      if (!manualEdits.stock) existing.stockCount = item.stockCount || existing.stockCount;
+      if (!manualEdits.description) existing.desc = item.description || existing.desc;
       existing.badge = item.tags?.elements?.some(t => t.name?.toLowerCase() === 'sale') ? 'sale'
            : item.tags?.elements?.some(t => t.name?.toLowerCase() === 'new') ? 'new'
            : existing.badge;
       // Preserve imageUrl — don't overwrite manual uploads
       // Preserve brand if manually edited (only set if currently default)
       const cloverBrand = extractBrand(item.name);
-      if (cloverBrand && (!existing.brand || existing.brand === 'Blackhawk Creek')) {
+      if (!manualEdits.brand && cloverBrand && (!existing.brand || existing.brand === 'Blackhawk Creek')) {
         existing.brand = cloverBrand;
       }
 
@@ -589,12 +599,15 @@ app.put('/api/products/:id', (req, res) => {
 
     if (!found || !foundItem) return res.status(404).json({ error: 'Product not found' });
 
+    // Track manually edited fields so Clover sync won't overwrite them
+    if (!foundItem._manualEdits) foundItem._manualEdits = {};
+
     // Apply basic field updates
-    if (updates.name !== undefined) foundItem.name = updates.name;
-    if (updates.brand !== undefined) foundItem.brand = updates.brand;
-    if (updates.price !== undefined) foundItem.price = parseFloat(updates.price);
-    if (updates.stock !== undefined) foundItem.stockCount = parseInt(updates.stock);
-    if (updates.description !== undefined) foundItem.desc = updates.description;
+    if (updates.name !== undefined) { foundItem.name = updates.name; foundItem._manualEdits.name = true; }
+    if (updates.brand !== undefined) { foundItem.brand = updates.brand; foundItem._manualEdits.brand = true; }
+    if (updates.price !== undefined) { foundItem.price = parseFloat(updates.price); foundItem._manualEdits.price = true; }
+    if (updates.stock !== undefined) { foundItem.stockCount = parseInt(updates.stock); foundItem._manualEdits.stock = true; }
+    if (updates.description !== undefined) { foundItem.desc = updates.description; foundItem._manualEdits.description = true; }
 
     // Handle image (base64 or URL)
     if (updates.imageUrl !== undefined) {
@@ -1359,7 +1372,7 @@ app.get('/api/sales/export/csv', (req, res) => {
 });
 
 // ─── Footer Pages ───────────────────────────────────────
-const FOOTER_PAGES_FILE = path.join(__dirname, 'data', 'footer-pages.json');
+const FOOTER_PAGES_FILE = path.join(DATA_DIR, 'footer-pages.json');
 
 function loadFooterPages() {
   try {

@@ -3470,17 +3470,24 @@ async function initCloverTokenizer() {
     const configRes = await fetch(API_BASE + '/api/checkout/config');
     const config = await configRes.json();
 
+    console.log('--- Clover Config ---');
+    console.log('Environment:', config.environment);
+    console.log('Public Key:', config.publicKey ? config.publicKey.substring(0, 12) + '...' : 'MISSING');
+    console.log('Merchant ID:', config.merchantId || 'MISSING');
+    console.log('---------------------');
+
     if (!config.publicKey) {
       console.warn('Clover public key not configured');
       return;
     }
 
-    // Load Clover SDK if not loaded
+    // Load Clover SDK — environment MUST match your API keys
     if (!window.Clover) {
+      const sdkUrl = config.environment === 'production'
+        ? 'https://checkout.clover.com/sdk.js'
+        : 'https://checkout.sandbox.dev.clover.com/sdk.js';
+      console.log('Loading Clover SDK from:', sdkUrl);
       await new Promise((resolve, reject) => {
-        const sdkUrl = config.environment === 'production'
-          ? 'https://checkout.clover.com/sdk.js'
-          : 'https://checkout.sandbox.dev.clover.com/sdk.js';
         const script = document.createElement('script');
         script.src = sdkUrl;
         script.onload = resolve;

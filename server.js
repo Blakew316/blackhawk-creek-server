@@ -149,6 +149,12 @@ async function syncFromClover() {
 
   console.log(`   Found ${itemsData.elements.length} items`);
 
+  // Debug: log first 3 items' raw price data from Clover
+  for (let i = 0; i < Math.min(3, itemsData.elements.length); i++) {
+    const dbgItem = itemsData.elements[i];
+    console.log(`   🔍 Item "${dbgItem.name}" — raw price: ${dbgItem.price} cents ($${dbgItem.price ? (dbgItem.price / 100).toFixed(2) : '0.00'}), priceType: ${dbgItem.priceType || 'not set'}`);
+  }
+
   // 3. Transform Clover items into website product format
   const products = {};
   let idCounter = 1;

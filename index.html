@@ -1638,38 +1638,6 @@
   }
 
   /* Clover iframe fields — hard lock at 38px to match inputs */
-  .clover-iframe-field {
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    background: white;
-    transition: border-color 0.15s, box-shadow 0.15s;
-    height: 38px !important;
-    max-height: 38px !important;
-    overflow: hidden !important;
-    box-sizing: border-box;
-    margin-bottom: 0;
-  }
-  .clover-iframe-field.focused {
-    border-color: var(--color-olive);
-    box-shadow: 0 0 0 2px rgba(61,74,47,0.08);
-  }
-  .clover-iframe-field.error {
-    border-color: #dc2626;
-    box-shadow: 0 0 0 2px rgba(220,38,38,0.08);
-  }
-  .clover-iframe-field * {
-    max-height: 38px !important;
-  }
-  .clover-iframe-field iframe {
-    width: 100% !important;
-    height: 36px !important;
-    max-height: 36px !important;
-    border: none !important;
-    display: block !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
   .payment-card-wrap {
     background: #f9fafb;
     border: 1px solid #e5e7eb;
@@ -1782,15 +1750,6 @@
     color: #9ca3af;
     margin-top: 12px;
   }
-  /* Hide Clover SDK injected branding */
-  .clover-footer,
-  [class*="clover-brand"],
-  [class*="clover-footer"],
-  [class*="powered-by"],
-  .clover-iframe-field + div:not(.checkout-row):not(.checkout-field) {
-    display: none !important;
-  }
-
   .back-to-cart-btn {
     display: flex;
     align-items: center;
@@ -2455,19 +2414,18 @@
               <span class="card-brand amex">AMEX</span>
               <span class="card-brand discover">DISC<span class="disc-dot"></span>VER</span>
             </div>
-            <!-- Clover iframe tokenizer mounts here -->
             <div class="checkout-field" style="margin-bottom:10px;">
               <label>Card Number</label>
-              <div id="clover-card-number" class="clover-iframe-field"></div>
+              <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="cc-number" required oninput="formatCardNumber(this)">
             </div>
             <div class="checkout-row">
               <div class="checkout-field">
                 <label>Expiration</label>
-                <div id="clover-card-exp" class="clover-iframe-field"></div>
+                <input type="text" id="cardExp" placeholder="MM/YY" maxlength="5" autocomplete="cc-exp" required oninput="formatCardExp(this)">
               </div>
               <div class="checkout-field">
                 <label>CVV</label>
-                <div id="clover-card-cvv" class="clover-iframe-field"></div>
+                <input type="text" id="cardCvv" placeholder="123" maxlength="4" autocomplete="cc-csc" required>
               </div>
               <div class="checkout-field"><label>ZIP (Billing)</label><input type="text" id="billZip" maxlength="10" required></div>
             </div>
@@ -3464,92 +3422,28 @@ function populateCheckoutSummary() {
   document.getElementById('checkoutTotal').textContent = '$' + total.toFixed(2);
 }
 
+let cloverConfig = null;
+
 async function initCloverTokenizer() {
   try {
-    // Get config from server
     const configRes = await fetch(API_BASE + '/api/checkout/config');
-    const config = await configRes.json();
-
-    console.log('--- Clover Config ---');
-    console.log('Environment:', config.environment);
-    console.log('Public Key:', config.publicKey ? config.publicKey.substring(0, 12) + '...' : 'MISSING');
-    console.log('Merchant ID:', config.merchantId || 'MISSING');
-    console.log('---------------------');
-
-    if (!config.publicKey) {
-      console.warn('Clover public key not configured');
-      return;
-    }
-
-    // Load Clover SDK — environment MUST match your API keys
-    if (!window.Clover) {
-      const sdkUrl = config.environment === 'production'
-        ? 'https://checkout.clover.com/sdk.js'
-        : 'https://checkout.sandbox.dev.clover.com/sdk.js';
-      console.log('Loading Clover SDK from:', sdkUrl);
-      await new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = sdkUrl;
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
-    }
-
-    // Initialize Clover instance with PAKMS key
-    console.log('🔐 Initializing Clover with key:', config.publicKey.substring(0, 12) + '...');
-    cloverInstance = new Clover(config.publicKey, {
-      merchantId: config.merchantId
-    });
-    const elements = cloverInstance.elements();
-
-    // Clear previous iframes
-    ['clover-card-number', 'clover-card-exp', 'clover-card-cvv'].forEach(id => {
-      document.getElementById(id).innerHTML = '';
-    });
-
-    // Style overrides for Clover iframe inputs — match 38px input height
-    const fieldStyle = {
-      input: {
-        fontSize: '14px',
-        padding: '0 10px',
-        height: '36px',
-        lineHeight: '36px',
-        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        color: '#111827',
-        margin: '0',
-        border: 'none',
-        outline: 'none'
-      },
-      'input::placeholder': {
-        color: '#b0b5be'
-      }
-    };
-
-    // Mount card fields
-    const cardNumber = elements.create('CARD_NUMBER', { style: fieldStyle });
-    const cardExp = elements.create('CARD_DATE', { style: fieldStyle });
-    const cardCvv = elements.create('CARD_CVV', { style: fieldStyle });
-
-    cardNumber.mount('#clover-card-number');
-    cardExp.mount('#clover-card-exp');
-    cardCvv.mount('#clover-card-cvv');
-
-    // Track focus/blur for styling
-    [['#clover-card-number', cardNumber], ['#clover-card-exp', cardExp], ['#clover-card-cvv', cardCvv]].forEach(([sel, el]) => {
-      el.addEventListener('focus', () => document.querySelector(sel).classList.add('focused'));
-      el.addEventListener('blur', () => document.querySelector(sel).classList.remove('focused'));
-      el.addEventListener('change', (e) => {
-        if (e.error) document.querySelector(sel).classList.add('error');
-        else document.querySelector(sel).classList.remove('error');
-      });
-    });
-
-    cloverTokenizer = cloverInstance;
-    console.log('Clover tokenizer initialized');
+    cloverConfig = await configRes.json();
+    console.log('✅ Checkout config loaded — environment:', cloverConfig.environment);
+    cloverTokenizer = true; // Flag that checkout is ready
   } catch (err) {
-    console.error('Failed to init Clover tokenizer:', err);
+    console.error('Failed to load checkout config:', err);
   }
+}
+
+function formatCardNumber(input) {
+  let v = input.value.replace(/\D/g, '').substring(0, 16);
+  input.value = v.replace(/(.{4})/g, '$1 ').trim();
+}
+
+function formatCardExp(input) {
+  let v = input.value.replace(/\D/g, '').substring(0, 4);
+  if (v.length >= 3) v = v.substring(0, 2) + '/' + v.substring(2);
+  input.value = v;
 }
 
 async function processCheckout() {
@@ -3568,45 +3462,87 @@ async function processCheckout() {
   const shipZip = document.getElementById('shipZip').value.trim();
   const billZip = document.getElementById('billZip').value.trim();
 
+  // Get card details from input fields
+  const cardNum = document.getElementById('cardNumber').value.replace(/\s/g, '');
+  const cardExpRaw = document.getElementById('cardExp').value.trim();
+  const cardCvv = document.getElementById('cardCvv').value.trim();
+
   if (!email || !shipFirst || !shipLast || !shipAddress || !shipCity || !shipZip || !billZip) {
     errorEl.textContent = 'Please fill in all required fields.';
     errorEl.style.display = 'block';
     return;
   }
 
-  if (!cloverTokenizer) {
+  if (!cardNum || cardNum.length < 13 || cardNum.length > 19) {
+    errorEl.textContent = 'Please enter a valid card number.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  if (!cardExpRaw || !cardExpRaw.includes('/')) {
+    errorEl.textContent = 'Please enter a valid expiration date (MM/YY).';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  if (!cardCvv || cardCvv.length < 3) {
+    errorEl.textContent = 'Please enter a valid CVV.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  if (!cloverTokenizer || !cloverConfig) {
     errorEl.textContent = 'Payment system is loading. Please wait a moment and try again.';
     errorEl.style.display = 'block';
     return;
   }
+
+  // Parse expiration
+  const expParts = cardExpRaw.split('/');
+  const expMonth = expParts[0].trim();
+  const expYear = '20' + expParts[1].trim();
 
   // Disable button
   btn.disabled = true;
   btnText.textContent = 'Processing...';
 
   try {
-    // Tokenize card via Clover (with 30s timeout)
-    console.log('🔐 Tokenizing card...');
-    let tokenResult;
-    try {
-      tokenResult = await Promise.race([
-        cloverTokenizer.createToken(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Card tokenization timed out. Please refresh and try again.')), 30000))
-      ]);
-    } catch (tokenErr) {
-      throw new Error(tokenErr.message || 'Card tokenization failed. Please check your card details and try again.');
+    // Tokenize card via Clover REST API (bypasses iframe entirely)
+    console.log('🔐 Tokenizing card via Clover API...');
+    const tokenUrl = cloverConfig.environment === 'production'
+      ? 'https://token.clover.com/v1/tokens'
+      : 'https://token-sandbox.dev.clover.com/v1/tokens';
+
+    const tokenRes = await fetch(tokenUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': cloverConfig.publicKey
+      },
+      body: JSON.stringify({
+        card: {
+          number: cardNum,
+          exp_month: expMonth,
+          exp_year: expYear,
+          cvv: cardCvv,
+          brand: detectCardBrand(cardNum)
+        }
+      })
+    });
+
+    const tokenData = await tokenRes.json();
+    console.log('🔐 Token response:', tokenRes.status, tokenData);
+
+    if (!tokenRes.ok || tokenData.error) {
+      const errMsg = tokenData.error?.message || tokenData.message || 'Card was declined. Please check your details.';
+      throw new Error(errMsg);
     }
 
-    console.log('🔐 Token result:', tokenResult);
-
-    if (tokenResult.errors) {
-      const firstError = Object.values(tokenResult.errors)[0];
-      throw new Error(firstError || 'Invalid card details. Please check and try again.');
+    if (!tokenData.id) {
+      throw new Error('Failed to process card. Please try again.');
     }
 
-    if (!tokenResult.token) {
-      throw new Error('Failed to tokenize card. Please check your card details.');
-    }
+    console.log('✅ Card tokenized:', tokenData.id);
 
     // Build order items
     const items = cart.map(item => {
@@ -3624,48 +3560,34 @@ async function processCheckout() {
 
     const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
 
-    // Send to our server (with 60s timeout)
+    // Send to our server
     console.log('💳 Sending payment to server...');
-    const controller = new AbortController();
-    const serverTimeout = setTimeout(() => controller.abort(), 60000);
-
-    let res;
-    try {
-      res = await fetch(API_BASE + '/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          token: tokenResult.token,
-          amount: Math.round(subtotal * 100) / 100,
-          items,
-          email,
-          shipping: {
-            firstName: shipFirst,
-            lastName: shipLast,
-            address: shipAddress,
-            apt: document.getElementById('shipApt').value.trim(),
-            city: shipCity,
-            state: shipState,
-            zip: shipZip
-          },
-          billing: { zip: billZip }
-        })
-      });
-    } catch (fetchErr) {
-      if (fetchErr.name === 'AbortError') {
-        throw new Error('Payment request timed out. Please check your connection and try again.');
-      }
-      throw new Error('Could not reach the payment server. Please check your connection.');
-    } finally {
-      clearTimeout(serverTimeout);
-    }
+    const res = await fetch(API_BASE + '/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token: tokenData.id,
+        amount: Math.round(subtotal * 100) / 100,
+        items,
+        email,
+        shipping: {
+          firstName: shipFirst,
+          lastName: shipLast,
+          address: shipAddress,
+          apt: document.getElementById('shipApt').value.trim(),
+          city: shipCity,
+          state: shipState,
+          zip: shipZip
+        },
+        billing: { zip: billZip }
+      })
+    });
 
     let data;
     try {
       data = await res.json();
     } catch (parseErr) {
-      throw new Error('Unexpected response from payment server. Please try again.');
+      throw new Error('Unexpected response from server. Please try again.');
     }
 
     console.log('💳 Server response:', res.status, data);
@@ -3681,6 +3603,11 @@ async function processCheckout() {
     document.getElementById('confCard').textContent = (data.brand || 'Card').toUpperCase() + ' ending in ' + (data.last4 || '****');
     document.getElementById('orderConfirmation').style.display = 'flex';
 
+    // Clear card fields
+    document.getElementById('cardNumber').value = '';
+    document.getElementById('cardExp').value = '';
+    document.getElementById('cardCvv').value = '';
+
     // Clear cart
     cart = [];
     saveCartToStorage();
@@ -3695,6 +3622,14 @@ async function processCheckout() {
     btn.disabled = false;
     btnText.textContent = 'Place Order';
   }
+}
+
+function detectCardBrand(num) {
+  if (/^4/.test(num)) return 'VISA';
+  if (/^5[1-5]/.test(num) || /^2[2-7]/.test(num)) return 'MC';
+  if (/^3[47]/.test(num)) return 'AMEX';
+  if (/^6(?:011|5)/.test(num)) return 'DISCOVER';
+  return 'UNKNOWN';
 }
 
 function finishCheckout() {

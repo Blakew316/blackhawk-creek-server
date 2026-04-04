@@ -43,6 +43,7 @@ const BASE_URL = ENVIRONMENT === 'production'
 
 // Cached product data file
 const DATA_FILE = path.join(__dirname, 'data', 'products.json');
+const SALES_FILE = path.join(__dirname, 'data', 'sales.json');
 
 // Ensure data directory exists
 if (!fs.existsSync(path.join(__dirname, 'data'))) {
@@ -739,6 +740,290 @@ app.delete('/api/products/:id', (req, res) => {
 
     saveProductData(data);
     res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── Sales Data Helpers ────────────────────────────────────
+function loadSalesData() {
+  if (fs.existsSync(SALES_FILE)) {
+    return JSON.parse(fs.readFileSync(SALES_FILE, 'utf8'));
+  }
+  return { orders: [], nextOrderId: 1001 };
+}
+
+function saveSalesData(data) {
+  fs.writeFileSync(SALES_FILE, JSON.stringify(data, null, 2));
+}
+
+// ─── POST /api/sales — Record a new sale/order ────────────────────────
+app.post('/api/sales', (req, res) => {
+  try {
+    const { items, paymentMethod, customerName, discount, tax } = req.body;
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'Order must contain at least one item' });
+    }
+
+    const salesData = loadSalesData();
+    const productData = loadProductData();
+
+    const subtotal = items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+    const discountAmt = parseFloat(discount) || 0;
+    const taxAmt = parseFloat(tax) || (subtotal * 0.0825); // Default 8.25% TX sales tax
+    const total = subtotal - discountAmt + taxAmt;
+
+    const order = {
+      id: salesData.nextOrderId++,
+      timestamp: new Date().toISOString(),
+      items: items.map(i => ({
+        productId: i.id,
+        name: i.name,
+        brand: i.brand || '',
+        category: i.category || '',
+        sku: i.sku || '',
+        price: i.price,
+        quantity: i.quantity,
+        lineTotal: i.price * i.quantity
+      })),
+      subtotal: Math.round(subtotal * 100) / 100,
+      discount: Math.round(discountAmt * 100) / 100,
+      tax: Math.round(taxAmt * 100) / 100,
+      total: Math.round(total * 100) / 100,
+      paymentMethod: paymentMethod || 'card',
+      customerName: customerName || null,
+      itemCount: items.reduce((sum, i) => sum + i.quantity, 0),
+      status: 'completed'
+    };
+
+    salesData.orders.push(order);
+    saveSalesData(salesData);
+
+    // Update stock counts
+    for (const orderItem of order.items) {
+      if (orderItem.productId) {
+        for (const catItems of Object.values(productData.products)) {
+          const prod = catItems.find(p => p.id === orderItem.productId);
+          if (prod && prod.stockCount !== null && prod.stockCount !== undefined) {
+            prod.stockCount = Math.max(0, prod.stockCount - orderItem.quantity);
+            prod.inStock = prod.stockCount > 0;
+          }
+        }
+      }
+    }
+    saveProductData(productData);
+
+    res.json({ success: true, order });
+  } catch (err) {
+    console.error('Record sale error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── POST /api/sales/:id/refund — Refund an order ────────────────────
+app.post('/api/sales/:id/refund', (req, res) => {
+  try {
+    const orderId = parseInt(req.params.id);
+    const salesData = loadSalesData();
+    const order = salesData.orders.find(o => o.id === orderId);
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+    if (order.status === 'refunded') return res.status(400).json({ error: 'Order already refunded' });
+
+    order.status = 'refunded';
+    order.refundedAt = new Date().toISOString();
+    saveSalesData(salesData);
+
+    // Restore stock
+    const productData = loadProductData();
+    for (const orderItem of order.items) {
+      if (orderItem.productId) {
+        for (const catItems of Object.values(productData.products)) {
+          const prod = catItems.find(p => p.id === orderItem.productId);
+          if (prod && prod.stockCount !== null) {
+            prod.stockCount += orderItem.quantity;
+            prod.inStock = true;
+          }
+        }
+      }
+    }
+    saveProductData(productData);
+
+    res.json({ success: true, order });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── GET /api/sales — Get all sales (with optional date filters) ─────
+app.get('/api/sales', (req, res) => {
+  try {
+    const salesData = loadSalesData();
+    let orders = salesData.orders || [];
+
+    // Date filtering
+    if (req.query.from) {
+      const from = new Date(req.query.from);
+      orders = orders.filter(o => new Date(o.timestamp) >= from);
+    }
+    if (req.query.to) {
+      const to = new Date(req.query.to);
+      to.setHours(23, 59, 59, 999);
+      orders = orders.filter(o => new Date(o.timestamp) <= to);
+    }
+    if (req.query.status) {
+      orders = orders.filter(o => o.status === req.query.status);
+    }
+
+    res.json({ orders, total: orders.length });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── GET /api/sales/summary — Sales dashboard summary with KPIs ──────
+app.get('/api/sales/summary', (req, res) => {
+  try {
+    const salesData = loadSalesData();
+    const allOrders = salesData.orders || [];
+
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const weekStart = new Date(todayStart);
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+
+    function summarize(orders) {
+      const completed = orders.filter(o => o.status === 'completed');
+      const refunded = orders.filter(o => o.status === 'refunded');
+      return {
+        orderCount: completed.length,
+        refundCount: refunded.length,
+        grossSales: Math.round(completed.reduce((s, o) => s + o.subtotal, 0) * 100) / 100,
+        netSales: Math.round(completed.reduce((s, o) => s + o.total, 0) * 100) / 100,
+        totalRevenue: Math.round(completed.reduce((s, o) => s + o.total, 0) * 100) / 100,
+        totalRefunds: Math.round(refunded.reduce((s, o) => s + o.total, 0) * 100) / 100,
+        totalDiscount: Math.round(completed.reduce((s, o) => s + (o.discount || 0), 0) * 100) / 100,
+        totalTax: Math.round(completed.reduce((s, o) => s + (o.tax || 0), 0) * 100) / 100,
+        avgTicket: completed.length > 0 ? Math.round((completed.reduce((s, o) => s + o.total, 0) / completed.length) * 100) / 100 : 0,
+        itemsSold: completed.reduce((s, o) => s + (o.itemCount || 0), 0)
+      };
+    }
+
+    const todayOrders = allOrders.filter(o => new Date(o.timestamp) >= todayStart);
+    const weekOrders = allOrders.filter(o => new Date(o.timestamp) >= weekStart);
+    const monthOrders = allOrders.filter(o => new Date(o.timestamp) >= monthStart);
+    const lastMonthOrders = allOrders.filter(o => new Date(o.timestamp) >= lastMonthStart && new Date(o.timestamp) <= lastMonthEnd);
+
+    // Top selling items (all time)
+    const itemSales = {};
+    for (const order of allOrders.filter(o => o.status === 'completed')) {
+      for (const item of order.items) {
+        const key = item.name;
+        if (!itemSales[key]) itemSales[key] = { name: item.name, brand: item.brand, category: item.category, quantity: 0, revenue: 0 };
+        itemSales[key].quantity += item.quantity;
+        itemSales[key].revenue += item.lineTotal;
+      }
+    }
+    const topItems = Object.values(itemSales).sort((a, b) => b.revenue - a.revenue).slice(0, 20);
+
+    // Sales by category
+    const categorySales = {};
+    for (const order of allOrders.filter(o => o.status === 'completed')) {
+      for (const item of order.items) {
+        const cat = item.category || 'Uncategorized';
+        if (!categorySales[cat]) categorySales[cat] = { category: cat, quantity: 0, revenue: 0, orderCount: 0 };
+        categorySales[cat].quantity += item.quantity;
+        categorySales[cat].revenue += item.lineTotal;
+        categorySales[cat].orderCount++;
+      }
+    }
+
+    // Sales by payment method
+    const paymentBreakdown = {};
+    for (const order of allOrders.filter(o => o.status === 'completed')) {
+      const method = order.paymentMethod || 'card';
+      if (!paymentBreakdown[method]) paymentBreakdown[method] = { method, count: 0, total: 0 };
+      paymentBreakdown[method].count++;
+      paymentBreakdown[method].total += order.total;
+    }
+
+    // Hourly breakdown for today
+    const hourlyToday = Array(24).fill(null).map((_, i) => ({ hour: i, orders: 0, revenue: 0 }));
+    for (const order of todayOrders.filter(o => o.status === 'completed')) {
+      const h = new Date(order.timestamp).getHours();
+      hourlyToday[h].orders++;
+      hourlyToday[h].revenue += order.total;
+    }
+
+    // Daily breakdown for the last 30 days
+    const dailySales = [];
+    for (let i = 29; i >= 0; i--) {
+      const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+      const dayEnd = new Date(day);
+      dayEnd.setHours(23, 59, 59, 999);
+      const dayOrders = allOrders.filter(o => {
+        const d = new Date(o.timestamp);
+        return d >= day && d <= dayEnd && o.status === 'completed';
+      });
+      dailySales.push({
+        date: day.toISOString().split('T')[0],
+        label: day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        orders: dayOrders.length,
+        revenue: Math.round(dayOrders.reduce((s, o) => s + o.total, 0) * 100) / 100,
+        items: dayOrders.reduce((s, o) => s + (o.itemCount || 0), 0)
+      });
+    }
+
+    res.json({
+      today: summarize(todayOrders),
+      thisWeek: summarize(weekOrders),
+      thisMonth: summarize(monthOrders),
+      lastMonth: summarize(lastMonthOrders),
+      allTime: summarize(allOrders),
+      topItems,
+      categorySales: Object.values(categorySales).sort((a, b) => b.revenue - a.revenue),
+      paymentBreakdown: Object.values(paymentBreakdown),
+      hourlyToday,
+      dailySales,
+      recentOrders: allOrders.slice(-50).reverse()
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── GET /api/sales/export/csv — Export sales as CSV ─────────────────
+app.get('/api/sales/export/csv', (req, res) => {
+  try {
+    const salesData = loadSalesData();
+    let orders = salesData.orders || [];
+    if (req.query.from) orders = orders.filter(o => new Date(o.timestamp) >= new Date(req.query.from));
+    if (req.query.to) { const to = new Date(req.query.to); to.setHours(23,59,59,999); orders = orders.filter(o => new Date(o.timestamp) <= to); }
+
+    const rows = [['Order ID','Date','Time','Items','Item Count','Subtotal','Discount','Tax','Total','Payment Method','Status','Customer']];
+    for (const o of orders) {
+      const d = new Date(o.timestamp);
+      const itemNames = o.items.map(i => `${i.name} x${i.quantity}`).join('; ');
+      rows.push([
+        o.id,
+        d.toLocaleDateString(),
+        d.toLocaleTimeString(),
+        `"${itemNames.replace(/"/g, '""')}"`,
+        o.itemCount,
+        o.subtotal,
+        o.discount || 0,
+        o.tax || 0,
+        o.total,
+        o.paymentMethod || 'card',
+        o.status,
+        o.customerName || ''
+      ]);
+    }
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="blackhawk-creek-sales.csv"');
+    res.send(rows.map(r => r.join(',')).join('\n'));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

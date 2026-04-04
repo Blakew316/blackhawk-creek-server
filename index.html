@@ -3496,8 +3496,11 @@ async function initCloverTokenizer() {
       });
     }
 
-    // Initialize Clover instance
-    cloverInstance = new Clover(config.publicKey);
+    // Initialize Clover instance with PAKMS key
+    console.log('🔐 Initializing Clover with key:', config.publicKey.substring(0, 12) + '...');
+    cloverInstance = new Clover(config.publicKey, {
+      merchantId: config.merchantId
+    });
     const elements = cloverInstance.elements();
 
     // Clear previous iframes

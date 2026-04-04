@@ -2159,7 +2159,7 @@
       <button class="search-btn" onclick="performSearch()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
     </div>
     <div class="header-actions">
-      <div class="header-action" onclick="showAdminLoginModal()">
+      <div class="header-action" onclick="goToBackoffice()">
         <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg></div>
         <div>Account</div>
       </div>
@@ -2779,10 +2779,6 @@
         <div id="syncStatus" style="margin-bottom: 20px; padding: 16px; background: #f5f5f5; border-radius: 8px; font-size: 13px; color: #555;">
           Checking sync status...
         </div>
-        <div style="margin-bottom: 20px;">
-          <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1a1a1a;">Admin Password</label>
-          <input type="password" id="syncPassword" placeholder="Enter admin password" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: Inter;">
-        </div>
         <button class="btn-primary" style="width: 100%;" onclick="runCloverSync()" id="syncButton">Sync Now</button>
       </div>
     </div>
@@ -2907,21 +2903,7 @@
   </div>
 </div>
 
-<!-- ADMIN LOGIN MODAL -->
-<div class="modal" id="adminLoginModal">
-  <div class="modal-content" style="max-width: 400px;">
-    <button class="modal-close" onclick="closeAdminModal()">×</button>
-    <div class="modal-header">Admin Access</div>
-    <div class="modal-body">Enter the admin password to access the inventory dashboard.</div>
-    <div style="margin-bottom: 20px;">
-      <input type="password" id="adminPassword" placeholder="Enter password" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-    </div>
-    <div class="modal-footer">
-      <button class="modal-button primary" onclick="submitAdminPassword()">Login</button>
-      <button class="modal-button secondary" onclick="closeAdminModal()">Cancel</button>
-    </div>
-  </div>
-</div>
+<!-- Admin login modal removed — dashboard is now open access -->
 
 <!-- EDIT PRODUCT MODAL -->
 <div class="modal" id="editProductModal">
@@ -3008,7 +2990,7 @@
 
 <script>
 const API_BASE = '';
-const ADMIN_PASSWORD = 'admin123';
+// Admin password removed — dashboard is open access
 
 let cart = [];
 let products = [];
@@ -3919,25 +3901,6 @@ function scrollToProducts() {
 }
 
 // ============ ADMIN INTERFACE ============
-function showAdminLoginModal() {
-  document.getElementById('adminLoginModal').classList.add('active');
-}
-
-function closeAdminModal() {
-  document.getElementById('adminLoginModal').classList.remove('active');
-  document.getElementById('adminPassword').value = '';
-}
-
-function submitAdminPassword() {
-  const pwd = document.getElementById('adminPassword').value;
-  if (pwd === ADMIN_PASSWORD) {
-    closeAdminModal();
-    goToBackoffice();
-  } else {
-    alert('Incorrect password');
-  }
-}
-
 function goToBackoffice() {
   document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
   document.getElementById('backoffice').classList.add('active');
@@ -4364,9 +4327,6 @@ async function loadSyncStatus() {
 }
 
 async function runCloverSync() {
-  const password = document.getElementById('syncPassword').value;
-  if (!password) { alert('Please enter the admin password'); return; }
-
   const btn = document.getElementById('syncButton');
   btn.textContent = 'Syncing...';
   btn.disabled = true;
@@ -4375,7 +4335,7 @@ async function runCloverSync() {
     const res = await fetch(API_BASE + '/api/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password })
+      body: JSON.stringify({})
     });
     const data = await res.json();
     if (res.ok) {

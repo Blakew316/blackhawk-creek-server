@@ -602,14 +602,8 @@ app.get('/api/products', (req, res) => {
   }
 });
 
-// POST /api/sync — Pull fresh data from Clover (password protected)
+// POST /api/sync — Pull fresh data from Clover
 app.post('/api/sync', async (req, res) => {
-  const { password } = req.body;
-
-  if (password !== ADMIN_PASSWORD) {
-    return res.status(401).json({ error: 'Invalid admin password' });
-  }
-
   if (!MERCHANT_ID || !API_TOKEN || MERCHANT_ID === 'YOUR_MERCHANT_ID_HERE') {
     return res.status(400).json({
       error: 'Clover credentials not configured',

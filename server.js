@@ -253,17 +253,6 @@ app.post('/webhook', (req, res) => {
   res.status(200).send('OK');
 });
 
-// Also handle root-level verification (some Clover setups hit the base URL)
-app.get('/', (req, res) => {
-  // If there's an HTML file in public/, serve that; otherwise respond OK
-  const indexPath = path.join(__dirname, 'public', 'index.html');
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    res.status(200).send('Blackhawk Creek Outfitters — Clover Sync Server');
-  }
-});
-
 // GET /api/products — Returns cached product data for the website
 app.get('/api/products', (req, res) => {
   try {

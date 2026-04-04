@@ -962,13 +962,14 @@ async function syncOrderToClover(order, productData) {
   };
 
   // 1. Create the order
+  const itemSummary = order.items.map(i => `${i.quantity}x ${i.name}`).join(', ');
   const createOrderRes = await fetch(`${cloverAPI}/orders`, {
     method: 'POST',
     headers,
     body: JSON.stringify({
       state: 'locked',
       title: `Online Order #${order.id}`,
-      note: `Website order — ${order.customerName || 'Guest'} (${order.customerEmail || 'no email'})`,
+      note: `Website order — ${order.customerName || 'Guest'} (${order.customerEmail || 'no email'})\nItems: ${itemSummary}`,
       orderType: { id: 'online' }
     })
   });
@@ -993,27 +994,33 @@ async function syncOrderToClover(order, productData) {
       }
     }
 
+    const priceInCents = Math.round(item.price * 100);
+
+    // Always create a named line item with price so it shows in Clover dashboard
+    const lineItemPayload = {
+      name: item.name,
+      price: priceInCents,
+      note: item.sku ? `SKU: ${item.sku}` : ''
+    };
+
+    // Link to inventory item if available so Clover tracks stock
     if (cloverItemId) {
-      // Add the existing Clover inventory item
-      await fetch(`${cloverAPI}/orders/${cloverOrderId}/line_items`, {
+      lineItemPayload.item = { id: cloverItemId };
+    }
+
+    // Add one line item per quantity unit (Clover counts each line item as qty 1)
+    for (let q = 0; q < item.quantity; q++) {
+      const lineRes = await fetch(`${cloverAPI}/orders/${cloverOrderId}/line_items`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          item: { id: cloverItemId },
-          unitQty: item.quantity
-        })
+        body: JSON.stringify(lineItemPayload)
       });
-    } else {
-      // Create a custom line item (for products not synced from Clover)
-      await fetch(`${cloverAPI}/orders/${cloverOrderId}/line_items`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          name: item.name,
-          price: Math.round(item.price * 100),
-          unitQty: item.quantity
-        })
-      });
+      if (!lineRes.ok) {
+        const errText = await lineRes.text();
+        console.warn(`⚠️ Failed to add line item "${item.name}":`, lineRes.status, errText);
+      } else {
+        console.log(`  ✅ Added line item: ${item.name} — $${item.price}`);
+      }
     }
   }
 

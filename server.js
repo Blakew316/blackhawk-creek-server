@@ -175,9 +175,30 @@ async function syncFromClover() {
   }
   console.log(`   Found ${Object.keys(categoriesMap).length} categories`);
 
-  // 2. Fetch all items with their category associations
+  // 1b. Build item→category mapping by fetching items for each category
+  // (more reliable than expand=categories on items endpoint)
+  const itemCategoryMap = {}; // itemId → { name, id }
+  for (const [catId, cat] of Object.entries(categoriesMap)) {
+    try {
+      const catItems = await cloverFetch(`/categories/${catId}/items?limit=500`);
+      if (catItems.elements) {
+        for (const ci of catItems.elements) {
+          // First category wins (don't overwrite if already assigned)
+          if (!itemCategoryMap[ci.id]) {
+            itemCategoryMap[ci.id] = { name: cat.name, id: catId };
+          }
+        }
+        console.log(`   📁 Category "${cat.name}" has ${catItems.elements.length} items`);
+      }
+    } catch (e) {
+      console.warn(`   ⚠️  Failed to fetch items for category "${cat.name}": ${e.message}`);
+    }
+  }
+  console.log(`   📋 Mapped ${Object.keys(itemCategoryMap).length} items to categories`);
+
+  // 2. Fetch all items with tags
   console.log('📦 Fetching items...');
-  const itemsData = await cloverFetch('/items?expand=categories,tags,modifierGroups&limit=500');
+  const itemsData = await cloverFetch('/items?expand=tags,modifierGroups&limit=500');
 
   if (!itemsData.elements || itemsData.elements.length === 0) {
     console.log('   ⚠️  No items found in Clover inventory');
@@ -223,10 +244,15 @@ async function syncFromClover() {
     // Skip hidden/deleted items
     if (item.hidden || item.isDeleted) continue;
 
-    // Use Clover's actual category names directly
+    // Use Clover's actual category names directly (from item→category mapping)
     let categoryKey = 'general';
     let categoryDisplayName = 'General';
-    if (item.categories && item.categories.elements && item.categories.elements.length > 0) {
+    const catLookup = itemCategoryMap[item.id];
+    if (catLookup) {
+      categoryDisplayName = catLookup.name;
+      categoryKey = categoryToKey(categoryDisplayName);
+    } else if (item.categories && item.categories.elements && item.categories.elements.length > 0) {
+      // Fallback to expand data if available
       const firstCategory = item.categories.elements[0];
       categoryDisplayName = firstCategory.name || 'General';
       categoryKey = categoryToKey(categoryDisplayName);

@@ -3115,8 +3115,11 @@ const categoryGroups = {
 };
 
 function showCategoryGroup(group) {
-  const cats = categoryGroups[group] || [];
-  const filtered = allProducts.filter(p => cats.some(c => p.category === c));
+  const cats = (categoryGroups[group] || []).map(c => c.toLowerCase());
+  const filtered = allProducts.filter(p => {
+    const pCat = (p.category || '').toLowerCase();
+    return cats.some(c => pCat === c || pCat.includes(c) || c.includes(pCat));
+  });
   displayProducts(filtered);
   // Highlight ALL PRODUCTS in nav since this is a cross-category filter
   document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));

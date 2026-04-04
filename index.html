@@ -3059,6 +3059,118 @@ function autoCategorize(name) {
   return 'General';
 }
 
+// Auto-resolve product images from manufacturer Shopify stores (client-side)
+let _imgCache = null;
+async function buildClientImageCache() {
+  if (_imgCache) return _imgCache;
+  async function fetchShopify(url) {
+    try {
+      const r = await fetch(url + '/products.json?limit=250');
+      const d = await r.json();
+      const m = {};
+      (d.products || []).forEach(p => {
+        const t = p.title.toLowerCase();
+        const img = p.images && p.images[0] ? p.images[0].src.split('?')[0] : null;
+        if (img) {
+          m[t] = img;
+          if (p.variants) p.variants.forEach(v => {
+            m[(t + ' - ' + (v.title || '')).toLowerCase()] = v.featured_image ? v.featured_image.src.split('?')[0] : img;
+          });
+        }
+      });
+      return m;
+    } catch (e) { console.warn('Image fetch failed:', url, e.message); return {}; }
+  }
+  try {
+    const [s6, ba, ard] = await Promise.all([
+      fetchShopify('https://6thsensefishing.com'),
+      fetchShopify('https://bassassassin.com'),
+      fetchShopify('https://ardentoutdoors.com')
+    ]);
+    const s6k = Object.keys(s6), bak = Object.keys(ba), ardk = Object.keys(ard);
+    function findImg(store, sk, key, color) {
+      const c = (color || '').toLowerCase().trim();
+      if (c) {
+        const m1 = sk.find(k => k.includes(key) && k.includes(c) && !k.includes('/'));
+        if (m1) return store[m1];
+        const m2 = sk.find(k => k.includes(key) && k.includes(c));
+        if (m2) return store[m2];
+      }
+      const base = sk.filter(k => k === key || (k.startsWith(key) && k.split(' - ').length <= 2));
+      if (base.length) { base.sort((a,b) => a.length - b.length); return store[base[0]]; }
+      const any = sk.find(k => k.includes(key));
+      return any ? store[any] : null;
+    }
+    const rules = [
+      [/divine spinnerbait/i, s6, s6k, 'divine spinnerbait'],
+      [/divine swim jig/i, s6, s6k, 'divine swim jig'],
+      [/flock blade/i, s6, s6k, 'flock blade series'],
+      [/vega hush frog/i, s6, s6k, 'vega hush frog'],
+      [/vega frog/i, s6, s6k, 'vega frog'],
+      [/boosa/i, s6, s6k, 'boosa'],
+      [/ridge lizard/i, s6, s6k, 'ridge lizard 5.7'],
+      [/crappie strobe/i, s6, s6k, 'crappie strobe'],
+      [/strobe minnow/i, s6, s6k, 'strobe minnow'],
+      [/pressure series/i, s6, s6k, 'pressure series'],
+      [/jugular h/i, s6, s6k, 'jugular hybrid hook'],
+      [/catfish hook/i, s6, s6k, 'catfish hook'],
+      [/live minnow hook/i, s6, s6k, 'live minnow hook'],
+      [/bluegill.*hook|sunfish.*hook/i, s6, s6k, 'bluegill and sunfish hook'],
+      [/lead split shot/i, s6, s6k, 'splitball'],
+      [/lead worm weight/i, s6, s6k, 'divine worm weights'],
+      [/6th sense banner/i, s6, s6k, '6th sense club banner'],
+      [/duke\s*\d/i, s6, s6k, 'duke'],
+      [/hogwalla/i, s6, s6k, 'hogwalla 5.8'],
+      [/nedfry/i, s6, s6k, 'nedfry 4.6'],
+      [/bamboosa/i, s6, s6k, 'bamboosa 5.3'],
+      [/crappie shindo/i, s6, s6k, 'the crappie shindo 2.2'],
+      [/panorama axle/i, s6, s6k, 'panorama axle jighead'],
+      [/quake/i, s6, s6k, 'quake'],
+      [/splashback/i, s6, s6k, 'splashback popper'],
+      [/pecos underspin/i, s6, s6k, 'pecos underspin jighead'],
+      [/juggle head/i, s6, s6k, 'masterclass juggle head'],
+      [/finesse minnow/i, s6, s6k, 'finesse minnow jighead'],
+      [/6th sense hat/i, s6, s6k, 'sobro capsule hat'],
+      [/railworm|rail worm/i, ba, bak, '7" rail worm'],
+      [/tapout/i, ba, bak, '7.5" tapout'],
+      [/twitch\s*\d/i, ba, bak, '6" twitch'],
+      [/fw shad/i, ba, bak, '5" fw shad'],
+      [/crappie dapper/i, ba, bak, '2" crappie dapper'],
+      [/tiny shad/i, ba, bak, '2" pro tiny shad'],
+      [/reel butter oil/i, ard, ardk, 'reel butter oil'],
+      [/reel butter grease/i, ard, ardk, 'reel butter grease'],
+      [/ardent reel care/i, ard, ardk, 'reel care'],
+      [/lubrication kit/i, ard, ardk, 'reel butter lubrication pack'],
+      [/reel kleen/i, ard, ardk, 'reel kleen cleaning kit'],
+      [/cooler-d-funk.*wipe/i, ard, ardk, 'cooler d-funk wipes'],
+      [/cooler-d-funk/i, ard, ardk, 'cooler d-funk 16 oz bottle'],
+      [/fish-d-funk.*wipe/i, ard, ardk, 'fish d-funk wipes'],
+      [/fish-d-funk/i, ard, ardk, 'fish-d-funk 8oz. spray'],
+      [/combo.*finesse/i, ard, ardk, 'finesse ultra-light combo'],
+      [/combo.*big water/i, ard, ardk, 'big water comfort grip combos'],
+      [/combo.*super duty/i, ard, ardk, 'super duty spinning combo'],
+      [/combo.*primo/i, ard, ardk, 'comfort grip combo - primo'],
+      [/combo.*vario|combo.*hd|combo.*pink/i, ard, ardk, 'finesse ultra-light combo'],
+    ];
+    _imgCache = { rules, findImg };
+    console.log('Image cache built:', s6k.length, '+', bak.length, '+', ardk.length, 'entries');
+  } catch (e) { console.warn('Image cache failed:', e.message); _imgCache = {}; }
+  return _imgCache;
+}
+function resolveImage(name) {
+  if (!_imgCache || !_imgCache.rules) return null;
+  const parts = name.split(/\s*-\s*/);
+  let color = '';
+  for (let i = 1; i < parts.length; i++) {
+    const p = parts[i].trim().toLowerCase();
+    if (p && !/^\d/.test(p) && !/(oz|hook|pk|ct|dc|\d+\s*(ct|pk))$/i.test(p) && p.length > 1) { color = p; break; }
+  }
+  for (const [regex, store, sk, key] of _imgCache.rules) {
+    if (regex.test(name)) return _imgCache.findImg(store, sk, key, color);
+  }
+  return null;
+}
+
 async function loadProducts(retries = 3) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
@@ -3076,6 +3188,23 @@ async function loadProducts(retries = 3) {
         }
       });
       products = allProducts;
+      // Auto-resolve images in the background (non-blocking)
+      const needsImages = allProducts.some(p => !p.imageUrl);
+      if (needsImages) {
+        buildClientImageCache().then(() => {
+          let resolved = 0;
+          allProducts.forEach(p => {
+            if (!p.imageUrl) {
+              const url = resolveImage(p.name);
+              if (url) { p.imageUrl = url; resolved++; }
+            }
+          });
+          if (resolved > 0) {
+            console.log('Resolved ' + resolved + ' product images');
+            displayProducts(currentCategory === 'All' ? allProducts : allProducts.filter(pp => pp.category === currentCategory));
+          }
+        });
+      }
       return;
     } catch (error) {
       console.warn(`Product load attempt ${attempt}/${retries} failed:`, error.message);

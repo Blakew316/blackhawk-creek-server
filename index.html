@@ -59,25 +59,7 @@
   a { text-decoration: none; color: inherit; }
   img { max-width: 100%; display: block; }
 
-  /* ===================== TOP BAR ===================== */
-  .top-bar {
-    background: #080808;
-    padding: 8px 0;
-    font-size: 11px;
-    font-weight: 500;
-    color: #666;
-    border-bottom: 1px solid #1a1a1a;
-    letter-spacing: 0.3px;
-  }
-  .top-bar .container {
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .top-bar a {
-    color: var(--color-tan); margin-left: 20px;
-    transition: color var(--transition);
-    font-weight: 500;
-  }
-  .top-bar a:hover { color: var(--color-gold); }
+  /* top-bar removed — content moved to footer */
 
   .container { max-width: 1340px; margin: 0 auto; padding: 0 24px; }
 
@@ -245,6 +227,121 @@
   .hero-button:hover {
     background: #c99a4e;
     transform: translateY(-2px);
+  }
+
+  /* ===================== HOMEPAGE HERO ===================== */
+  .hero-home {
+    position: relative;
+    height: 400px;
+    background: linear-gradient(135deg, #3d4a2f 0%, #465a33 40%, #2d3a1f 100%);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--color-cream);
+    padding: 60px 40px;
+  }
+  .hero-home h1 {
+    font-family: var(--font-heading);
+    font-size: 48px;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+  }
+  .hero-home p {
+    font-size: 18px;
+    margin-bottom: 30px;
+    opacity: 0.95;
+    max-width: 600px;
+  }
+  .hero-home-button {
+    display: inline-block;
+    padding: 16px 40px;
+    background: var(--color-gold);
+    color: var(--color-darker);
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+  .hero-home-button:hover {
+    background: #c99a4e;
+    transform: translateY(-2px);
+  }
+
+  /* ===================== STORE INFO ===================== */
+  .store-info {
+    background: var(--color-surface);
+    padding: 60px 40px;
+  }
+  .store-info-container {
+    max-width: 1340px;
+    margin: 0 auto;
+  }
+  .store-info h2 {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 40px;
+    color: var(--color-text-dark);
+    text-align: center;
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  .info-column h3 {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-olive);
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .info-column p {
+    margin-bottom: 15px;
+    color: var(--color-text-body);
+    line-height: 1.8;
+    font-size: 15px;
+  }
+  .info-column strong {
+    font-weight: 600;
+    color: var(--color-text-dark);
+  }
+  .info-column iframe {
+    width: 100%;
+    border: 0;
+    border-radius: var(--radius);
+    min-height: 280px;
+  }
+
+  @media (max-width: 768px) {
+    .info-grid {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+    .hero-home {
+      height: 300px;
+      padding: 40px 24px;
+    }
+    .hero-home h1 {
+      font-size: 32px;
+    }
+    .hero-home p {
+      font-size: 16px;
+    }
   }
 
   /* ===================== PRODUCTS SECTION ===================== */
@@ -883,21 +980,10 @@
 </head>
 <body>
 
-<!-- TOP BAR -->
-<div class="top-bar">
-  <div class="container">
-    <div>🚚 FREE SHIPPING ON ORDERS OVER $100</div>
-    <div style="display: flex; gap: 20px;">
-      <a href="#help">Help & Support</a>
-      <a href="#track">Track Order</a>
-    </div>
-  </div>
-</div>
-
 <!-- HEADER -->
 <header class="header">
   <div class="container">
-    <div class="logo" onclick="goToStorefront()">
+    <div class="logo" onclick="goToHomepage()">
       <div class="logo-img-wrap">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 110">
           <defs>
@@ -956,8 +1042,45 @@
   </div>
 </section>
 
+<!-- HOMEPAGE -->
+<div id="homepage" class="page">
+  <!-- HERO SECTION -->
+  <section class="hero-home">
+    <h1>BLACKHAWK CREEK OUTFITTERS</h1>
+    <p>Your Local Destination for Premium Fishing & Hunting Gear</p>
+    <button class="hero-home-button" onclick="goToShop()">SHOP NOW</button>
+  </section>
+
+  <!-- STORE INFO SECTION -->
+  <section class="store-info">
+    <div class="store-info-container">
+      <h2>Visit Our Store</h2>
+      <div class="info-grid">
+        <div class="info-column">
+          <h3>Store Hours</h3>
+          <p><strong>Monday - Saturday:</strong> 7:00 AM - 7:00 PM</p>
+          <p><strong>Sunday:</strong> 9:00 AM - 5:00 PM</p>
+          <h3 style="margin-top: 30px;">Location</h3>
+          <p>
+            Blackhawk Creek Outfitters<br>
+            20257 TX-110 S<br>
+            Whitehouse, TX 75791
+          </p>
+          <h3 style="margin-top: 30px;">Contact</h3>
+          <p><strong>Phone:</strong> (903) 555-0123</p>
+        </div>
+        <div class="info-column">
+          <a href="https://www.google.com/maps/search/?api=1&query=20257+TX-110+S+Whitehouse+TX+75791" target="_blank" rel="noopener" style="display:block; position:relative; border-radius:10px; overflow:hidden; min-height:280px;">
+            <img src="https://maps.googleapis.com/maps/api/staticmap?center=20257+TX-110+S+Whitehouse+TX+75791&zoom=14&size=600x400&markers=color:red%7C20257+TX-110+S+Whitehouse+TX+75791&key=&style=feature:all" alt="Map - 20257 TX-110 S, Whitehouse, TX 75791" style="width:100%; height:100%; min-height:280px; object-fit:cover; border-radius:10px; display:block;" onerror="this.parentElement.innerHTML='<div style=&quot;width:100%;min-height:280px;background:#e8e8e8;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;&quot;><svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;40&quot; height=&quot;40&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;%23b83a2e&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><path d=&quot;M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z&quot;/><circle cx=&quot;12&quot; cy=&quot;10&quot; r=&quot;3&quot;/></svg><span style=&quot;color:%23555;font-weight:600;font-size:14px;&quot;>20257 TX-110 S, Whitehouse, TX 75791</span><span style=&quot;color:%23c9a96e;font-size:12px;font-weight:500;&quot;>Click to open in Google Maps →</span></div>';">
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
 <!-- MAIN CONTENT -->
-<div id="storefront" class="page active">
+<div id="storefront" class="page">
   <!-- PRODUCTS SECTION -->
   <section class="products-section">
     <div class="container">
@@ -979,6 +1102,7 @@
     <div class="backoffice-nav">
       <button class="active" onclick="switchBackofficeTab('inventory')">Inventory</button>
       <button onclick="switchBackofficeTab('add')">Add Product</button>
+      <button onclick="switchBackofficeTab('categories')">Categories</button>
       <button onclick="switchBackofficeTab('sync')">Sync Clover</button>
       <button onclick="goToStorefront()">← Back to Store</button>
     </div>
@@ -986,9 +1110,6 @@
     <div id="inventoryTab">
       <div class="backoffice-header">
         <h1 class="backoffice-title">Inventory Management</h1>
-        <div class="backoffice-actions">
-          <button class="btn-primary" onclick="showAddProductForm()">+ Add Product</button>
-        </div>
       </div>
       <table class="inventory-table" id="inventoryTable">
         <thead>
@@ -1053,6 +1174,27 @@
           <input type="password" id="syncPassword" placeholder="Enter admin password" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: Inter;">
         </div>
         <button class="btn-primary" style="width: 100%;" onclick="runCloverSync()" id="syncButton">Sync Now</button>
+      </div>
+    </div>
+
+    <div id="categoriesTab" style="display: none;">
+      <div class="backoffice-header">
+        <h1 class="backoffice-title">Manage Categories</h1>
+      </div>
+      <div style="background: white; padding: 30px; border-radius: 10px; max-width: 800px;">
+        <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #e0e0e0;">
+          <h3 style="margin-bottom: 15px; color: #1a1a1a; font-size: 16px; font-weight: 600;">Add New Category</h3>
+          <div style="display: flex; gap: 10px;">
+            <input type="text" id="categoryInput" placeholder="Category name" style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: Inter;">
+            <button class="btn-primary" onclick="addCategory(document.getElementById('categoryInput').value)">Add Category</button>
+          </div>
+        </div>
+        <div>
+          <h3 style="margin-bottom: 15px; color: #1a1a1a; font-size: 16px; font-weight: 600;">Existing Categories</h3>
+          <div id="categoriesList" style="display: grid; gap: 10px;">
+            <!-- Categories will be loaded here -->
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1129,9 +1271,11 @@
       </div>
       <div class="footer-section">
         <h4>Customer Service</h4>
-        <a href="#">Contact Us</a>
+        <a href="#">Help & Support</a>
+        <a href="#">Track Order</a>
         <a href="#">Returns</a>
         <a href="#">Shipping Info</a>
+        <a href="#">Free Shipping on Orders Over $100</a>
       </div>
       <div class="footer-section">
         <h4>Resources</h4>
@@ -1147,7 +1291,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; 2024 Blackhawk Creek Outfitters. All rights reserved. | Synced with Clover POS</p>
+      <p>&copy; 2024 Blackhawk Creek Outfitters. All rights reserved.</p>
     </div>
   </div>
 </footer>
@@ -1169,7 +1313,7 @@ async function initApp() {
   updateCartUI();
   await loadProducts();
   buildNavigation();
-  displayProducts(allProducts);
+  goToHomepage();
 }
 
 async function loadProducts(retries = 3) {
@@ -1204,12 +1348,30 @@ function buildNavigation() {
 
   const navContainer = document.getElementById('navContainer');
   navContainer.innerHTML = '';
+
+  // HOME button
+  const homeItem = document.createElement('div');
+  homeItem.className = 'nav-item';
+  homeItem.textContent = 'HOME';
+  homeItem.onclick = function() { goToHomepage(); };
+  navContainer.appendChild(homeItem);
+
+  // ALL PRODUCTS button
+  const allItem = document.createElement('div');
+  allItem.className = 'nav-item active';
+  allItem.textContent = 'ALL PRODUCTS';
+  allItem.onclick = function() { goToShop(); showCategory('All', this); };
+  navContainer.appendChild(allItem);
+
+  // Category items
   categories.forEach(cat => {
-    const item = document.createElement('div');
-    item.className = 'nav-item' + (cat === 'All' ? ' active' : '');
-    item.textContent = cat.toUpperCase();
-    item.onclick = function() { showCategory(cat, this); };
-    navContainer.appendChild(item);
+    if (cat !== 'All') {
+      const item = document.createElement('div');
+      item.className = 'nav-item';
+      item.textContent = cat.toUpperCase();
+      item.onclick = function() { goToShop(); showCategory(cat, this); };
+      navContainer.appendChild(item);
+    }
   });
 }
 
@@ -1469,24 +1631,45 @@ function goToBackoffice() {
   loadInventoryTable();
 }
 
+function goToHomepage() {
+  document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+  document.getElementById('homepage').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+  document.querySelector('.nav-item').classList.add('active');
+}
+
+function goToShop() {
+  document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+  document.getElementById('storefront').classList.add('active');
+  if (!document.querySelector('.nav-item.active') || document.querySelector('.nav-item.active').textContent === 'HOME') {
+    const allProductsItem = Array.from(document.querySelectorAll('.nav-item')).find(item => item.textContent === 'ALL PRODUCTS');
+    if (allProductsItem) {
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      allProductsItem.classList.add('active');
+    }
+  }
+}
+
 function goToStorefront() {
   document.getElementById('backoffice').classList.remove('active');
-  document.getElementById('storefront').classList.add('active');
+  goToHomepage();
 }
 
 function switchBackofficeTab(tab) {
   document.getElementById('inventoryTab').style.display = tab === 'inventory' ? 'block' : 'none';
   document.getElementById('addTab').style.display = tab === 'add' ? 'block' : 'none';
+  document.getElementById('categoriesTab').style.display = tab === 'categories' ? 'block' : 'none';
   document.getElementById('syncTab').style.display = tab === 'sync' ? 'block' : 'none';
 
   document.querySelectorAll('.backoffice-nav button').forEach((btn, idx) => {
     btn.classList.remove('active');
-    if ((idx === 0 && tab === 'inventory') || (idx === 1 && tab === 'add') || (idx === 2 && tab === 'sync')) {
+    if ((idx === 0 && tab === 'inventory') || (idx === 1 && tab === 'add') || (idx === 2 && tab === 'categories') || (idx === 3 && tab === 'sync')) {
       btn.classList.add('active');
     }
   });
 
   if (tab === 'sync') loadSyncStatus();
+  if (tab === 'categories') loadCategoriesTab();
 }
 
 function loadInventoryTable() {
@@ -1696,6 +1879,114 @@ async function runCloverSync() {
     btn.textContent = 'Sync Now';
     btn.disabled = false;
   }
+}
+
+// ============ CATEGORY MANAGEMENT ============
+function loadCategoriesTab() {
+  const categories = new Set();
+  allProducts.forEach(product => {
+    if (product.category) categories.add(product.category);
+  });
+
+  const list = document.getElementById('categoriesList');
+  list.innerHTML = '';
+
+  if (categories.size === 0) {
+    list.innerHTML = '<p style="color: #999; font-style: italic;">No categories found. Products will define categories automatically.</p>';
+    return;
+  }
+
+  categories.forEach(cat => {
+    const item = document.createElement('div');
+    item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f9f9f9; border-radius: 6px; border: 1px solid #e0e0e0;';
+    const count = allProducts.filter(p => p.category === cat).length;
+    item.innerHTML = `
+      <div>
+        <strong style="color: #1a1a1a;">${cat}</strong>
+        <span style="color: #999; font-size: 12px; margin-left: 8px;">(${count} product${count !== 1 ? 's' : ''})</span>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn-edit" onclick="renameCategory('${cat.replace(/'/g, "\\'")}')">Rename</button>
+        <button class="btn-delete" onclick="deleteCategory('${cat.replace(/'/g, "\\'")}')">Delete</button>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function addCategory(name) {
+  const input = document.getElementById('categoryInput');
+  name = (name || input.value).trim();
+
+  if (!name) {
+    alert('Please enter a category name');
+    return;
+  }
+
+  const categories = new Set();
+  allProducts.forEach(product => {
+    if (product.category) categories.add(product.category);
+  });
+
+  if (categories.has(name)) {
+    alert('This category already exists');
+    return;
+  }
+
+  alert('Category "' + name + '" added! You can now assign products to this category by editing them.');
+  input.value = '';
+  loadCategoriesTab();
+}
+
+function renameCategory(oldName) {
+  const newName = prompt('Rename category from "' + oldName + '" to:', oldName);
+  if (newName === null || !newName.trim()) return;
+  const finalName = newName.trim();
+
+  if (finalName === oldName) return;
+
+  const categories = new Set();
+  allProducts.forEach(product => {
+    if (product.category) categories.add(product.category);
+  });
+
+  if (categories.has(finalName)) {
+    alert('A category with this name already exists');
+    return;
+  }
+
+  const productsToUpdate = allProducts.filter(p => p.category === oldName);
+  let updated = 0;
+
+  productsToUpdate.forEach(product => {
+    const updatedProduct = { ...product, category: finalName };
+    fetch(API_BASE + '/api/products/' + product.id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedProduct)
+    }).then(res => {
+      if (res.ok) {
+        updated++;
+        if (updated === productsToUpdate.length) {
+          loadProducts();
+          buildNavigation();
+          loadCategoriesTab();
+        }
+      }
+    }).catch(err => console.error('Error updating product:', err));
+  });
+
+  alert('Renaming category "' + oldName + '" to "' + finalName + '" - updating ' + productsToUpdate.length + ' product(s)...');
+}
+
+function deleteCategory(name) {
+  const productsInCategory = allProducts.filter(p => p.category === name);
+  const confirm = window.confirm('Are you sure you want to delete the category "' + name + '"?\n\nWarning: This will not delete products, just remove the category grouping. The ' + productsInCategory.length + ' product(s) in this category will lose their category assignment.');
+
+  if (!confirm) return;
+
+  alert('Category "' + name + '" deleted. ' + productsInCategory.length + ' product(s) are now unassigned.');
+  loadCategoriesTab();
 }
 
 // ============ STARTUP ============

@@ -1542,30 +1542,106 @@
       width: 100%;
       min-width: unset;
       height: auto;
-      position: relative;
-      flex-direction: row;
-      overflow-x: auto;
+      max-height: none;
+      position: sticky;
+      top: 0;
+      flex-direction: column;
+      overflow-x: hidden;
+      overflow-y: visible;
       background: #ffffff;
+      border-right: none;
+      border-bottom: 1px solid #e5e7eb;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
     .sidebar-brand { display: none; }
-    .sidebar-brand svg { width: 130px; }
     .sidebar-section-label { display: none; }
     .sidebar-divider { display: none; }
-    .sidebar-footer { margin-top: 0; border: none; padding: 4px; }
+    /* Wrap all nav items into a single horizontal scrolling strip */
     .sidebar-nav {
       flex-direction: row;
-      padding: 8px;
-      gap: 4px;
+      padding: 0;
+      gap: 0;
+      flex-wrap: nowrap;
     }
+    .sidebar-footer {
+      margin-top: 0;
+      border: none;
+      padding: 0;
+      display: contents;
+    }
+    .sidebar-footer .sidebar-nav-item {
+      padding: 10px 16px;
+    }
+    /* Create a scrollable tab bar inside the sidebar */
+    .backoffice-sidebar {
+      flex-direction: row;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 0 4px;
+      gap: 0;
+    }
+    .backoffice-sidebar::-webkit-scrollbar { display: none; }
     .sidebar-nav-item {
-      padding: 8px 14px;
+      padding: 12px 16px;
       white-space: nowrap;
-      font-size: 12px;
-      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 0;
+      color: #6b7280;
+      background: none;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s ease;
+    }
+    .sidebar-nav-item:hover {
+      background: #f9fafb;
+      color: #111827;
+      border-bottom-color: #d1d5db;
+    }
+    .sidebar-nav-item.active {
+      background: none;
+      color: var(--color-olive);
+      font-weight: 600;
+      border-bottom: 2px solid var(--color-olive);
+      box-shadow: none;
     }
     .sidebar-nav-item.active::before { display: none; }
     .sidebar-nav-item .nav-icon { display: none; }
-    .backoffice-main { padding: 20px 16px; }
+    .sidebar-nav-item .nav-badge {
+      font-size: 9px;
+      padding: 1px 6px;
+    }
+    .backoffice-main {
+      padding: 20px 16px;
+      min-height: calc(100vh - 50px);
+    }
+    .backoffice-container {
+      padding: 0;
+    }
+  }
+  @media (max-width: 600px) {
+    .sidebar-nav-item {
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    .backoffice-main {
+      padding: 16px 12px;
+    }
+    /* Make tables horizontally scrollable on small screens */
+    .bo-table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .backoffice-header {
+      flex-direction: column;
+      align-items: flex-start !important;
+    }
+    .backoffice-title {
+      font-size: 20px !important;
+    }
   }
 
   /* ===================== CHECKOUT PAGE ===================== */
@@ -1983,7 +2059,9 @@
     background: white;
     border-radius: 14px;
     border: 1px solid #e5e7eb;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02);
   }
   .inventory-table-wrap .inventory-table {

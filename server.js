@@ -86,10 +86,12 @@ const ECOM_BASE_URL = ENVIRONMENT === 'production'
 const DATA_DIR = PERSISTENT_DATA_DIR;
 const DATA_FILE = path.join(DATA_DIR, 'products.json');
 const SALES_FILE = path.join(DATA_DIR, 'sales.json');
+const CUSTOMERS_FILE = path.join(DATA_DIR, 'customers.json');
 
 console.log('📁 Data directory:', DATA_DIR);
 console.log('   Products file:', DATA_FILE);
 console.log('   Sales file:', SALES_FILE);
+console.log('   Customers file:', CUSTOMERS_FILE);
 
 // ─── Clover API Helper ──────────────────────────────────
 async function cloverFetch(endpoint) {
@@ -1138,6 +1140,12 @@ app.post('/api/checkout', async (req, res) => {
     salesData.orders.push(order);
     saveSalesData(salesData);
 
+    // Auto-save customer email to database
+    if (email) {
+      const custName = shipping ? `${shipping.firstName} ${shipping.lastName}` : '';
+      addCustomerEmail(email, custName, 'checkout');
+    }
+
     // Update stock counts
     for (const orderItem of order.items) {
       if (orderItem.productId) {
@@ -1319,6 +1327,110 @@ function loadSalesData() {
 function saveSalesData(data) {
   fs.writeFileSync(SALES_FILE, JSON.stringify(data, null, 2));
 }
+
+// ─── Customer Email Database ─────────────────────────────────────────
+function loadCustomers() {
+  if (fs.existsSync(CUSTOMERS_FILE)) {
+    return JSON.parse(fs.readFileSync(CUSTOMERS_FILE, 'utf8'));
+  }
+  return { customers: [] };
+}
+
+function saveCustomers(data) {
+  fs.writeFileSync(CUSTOMERS_FILE, JSON.stringify(data, null, 2));
+}
+
+function addCustomerEmail(email, name, source) {
+  if (!email || typeof email !== 'string') return;
+  const cleanEmail = email.trim().toLowerCase();
+  if (!cleanEmail || !cleanEmail.includes('@')) return;
+
+  const data = loadCustomers();
+  const existing = data.customers.find(c => c.email === cleanEmail);
+
+  if (existing) {
+    // Update last seen and order count
+    existing.lastSeen = new Date().toISOString();
+    existing.orderCount = (existing.orderCount || 0) + 1;
+    if (name && !existing.name) existing.name = name;
+    if (name && existing.name !== name) existing.name = name;
+  } else {
+    data.customers.push({
+      email: cleanEmail,
+      name: name || '',
+      source: source || 'checkout',
+      firstSeen: new Date().toISOString(),
+      lastSeen: new Date().toISOString(),
+      orderCount: 1,
+      subscribed: true
+    });
+  }
+  saveCustomers(data);
+  console.log('📧 Customer saved:', cleanEmail);
+}
+
+// ─── GET /api/customers — List all customers ──────────────────────────
+app.get('/api/customers', (req, res) => {
+  try {
+    const data = loadCustomers();
+    res.json(data.customers);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── POST /api/customers — Manually add a customer email ──────────────
+app.post('/api/customers', (req, res) => {
+  try {
+    const { email, name } = req.body;
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ error: 'Valid email is required' });
+    }
+    addCustomerEmail(email, name || '', 'manual');
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── DELETE /api/customers — Remove a customer by email ───────────────
+app.delete('/api/customers', (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+    const data = loadCustomers();
+    data.customers = data.customers.filter(c => c.email !== email.toLowerCase().trim());
+    saveCustomers(data);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── GET /api/customers/export — Export as CSV ────────────────────────
+app.get('/api/customers/export', (req, res) => {
+  try {
+    const data = loadCustomers();
+    const rows = [['Email', 'Name', 'Source', 'First Seen', 'Last Seen', 'Orders', 'Subscribed']];
+    for (const c of data.customers) {
+      rows.push([
+        c.email,
+        c.name || '',
+        c.source || 'checkout',
+        c.firstSeen || '',
+        c.lastSeen || '',
+        String(c.orderCount || 0),
+        c.subscribed !== false ? 'Yes' : 'No'
+      ]);
+    }
+    const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=customers.csv');
+    res.send(csv);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ─── POST /api/sales — Record a new sale/order ────────────────────────
 app.post('/api/sales', (req, res) => {

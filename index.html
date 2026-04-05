@@ -976,6 +976,7 @@
     top: 0;
     width: 420px;
     height: 100vh;
+    height: 100dvh;
     background: #ffffff;
     box-shadow: -8px 0 30px rgba(0,0,0,0.12);
     z-index: 1500;
@@ -990,6 +991,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
   }
   .cart-header h2 {
     font-size: 17px;
@@ -1133,6 +1135,7 @@
     padding: 20px 24px;
     border-top: 1px solid #e5e7eb;
     background: #fafafa;
+    flex-shrink: 0;
   }
   .cart-subtotal-row {
     display: flex;
@@ -2343,6 +2346,8 @@
     .cart-sidebar {
       width: 100%;
       right: -100%;
+      height: 100vh;
+      height: 100dvh;
     }
     .footer-content {
       grid-template-columns: 1fr;

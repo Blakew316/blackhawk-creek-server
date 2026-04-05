@@ -2417,26 +2417,13 @@
 <div id="homepage" class="page">
   <!-- HERO SECTION WITH VIDEO -->
   <section class="hero-home">
-    <video class="hero-video" autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1920&q=80&auto=format">
+    <video class="hero-video" autoplay muted loop playsinline>
       <source src="https://videos.pexels.com/video-files/5538137/5538137-hd_1920_1080_25fps.mp4" type="video/mp4">
       <source src="https://videos.pexels.com/video-files/5538137/5538137-sd_960_540_25fps.mp4" type="video/mp4">
     </video>
-    <img class="hero-poster" src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1920&q=80&auto=format" alt="" style="display:none;" onload="this.style.display='block'">
     <h1>BLACKHAWK CREEK<br>OUTFITTERS</h1>
     <p class="hero-tagline">East Texas's premier destination for fishing, hunting, and outdoor gear. Locally owned, expertly stocked.</p>
     <button class="hero-home-button" onclick="goToShop(); showCategory('All')">EXPLORE OUR GEAR</button>
-    <script>
-      (function(){
-        var v = document.querySelector('.hero-video');
-        var poster = document.querySelector('.hero-poster');
-        if(v) {
-          v.addEventListener('playing', function(){ if(poster) poster.style.display='none'; });
-          v.addEventListener('error', function(){ if(poster) poster.style.display='block'; });
-          // Hide poster once video can play
-          v.addEventListener('canplay', function(){ if(poster) poster.style.display='none'; });
-        }
-      })();
-    </script>
   </section>
 
   <!-- CATEGORY CARDS -->

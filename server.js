@@ -29,6 +29,11 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(__dirname));
 
+// Serve admin dashboard at /admin
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
 // Determine writable data directory
 function resolveDataDir() {
   const diskPath = process.env.RENDER_DISK_PATH;

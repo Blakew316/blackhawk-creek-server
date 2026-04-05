@@ -3,8 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blackhawk Creek Outfitters | Fishing & Hunting Gear</title>
+<title>Blackhawk Creek Outfitters | Admin Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
   @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
   :root {
@@ -2348,465 +2351,499 @@
       grid-template-columns: 1fr;
     }
   }
+
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<header class="header">
-  <div class="container">
-    <div class="logo" onclick="goToHomepage()">
-      <div class="logo-img-wrap">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 110">
+<!-- BACKOFFICE PAGE -->
+<div id="backoffice">
+  <div class="backoffice-layout">
+    <!-- LEFT SIDEBAR -->
+    <aside class="backoffice-sidebar">
+      <div class="sidebar-brand">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 110" style="width: 170px; height: auto;">
           <defs>
-            <filter id="soften" x="-5%" y="-5%" width="110%" height="110%">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="3"/>
-            </filter>
-            <mask id="edgeFade">
-              <rect x="8" y="4" width="344" height="102" rx="6" ry="6" fill="white" filter="url(#soften)"/>
-            </mask>
+            <filter id="soften2" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur in="SourceGraphic" stdDeviation="3"/></filter>
+            <mask id="edgeFade2"><rect x="8" y="4" width="344" height="102" rx="6" ry="6" fill="white" filter="url(#soften2)"/></mask>
           </defs>
-          <!-- Dark background with soft feathered edges -->
-          <rect x="0" y="0" width="360" height="110" fill="#1c1c1c" mask="url(#edgeFade)"/>
-          <!-- Gold border -->
+          <rect x="0" y="0" width="360" height="110" fill="#1c1c1c" mask="url(#edgeFade2)"/>
           <rect x="22" y="12" width="316" height="86" rx="3" ry="3" fill="none" stroke="#c9a96e" stroke-width="2.2"/>
-          <!-- BLACKHAWK CREEK -->
           <text x="180" y="58" text-anchor="middle" fill="#ffffff" font-family="'Oswald',sans-serif" font-size="28" font-weight="700" letter-spacing="3">BLACKHAWK CREEK</text>
-          <!-- OUTFITTERS -->
           <text x="180" y="85" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-family="'Oswald',sans-serif" font-size="16" font-weight="400" letter-spacing="7">OUTFITTERS</text>
         </svg>
       </div>
-    </div>
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="Search products..." oninput="onSearchInput()" onkeydown="if(event.key==='Enter'){event.preventDefault();performSearch();}if(event.key==='Escape'){clearSearch();this.blur();}">
-      <button class="search-clear" id="searchClear" onclick="clearSearch()" title="Clear search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-      <button class="search-btn" onclick="performSearch()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
-    </div>
-    <div class="header-actions">
-      <div class="header-action cart-badge" onclick="toggleCart()">
-        <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
-        <div>Cart</div>
-        <div class="cart-count" id="cartCount">0</div>
-      </div>
-    </div>
-  </div>
-</header>
 
-<!-- MAIN NAV -->
-<nav class="main-nav">
-  <div class="container" id="navContainer">
-    <div class="nav-item active" onclick="showCategory('All')">ALL PRODUCTS</div>
-  </div>
-</nav>
-
-<!-- HERO (hidden by default) -->
-<section class="hero">
-  <div class="hero-content">
-    <div class="hero-text">
-      <div class="hero-eyebrow">EXPLORE OUR GEAR</div>
-      <h1 class="hero-headline">BUILT FOR ADVENTURE</h1>
-      <p class="hero-subheadline">Premium fishing and hunting equipment for the discerning outdoorsperson.</p>
-      <button class="hero-button" onclick="scrollToProducts()">SHOP NOW</button>
-    </div>
-  </div>
-</section>
-
-<!-- HOMEPAGE -->
-<div id="homepage" class="page">
-  <!-- HERO SECTION WITH VIDEO -->
-  <section class="hero-home">
-    <video class="hero-video" autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1920&q=80&auto=format">
-      <source src="https://videos.pexels.com/video-files/5538137/5538137-hd_1920_1080_25fps.mp4" type="video/mp4">
-      <source src="https://videos.pexels.com/video-files/5538137/5538137-sd_960_540_25fps.mp4" type="video/mp4">
-    </video>
-    <img class="hero-poster" src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1920&q=80&auto=format" alt="" style="display:none;" onload="this.style.display='block'">
-    <h1>BLACKHAWK CREEK<br>OUTFITTERS</h1>
-    <p class="hero-tagline">East Texas's premier destination for fishing, hunting, and outdoor gear. Locally owned, expertly stocked.</p>
-    <button class="hero-home-button" onclick="goToShop(); showCategory('All')">EXPLORE OUR GEAR</button>
-    <script>
-      (function(){
-        var v = document.querySelector('.hero-video');
-        var poster = document.querySelector('.hero-poster');
-        if(v) {
-          v.addEventListener('playing', function(){ if(poster) poster.style.display='none'; });
-          v.addEventListener('error', function(){ if(poster) poster.style.display='block'; });
-          // Hide poster once video can play
-          v.addEventListener('canplay', function(){ if(poster) poster.style.display='none'; });
-        }
-      })();
-    </script>
-  </section>
-
-  <!-- CATEGORY CARDS -->
-  <section class="home-categories">
-    <h2 class="section-title">Shop By Category</h2>
-    <p class="section-subtitle">From rod and reel to rifle and scope — we've got everything for your next adventure.</p>
-    <div class="category-cards">
-      <div class="cat-card" onclick="goToShop(); showCategoryGroup('lures')">
-        <img src="https://images.pexels.com/photos/7805768/pexels-photo-7805768.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Man holding fish while kayaking on a lake" loading="lazy">
-        <div class="card-overlay">
-          <div class="card-label">Lures & Baits</div>
-          <div class="card-desc">Soft plastics, hardbaits, spinnerbaits, jigs, frogs, and more</div>
-        </div>
-      </div>
-      <div class="cat-card" onclick="goToShop(); showCategoryGroup('tackle')">
-        <img src="https://images.pexels.com/photos/6204825/pexels-photo-6204825.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Fishing tackle and terminal gear" loading="lazy">
-        <div class="card-overlay">
-          <div class="card-label">Terminal Tackle</div>
-          <div class="card-desc">Hooks, jigheads, weights, sinkers, and rigging essentials</div>
-        </div>
-      </div>
-      <div class="cat-card" onclick="goToShop(); showCategoryGroup('gear')">
-        <img src="https://images.pexels.com/photos/712067/pexels-photo-712067.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Rods reels and outdoor gear" loading="lazy">
-        <div class="card-overlay">
-          <div class="card-label">Rods, Reels & Gear</div>
-          <div class="card-desc">Rod & reel combos, apparel, reel care, and accessories</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PROMO BANNER -->
-  <section class="promo-banner">
-    <div class="promo-content">
-      <h2>Gear Up For Every Season</h2>
-      <p>Whether you're casting at dawn or heading to the deer stand, we carry trusted brands that perform when it matters most.</p>
-      <button class="promo-btn" onclick="goToShop(); showCategory('All')">BROWSE ALL PRODUCTS</button>
-    </div>
-  </section>
-
-  <!-- WHY SHOP WITH US -->
-  <section class="why-us">
-    <h2 class="section-title">Why Shop With Us</h2>
-    <div class="why-grid">
-      <div class="why-card">
-        <div class="why-icon">
-          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <h4>Trusted Brands</h4>
-        <p>We stock only proven, field-tested gear from brands that serious outdoorsmen rely on.</p>
-      </div>
-      <div class="why-card">
-        <div class="why-icon">
-          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        </div>
-        <h4>Expert Staff</h4>
-        <p>Our team are avid hunters and anglers who know the local waters and woodlands inside out.</p>
-      </div>
-      <div class="why-card">
-        <div class="why-icon">
-          <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-        </div>
-        <h4>Free Shipping</h4>
-        <p>Enjoy free shipping on all orders over $100 — delivered right to your door.</p>
-      </div>
-      <div class="why-card">
-        <div class="why-icon">
-          <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        </div>
-        <h4>Local Roots</h4>
-        <p>Proudly serving the East Texas community from our Whitehouse location.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- LIFESTYLE BANNER -->
-  <section class="lifestyle-banner">
-    <div class="lifestyle-img"></div>
-    <div class="lifestyle-text">
-      <h2>Born On The Water.<br>Built For The Field.</h2>
-      <p>At Blackhawk Creek Outfitters, we live the lifestyle we sell. Every product on our shelves has been vetted by our team of passionate outdoorsmen. Whether you're a seasoned pro or just getting started, we're here to help you make the most of your time outdoors.</p>
-      <button class="promo-btn" onclick="goToShop(); showCategory('All')">SHOP THE COLLECTION</button>
-    </div>
-  </section>
-
-  <!-- STORE INFO SECTION -->
-  <section class="store-info">
-    <div class="store-info-container">
-      <h2>Visit Our Store</h2>
-      <div class="info-grid">
-        <div class="info-column">
-          <h3>Store Hours</h3>
-          <p><strong>Monday - Saturday:</strong> 7:00 AM - 7:00 PM</p>
-          <p><strong>Sunday:</strong> 9:00 AM - 5:00 PM</p>
-          <h3 style="margin-top: 30px;">Location</h3>
-          <p>
-            Blackhawk Creek Outfitters<br>
-            20257 TX-110 S<br>
-            Whitehouse, TX 75791
-          </p>
-          <h3 style="margin-top: 30px;">Contact</h3>
-          <p><strong>Phone:</strong> (903) 555-0123</p>
-        </div>
-        <div class="info-column">
-          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3374.5!2d-95.19961688!3d32.18368385!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x86482db841f80953%3A0x7f812727d14195fd!2s20257%20TX-110%20S%2C%20Whitehouse%2C%20TX%2075791!5e0!3m2!1sen!2sus!4v1712200000000!5m2!1sen!2sus" width="100%" height="100%" style="border:0; border-radius:10px; min-height:280px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-        </div>
-      </div>
-    </div>
-  </section>
-</div>
-
-<!-- MAIN CONTENT -->
-<div id="storefront" class="page">
-  <!-- PRODUCTS SECTION -->
-  <section class="products-section">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-eyebrow">PREMIUM GEAR</div>
-        <h2 class="section-title">Featured Products</h2>
-        <p class="section-subtitle">Handpicked equipment for fishing and hunting enthusiasts</p>
-      </div>
-      <div class="products-grid" id="productsGrid">
-        <!-- Products will be loaded here -->
-      </div>
-    </div>
-  </section>
-</div>
-
-<!-- CHECKOUT PAGE -->
-<div id="checkoutPage" class="page">
-  <div class="checkout-wrapper">
-    <div class="checkout-header">
-      <div class="checkout-brand" onclick="goToHomepage()" style="cursor:pointer;">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 110" style="width:160px;height:auto;">
-          <defs><filter id="sf3" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur in="SourceGraphic" stdDeviation="3"/></filter><mask id="ef3"><rect x="8" y="4" width="344" height="102" rx="6" ry="6" fill="white" filter="url(#sf3)"/></mask></defs>
-          <rect width="360" height="110" fill="#1c1c1c" mask="url(#ef3)"/>
-          <rect x="22" y="12" width="316" height="86" rx="3" ry="3" fill="none" stroke="#c9a96e" stroke-width="2.2"/>
-          <text x="180" y="58" text-anchor="middle" fill="#fff" font-family="'Oswald',sans-serif" font-size="28" font-weight="700" letter-spacing="3">BLACKHAWK CREEK</text>
-          <text x="180" y="85" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-family="'Oswald',sans-serif" font-size="16" font-weight="400" letter-spacing="7">OUTFITTERS</text>
-        </svg>
-      </div>
-      <div class="checkout-secure">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Secure Checkout
-      </div>
-    </div>
-
-    <!-- Breadcrumb -->
-    <div class="checkout-breadcrumb">
-      <a onclick="goBackToCart()">Cart</a>
-      <span class="crumb-sep">›</span>
-      <span class="crumb-active">Checkout</span>
-      <span class="crumb-sep">›</span>
-      <span>Confirmation</span>
-    </div>
-
-    <div class="checkout-grid">
-      <!-- LEFT: Forms -->
-      <div class="checkout-forms">
-        <!-- Contact -->
-        <div class="checkout-section">
-          <h3 class="checkout-section-title"><span class="section-num">1</span> Contact Information</h3>
-          <div class="checkout-field">
-            <label>Email Address</label>
-            <input type="email" id="checkoutEmail" placeholder="your@email.com" required>
-          </div>
-        </div>
-
-        <!-- Shipping -->
-        <div class="checkout-section">
-          <h3 class="checkout-section-title"><span class="section-num">2</span> Shipping Address</h3>
-          <div class="checkout-row">
-            <div class="checkout-field"><label>First Name</label><input type="text" id="shipFirst" required></div>
-            <div class="checkout-field"><label>Last Name</label><input type="text" id="shipLast" required></div>
-          </div>
-          <div class="checkout-field"><label>Address</label><input type="text" id="shipAddress" placeholder="123 Main St" required></div>
-          <div class="checkout-field"><label>Apt / Suite (optional)</label><input type="text" id="shipApt"></div>
-          <div class="checkout-row">
-            <div class="checkout-field"><label>City</label><input type="text" id="shipCity" required></div>
-            <div class="checkout-field" style="max-width:100px;">
-              <label>State</label>
-              <select id="shipState" required>
-                <option value="TX" selected>TX</option><option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option><option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option><option value="CT">CT</option><option value="DE">DE</option><option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option><option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option><option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option><option value="UT">UT</option><option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option><option value="WI">WI</option><option value="WY">WY</option>
-              </select>
-            </div>
-            <div class="checkout-field" style="max-width:120px;"><label>ZIP</label><input type="text" id="shipZip" maxlength="10" required></div>
-          </div>
-        </div>
-
-        <!-- Payment -->
-        <div class="checkout-section">
-          <h3 class="checkout-section-title"><span class="section-num">3</span> Payment</h3>
-          <div class="payment-card-wrap">
-            <div class="payment-card-icons">
-              <span class="card-brand visa">VISA</span>
-              <span class="card-brand mastercard"><span class="mc-circles"></span></span>
-              <span class="card-brand amex">AMEX</span>
-              <span class="card-brand discover">DISC<span class="disc-dot"></span>VER</span>
-            </div>
-            <div class="checkout-field" style="margin-bottom:10px;">
-              <label>Card Number</label>
-              <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="cc-number" required oninput="formatCardNumber(this)">
-            </div>
-            <div class="checkout-row">
-              <div class="checkout-field">
-                <label>Expiration</label>
-                <input type="text" id="cardExp" placeholder="MM/YY" maxlength="5" autocomplete="cc-exp" required oninput="formatCardExp(this)">
-              </div>
-              <div class="checkout-field">
-                <label>CVV</label>
-                <input type="text" id="cardCvv" placeholder="123" maxlength="4" autocomplete="cc-csc" required>
-              </div>
-              <div class="checkout-field"><label>ZIP (Billing)</label><input type="text" id="billZip" maxlength="10" required></div>
-            </div>
-          </div>
-          <div id="paymentError" style="color: #dc2626; font-size: 13px; margin-top: 8px; display: none;"></div>
-        </div>
-
-        <button id="placeOrderBtn" class="place-order-btn" onclick="processCheckout()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          <span id="placeOrderText">Place Order</span>
+      <div class="sidebar-section-label">Inventory</div>
+      <nav class="sidebar-nav">
+        <button class="sidebar-nav-item active" onclick="switchBackofficeTab('inventory')">
+          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span>
+          <span class="nav-label">All Products</span>
+          <span class="nav-badge" id="sidebarProductCount">0</span>
         </button>
-        <p class="checkout-disclaimer">Your payment is encrypted and secure. We never store your card details.</p>
-      </div>
+        <button class="sidebar-nav-item" onclick="switchBackofficeTab('categories')">
+          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
+          <span class="nav-label">Categories</span>
+        </button>
+        <button class="sidebar-nav-item" onclick="switchBackofficeTab('add')">
+          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>
+          <span class="nav-label">Add Product</span>
+        </button>
+      </nav>
 
-      <!-- RIGHT: Order Summary -->
-      <div class="checkout-summary">
-        <div class="checkout-summary-card">
-          <h3 class="checkout-section-title">Order Summary</h3>
-          <div id="checkoutItems" class="checkout-items-list">
-            <!-- Populated by JS -->
-          </div>
-          <div class="checkout-totals">
-            <div class="total-row"><span>Subtotal</span><span id="checkoutSubtotal">$0.00</span></div>
-            <div class="total-row"><span>Shipping</span><span class="free-tag">FREE</span></div>
-            <div class="total-row"><span>Tax (8.25%)</span><span id="checkoutTax">$0.00</span></div>
-            <div class="total-row total-final"><span>Total</span><span id="checkoutTotal">$0.00</span></div>
-          </div>
-        </div>
-        <button class="back-to-cart-btn" onclick="goBackToCart()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M15 18l-6-6 6-6"/></svg>
-          Return to cart
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section-label">Sales</div>
+      <nav class="sidebar-nav">
+        <button class="sidebar-nav-item" onclick="switchBackofficeTab('sales')">
+          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+          <span class="nav-label">Sales & Reports</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section-label">Settings</div>
+      <nav class="sidebar-nav">
+        <button class="sidebar-nav-item" onclick="switchBackofficeTab('sync')">
+          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>
+          <span class="nav-label">Sync Clover</span>
+        </button>
+        <button class="sidebar-nav-item" onclick="switchBackofficeTab('pages')">
+          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+          <span class="nav-label">Footer Pages</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="sidebar-nav-item" onclick="window.location.href='/'">
+          <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+          <span class="nav-label">Back to Store</span>
         </button>
       </div>
-    </div>
-  </div>
+    </aside>
 
-  <!-- Order Confirmation Overlay -->
-  <div id="orderConfirmation" class="order-confirmation" style="display:none;">
-    <div class="confirmation-card">
-      <div class="confirmation-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" style="width:48px;height:48px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    <!-- RIGHT CONTENT AREA -->
+    <main class="backoffice-main">
+  <div class="backoffice-container">
+
+    <div id="inventoryTab">
+      <div class="backoffice-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <h1 class="backoffice-title" style="margin: 0;">Products</h1>
+          <p style="margin: 6px 0 0; color: #9ca3af; font-size: 13px; font-weight: 500;" id="inventorySubtitle">Manage your product catalog</p>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <div style="position: relative;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="inventorySearch" placeholder="Search products..." oninput="filterInventoryTable()" class="bo-form-input" style="padding: 10px 14px 10px 36px; width: 220px; font-size: 13px; border-radius: 10px;">
+          </div>
+          <button onclick="exportProducts('csv')" class="bo-btn secondary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export CSV
+          </button>
+        </div>
       </div>
-      <h2>Order Confirmed!</h2>
-      <p class="conf-order-id">Order #<span id="confOrderId"></span></p>
-      <p class="conf-msg">Thank you for your purchase. A confirmation email will be sent to <strong id="confEmail"></strong>.</p>
-      <div class="conf-details">
-        <div class="conf-row"><span>Charged</span><span id="confTotal"></span></div>
-        <div class="conf-row"><span>Card</span><span id="confCard"></span></div>
+
+      <!-- Bulk action bar (hidden by default) -->
+      <div id="bulkActionBar" class="bulk-bar" style="display: none;">
+        <span id="bulkSelectedCount">0 selected</span>
+        <button onclick="bulkEditSelected()" class="bo-btn primary" style="padding: 6px 14px; font-size: 12px;">Edit Selected</button>
+        <button onclick="bulkDeleteSelected()" class="bo-btn danger" style="padding: 6px 14px; font-size: 12px;">Delete Selected</button>
+        <button onclick="clearSelection()" class="bo-btn secondary" style="padding: 6px 14px; font-size: 12px;">Cancel</button>
       </div>
-      <button class="place-order-btn" onclick="finishCheckout()" style="margin-top:20px;">Continue Shopping</button>
-    </div>
-  </div>
-</div>
 
-
-<!-- CART OVERLAY -->
-<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
-
-<!-- CART SIDEBAR -->
-<div class="cart-sidebar" id="cartSidebar">
-  <div class="cart-header">
-    <h2>Your Cart <span class="cart-header-count" id="cartHeaderCount"></span></h2>
-    <button class="cart-close" onclick="toggleCart()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-  </div>
-  <div class="cart-items" id="cartItems">
-    <!-- Cart items populated by JS -->
-  </div>
-  <div class="cart-footer">
-    <div class="cart-subtotal-row">
-      <span>Subtotal</span>
-      <span id="cartSubtotal">$0.00</span>
-    </div>
-    <div class="cart-total">
-      <span>Estimated Total</span>
-      <span id="cartTotal">$0.00</span>
-    </div>
-    <button class="cart-checkout" onclick="checkout()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      Checkout
-    </button>
-    <button class="cart-continue" onclick="toggleCart()">Continue Shopping</button>
-  </div>
-</div>
-
-<!-- PRODUCT DETAIL MODAL -->
-<div class="modal" id="productModal">
-  <div class="modal-content">
-    <button class="modal-close" onclick="closeProductModal()">×</button>
-    <div class="modal-image" id="modalImage">
-      <!-- Product image -->
-    </div>
-    <div class="modal-header" id="modalTitle"></div>
-    <div class="modal-body" id="modalDescription"></div>
-    <div style="margin-bottom: 20px;">
-      <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 10px;">Quantity:</div>
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <button style="width: 32px; height: 32px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-weight: 600;" onclick="decreaseQty()">−</button>
-        <span id="qtyDisplay" style="min-width: 30px; text-align: center; font-weight: 600;">1</span>
-        <button style="width: 32px; height: 32px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-weight: 600;" onclick="increaseQty()">+</button>
+      <div class="inventory-table-wrap">
+        <table class="inventory-table" id="inventoryTable">
+          <thead>
+            <tr>
+              <th style="width: 40px; text-align: center;"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)" title="Select all"></th>
+              <th style="width: 56px;">Image</th>
+              <th>Product Name</th>
+              <th>Brand</th>
+              <th>Category</th>
+              <th style="text-align: right;">Price</th>
+              <th style="text-align: center;">Stock</th>
+              <th style="width: 80px; text-align: center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryTableBody">
+            <!-- Rows will be populated by JavaScript -->
+          </tbody>
+        </table>
       </div>
     </div>
-    <div style="font-size: 18px; font-weight: 600; color: #3d4a2f; margin-bottom: 20px;">Price: <span id="modalPrice"></span></div>
-    <div class="modal-footer">
-      <button class="modal-button primary" onclick="addToCart()">Add to Cart</button>
-      <button class="modal-button secondary" onclick="closeProductModal()">Close</button>
+
+    <div id="addTab" style="display: none;">
+      <div class="backoffice-header">
+        <div>
+          <h1 class="backoffice-title">Add New Product</h1>
+          <p style="margin: 6px 0 0; color: #9ca3af; font-size: 13px; font-weight: 500;">Create a new product listing</p>
+        </div>
+      </div>
+      <div class="bo-card" style="max-width: 600px;">
+        <div class="bo-card-body">
+        <form id="addProductForm" onsubmit="handleAddProduct(event)">
+          <div class="bo-form-group">
+            <label class="bo-form-label">Product Name</label>
+            <input type="text" name="name" required class="bo-form-input" placeholder="Enter product name">
+          </div>
+          <div class="bo-form-group">
+            <label class="bo-form-label">Brand</label>
+            <input type="text" name="brand" required class="bo-form-input" placeholder="Enter brand name">
+          </div>
+          <div class="bo-form-group">
+            <label class="bo-form-label">Category</label>
+            <input type="text" name="category" required class="bo-form-input" placeholder="Enter category">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="bo-form-group">
+              <label class="bo-form-label">Price</label>
+              <input type="number" name="price" step="0.01" required class="bo-form-input" placeholder="0.00">
+            </div>
+            <div class="bo-form-group">
+              <label class="bo-form-label">Stock</label>
+              <input type="number" name="stock" required class="bo-form-input" placeholder="0">
+            </div>
+          </div>
+          <button type="submit" class="bo-btn primary" style="width: 100%; justify-content: center; padding: 12px 24px; font-size: 14px; margin-top: 4px;">Add Product</button>
+        </form>
+        </div>
+      </div>
     </div>
+
+    <!-- SALES & REPORTS TAB -->
+    <div id="salesTab" style="display: none;">
+      <div class="backoffice-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h1 class="backoffice-title" style="margin: 0;">Sales & Reports</h1>
+          <p style="margin: 6px 0 0; color: #9ca3af; font-size: 13px; font-weight: 500;">Track revenue, orders, and performance</p>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <select id="salesPeriodFilter" onchange="loadSalesDashboard()" class="bo-form-select" style="width: auto; padding: 10px 36px 10px 14px; font-size: 13px;">
+            <option value="today">Today</option>
+            <option value="week" selected>This Week</option>
+            <option value="month">This Month</option>
+            <option value="all">All Time</option>
+          </select>
+          <button onclick="exportSales()" class="bo-btn primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export Sales
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI CARDS ROW -->
+      <div id="salesKpiCards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 18px; margin: 24px 0;">
+        <div class="sales-kpi-card">
+          <div class="kpi-label">Gross Sales</div>
+          <div class="kpi-value" id="kpiGrossSales">$0.00</div>
+          <div class="kpi-sub" id="kpiGrossSalesSub">&nbsp;</div>
+        </div>
+        <div class="sales-kpi-card">
+          <div class="kpi-label">Net Revenue</div>
+          <div class="kpi-value" id="kpiNetRevenue">$0.00</div>
+          <div class="kpi-sub" id="kpiNetRevenueSub">&nbsp;</div>
+        </div>
+        <div class="sales-kpi-card">
+          <div class="kpi-label">Orders</div>
+          <div class="kpi-value" id="kpiOrders">0</div>
+          <div class="kpi-sub" id="kpiOrdersSub">&nbsp;</div>
+        </div>
+        <div class="sales-kpi-card">
+          <div class="kpi-label">Items Sold</div>
+          <div class="kpi-value" id="kpiItemsSold">0</div>
+          <div class="kpi-sub" id="kpiItemsSoldSub">&nbsp;</div>
+        </div>
+        <div class="sales-kpi-card">
+          <div class="kpi-label">Avg Ticket</div>
+          <div class="kpi-value" id="kpiAvgTicket">$0.00</div>
+          <div class="kpi-sub" id="kpiAvgTicketSub">&nbsp;</div>
+        </div>
+        <div class="sales-kpi-card">
+          <div class="kpi-label">Refunds</div>
+          <div class="kpi-value" id="kpiRefunds">$0.00</div>
+          <div class="kpi-sub" id="kpiRefundsSub">&nbsp;</div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 22px;">
+        <!-- Revenue Trend Chart -->
+        <div class="sales-card">
+          <div class="sales-card-header">
+            <h3>Revenue Trend (Last 30 Days)</h3>
+          </div>
+          <div class="sales-card-body">
+            <canvas id="revenueTrendChart" height="220"></canvas>
+          </div>
+        </div>
+        <!-- Sales by Category Pie -->
+        <div class="sales-card">
+          <div class="sales-card-header">
+            <h3>Sales by Category</h3>
+          </div>
+          <div class="sales-card-body">
+            <canvas id="categorySalesChart" height="220"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECOND CHARTS ROW -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+        <!-- Hourly Sales -->
+        <div class="sales-card">
+          <div class="sales-card-header">
+            <h3>Today's Hourly Sales</h3>
+          </div>
+          <div class="sales-card-body">
+            <canvas id="hourlySalesChart" height="200"></canvas>
+          </div>
+        </div>
+        <!-- Payment Methods -->
+        <div class="sales-card">
+          <div class="sales-card-header">
+            <h3>Payment Methods</h3>
+          </div>
+          <div class="sales-card-body">
+            <canvas id="paymentChart" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOP SELLING ITEMS TABLE -->
+      <div class="sales-card" style="margin-bottom: 20px;">
+        <div class="sales-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <h3>Top Selling Items</h3>
+        </div>
+        <div class="sales-card-body" style="padding: 0;">
+          <table class="inventory-table" style="margin: 0;">
+            <thead>
+              <tr>
+                <th style="text-align: left; padding: 12px 16px;">#</th>
+                <th style="text-align: left; padding: 12px 16px;">Item Name</th>
+                <th style="text-align: left; padding: 12px 16px;">Brand</th>
+                <th style="text-align: left; padding: 12px 16px;">Category</th>
+                <th style="text-align: right; padding: 12px 16px;">Qty Sold</th>
+                <th style="text-align: right; padding: 12px 16px;">Revenue</th>
+              </tr>
+            </thead>
+            <tbody id="topItemsBody">
+              <tr><td colspan="6" style="text-align: center; padding: 30px; color: #999;">No sales data yet</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RECENT TRANSACTIONS TABLE -->
+      <div class="sales-card">
+        <div class="sales-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <h3>Recent Transactions</h3>
+        </div>
+        <div class="sales-card-body" style="padding: 0;">
+          <table class="inventory-table" style="margin: 0;">
+            <thead>
+              <tr>
+                <th style="text-align: left; padding: 12px 16px;">Order #</th>
+                <th style="text-align: left; padding: 12px 16px;">Date & Time</th>
+                <th style="text-align: left; padding: 12px 16px;">Items</th>
+                <th style="text-align: right; padding: 12px 16px;">Qty</th>
+                <th style="text-align: right; padding: 12px 16px;">Subtotal</th>
+                <th style="text-align: right; padding: 12px 16px;">Tax</th>
+                <th style="text-align: right; padding: 12px 16px;">Total</th>
+                <th style="text-align: center; padding: 12px 16px;">Payment</th>
+                <th style="text-align: center; padding: 12px 16px;">Status</th>
+                <th style="text-align: center; padding: 12px 16px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="recentOrdersBody">
+              <tr><td colspan="10" style="text-align: center; padding: 30px; color: #999;">No transactions yet</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="syncTab" style="display: none;">
+      <div class="backoffice-header">
+        <div>
+          <h1 class="backoffice-title">Sync from Clover POS</h1>
+          <p style="margin: 6px 0 0; color: #9ca3af; font-size: 13px; font-weight: 500;">Keep your online store in sync with Clover</p>
+        </div>
+      </div>
+      <div class="bo-card" style="max-width: 600px;">
+        <div class="bo-card-body">
+          <div class="bo-info-box" style="margin-bottom: 22px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;vertical-align:-3px;margin-right:6px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Pull the latest products, prices, and categories from your Clover POS system. This will update your website inventory to match Clover.
+          </div>
+          <div id="syncStatus" class="bo-info-box" style="margin-bottom: 22px; background: #f0fdf4; border-color: #bbf7d0; color: #166534;">
+            Checking sync status...
+          </div>
+          <button class="bo-btn primary" style="width: 100%; justify-content: center; padding: 12px 24px; font-size: 14px;" onclick="runCloverSync()" id="syncButton">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Sync Now
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER PAGES EDITOR -->
+    <div id="pagesTab" style="display: none;">
+      <div class="backoffice-header">
+        <div>
+          <h1 class="backoffice-title">Footer Pages</h1>
+          <p style="margin: 6px 0 0; color: #9ca3af; font-size: 13px; font-weight: 500;">Edit the footer navigation links and their page content</p>
+        </div>
+      </div>
+      <div class="bo-card" style="max-width: 900px;">
+        <div class="bo-card-body">
+        <div style="display: flex; gap: 12px; margin-bottom: 22px;">
+          <select id="footerSectionSelect" onchange="loadFooterSection()" class="bo-form-select" style="flex:1;">
+          </select>
+          <button class="bo-btn primary" onclick="addFooterSection()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Section
+          </button>
+        </div>
+
+        <div id="footerSectionEditor" style="display:none;">
+          <div class="bo-form-group">
+            <label class="bo-form-label">Section Title</label>
+            <div style="display:flex;gap:10px;">
+              <input type="text" id="footerSectionTitle" class="bo-form-input" style="flex:1;">
+              <button class="bo-btn danger" onclick="deleteFooterSection()" style="font-size:12px;">Delete Section</button>
+            </div>
+          </div>
+
+          <div class="bo-form-group">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <label class="bo-form-label" style="margin-bottom:0;">Links</label>
+              <button class="bo-btn secondary" onclick="addFooterLink()" style="font-size:11px;padding:5px 12px;">+ Add Link</button>
+            </div>
+            <div id="footerLinksEditor"></div>
+          </div>
+
+          <button class="bo-btn primary" onclick="saveFooterPages()" style="width:100%; justify-content: center; padding: 12px 24px;">Save Changes</button>
+          <p id="footerSaveStatus" style="text-align:center;font-size:12px;color:#059669;margin-top:10px;display:none;">Saved!</p>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="categoriesTab" style="display: none;">
+      <div class="backoffice-header">
+        <div>
+          <h1 class="backoffice-title">Manage Categories</h1>
+          <p style="margin: 6px 0 0; color: #9ca3af; font-size: 13px; font-weight: 500;">Organize your products into categories</p>
+        </div>
+      </div>
+      <div class="bo-card" style="max-width: 800px;">
+        <div class="bo-card-body">
+          <div style="margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1px solid #eceef2;">
+            <h3 class="bo-section-title">Add New Category</h3>
+            <div style="display: flex; gap: 10px;">
+              <input type="text" id="categoryInput" placeholder="Category name" class="bo-form-input" style="flex: 1;">
+              <button class="bo-btn primary" onclick="addCategory(document.getElementById('categoryInput').value)">Add Category</button>
+            </div>
+          </div>
+          <div>
+            <h3 class="bo-section-title">Existing Categories</h3>
+            <div id="categoriesList" style="display: grid; gap: 10px;">
+              <!-- Categories will be loaded here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    </main>
   </div>
 </div>
 
 
-<!-- FOOTER PAGE VIEWER -->
-<div class="page footer-page-viewer" id="footerPageViewer">
-  <div class="container" style="padding: 40px 20px; max-width: 800px; margin: 0 auto;">
-    <button onclick="closeFooterPage()" style="display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:#2563eb;cursor:pointer;font-size:14px;font-family:inherit;padding:0;margin-bottom:24px;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polyline points="15 18 9 12 15 6"/></svg>
-      Back to Shop
-    </button>
-    <h1 id="footerPageTitle" style="font-size:28px;font-weight:700;color:#1a1a1a;margin-bottom:20px;"></h1>
-    <div id="footerPageContent" style="font-size:15px;line-height:1.8;color:#444;white-space:pre-wrap;"></div>
+<!-- Admin login modal removed — dashboard is open access -->
+
+<!-- EDIT PRODUCT MODAL -->
+<div class="modal" id="editProductModal">
+  <div class="modal-content" style="max-width: 520px; border-radius: 16px; overflow: hidden;">
+    <button class="modal-close" onclick="closeEditModal()">&times;</button>
+    <div class="modal-header" style="font-size: 18px; font-weight: 700; color: #111827;">Edit Product</div>
+    <div class="modal-body" style="padding: 0;">
+      <form id="editProductForm" onsubmit="saveProductEdit(event)" style="display: flex; flex-direction: column; gap: 18px;">
+        <input type="hidden" id="editProductId">
+
+        <!-- Image preview + upload -->
+        <div style="text-align: center;">
+          <div id="editImagePreview" style="width: 120px; height: 120px; margin: 0 auto 12px; border-radius: 14px; overflow: hidden; background: #f8f9fb; display: flex; align-items: center; justify-content: center; border: 2px dashed #d1d5db; cursor: pointer; transition: all 0.2s ease;" onclick="document.getElementById('editImageInput').click()" onmouseover="this.style.borderColor='var(--color-olive)'" onmouseout="this.style.borderColor='#d1d5db'">
+            <span id="editImagePlaceholder" style="color: #9ca3af; font-size: 12px; font-weight: 500;">Click to upload</span>
+          </div>
+          <input type="file" id="editImageInput" accept="image/*" style="display: none;" onchange="previewEditImage(event)">
+          <button type="button" onclick="document.getElementById('editImageInput').click()" class="bo-btn secondary" style="font-size: 12px; padding: 6px 16px;">Change Image</button>
+        </div>
+
+        <!-- Product Name -->
+        <div class="bo-form-group" style="margin-bottom: 0;">
+          <label class="bo-form-label">Product Name</label>
+          <input type="text" id="editProductName" required class="bo-form-input">
+        </div>
+
+        <!-- Brand -->
+        <div class="bo-form-group" style="margin-bottom: 0;">
+          <label class="bo-form-label">Brand</label>
+          <input type="text" id="editProductBrand" class="bo-form-input">
+        </div>
+
+        <!-- Price & Stock side by side -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="bo-form-group" style="margin-bottom: 0;">
+            <label class="bo-form-label">Price ($)</label>
+            <input type="number" id="editProductPrice" step="0.01" min="0" required class="bo-form-input">
+          </div>
+          <div class="bo-form-group" style="margin-bottom: 0;">
+            <label class="bo-form-label">Stock Count</label>
+            <input type="number" id="editProductStock" min="0" class="bo-form-input">
+          </div>
+        </div>
+
+        <!-- Category -->
+        <div class="bo-form-group" style="margin-bottom: 0;">
+          <label class="bo-form-label">Category</label>
+          <select id="editProductCategory" class="bo-form-select">
+            <!-- Options populated dynamically -->
+          </select>
+        </div>
+
+        <div class="modal-footer" style="margin-top: 4px; padding-top: 18px; border-top: 1px solid #eceef2;">
+          <button type="submit" class="modal-button primary" style="border-radius: 10px; font-weight: 600;">Save Changes</button>
+          <button type="button" class="modal-button secondary" onclick="closeEditModal()" style="border-radius: 10px;">Cancel</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
-<!-- FOOTER -->
-<footer class="footer">
-  <div class="container">
-    <div class="footer-content" id="footerDynamic">
-      <!-- Footer sections loaded dynamically from saved data -->
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2024 Blackhawk Creek Outfitters. All rights reserved.</p>
-      <a href="/admin" style="color: rgba(255,255,255,0.25); font-size: 11px; text-decoration: none; margin-top: 8px; display: inline-block; letter-spacing: 0.5px; transition: color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'">Admin</a>
-    </div>
-  </div>
-</footer>
 
 <script>
 const API_BASE = '';
-// Admin password removed — dashboard is open access
-
 let cart = [];
 let products = [];
-let selectedProduct = null;
-let selectedQty = 1;
 let allProducts = [];
 let currentCategory = 'All';
+let footerPagesData = [];
+
+// Stub functions — storefront-only, not needed in admin
+function buildNavigation() {}
+function displayProducts() {}
 
 // ============ INITIALIZATION ============
 async function initApp() {
-  loadCartFromStorage();
-  updateCartUI();
   await loadProducts();
-  buildNavigation();
+  loadInventoryTable();
+  updateSidebarProductCount();
+  switchBackofficeTab('inventory');
   loadFooterPagesFromServer();
-  goToHomepage();
 }
 
-// Auto-categorize products by name keywords
+// ============ AUTO-CATEGORIZE ============
 function autoCategorize(name) {
   const n = (name || '').toLowerCase();
   // Soft Plastics
@@ -2840,6 +2877,8 @@ function autoCategorize(name) {
 
 // Auto-resolve product images from manufacturer Shopify stores (client-side)
 // Hardcoded product image + price map — zero external dependencies, instant loading, unbreakable
+
+// ============ PRODUCT DATA ============
 const PRODUCT_DATA = {
   "Railworm 7\" - Redbug - 10 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/RW58451-WEBSITE-scaled.jpg", 5.99],
   "Railworm 7\" - Green Pumpkin/Blue Glitter - 10 ct": ["https://cdn.shopify.com/s/files/1/0670/3995/3137/files/RW58484-WEBSITE-scaled.jpg", 5.99],
@@ -2998,6 +3037,7 @@ const PRODUCT_DATA = {
 function resolveImage(name) { const d = PRODUCT_DATA[name]; return d ? d[0] : null; }
 function resolvePrice(name) { const d = PRODUCT_DATA[name]; return d ? d[1] : null; }
 
+// ============ LOAD PRODUCTS ============
 async function loadProducts(retries = 3) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
@@ -3048,676 +3088,904 @@ async function loadProducts(retries = 3) {
   }
 }
 
-function buildNavigation() {
-  const categories = new Set(['All']);
+// ============ ADMIN FUNCTIONS ============
+function switchBackofficeTab(tab) {
+  const tabs = ['inventory', 'add', 'categories', 'sales', 'sync', 'pages'];
+  tabs.forEach(t => {
+    const el = document.getElementById(t + 'Tab');
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+  });
+
+  // Update sidebar active state — matches sidebar button order:
+  // inventory(0), categories(1), add(2), sales(3), sync(4), pages(5)
+  const tabToIndex = { inventory: 0, categories: 1, add: 2, sales: 3, sync: 4, pages: 5 };
+  document.querySelectorAll('.sidebar-nav .sidebar-nav-item').forEach(btn => btn.classList.remove('active'));
+  const allNavItems = document.querySelectorAll('.sidebar-nav .sidebar-nav-item');
+  if (allNavItems[tabToIndex[tab]] !== undefined) allNavItems[tabToIndex[tab]].classList.add('active');
+
+  if (tab === 'sync') loadSyncStatus();
+  if (tab === 'categories') loadCategoriesTab();
+  if (tab === 'sales') loadSalesDashboard();
+  if (tab === 'inventory') { updateSidebarProductCount(); loadInventoryTable(); }
+  if (tab === 'pages') loadFooterPagesEditor();
+}
+
+function updateSidebarProductCount() {
+  const badge = document.getElementById('sidebarProductCount');
+  if (badge) badge.textContent = allProducts.length;
+  const sub = document.getElementById('inventorySubtitle');
+  if (sub) sub.textContent = allProducts.length + ' products in catalog';
+}
+
+let selectedProductIds = new Set();
+
+function loadInventoryTable() {
+  const tbody = document.getElementById('inventoryTableBody');
+  tbody.innerHTML = '';
+  const query = (document.getElementById('inventorySearch')?.value || '').toLowerCase();
+
+  const filtered = query
+    ? allProducts.filter(p => p.name.toLowerCase().includes(query) || (p.brand && p.brand.toLowerCase().includes(query)) || (p.category && p.category.toLowerCase().includes(query)) || (p.sku && p.sku.toLowerCase().includes(query)))
+    : allProducts;
+
+  const placeholderSVG = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50"><rect fill="#f5f5f5" width="50" height="50" rx="6"/><text x="25" y="28" text-anchor="middle" fill="#ccc" font-family="sans-serif" font-size="9">No img</text></svg>')}`;
+
+  filtered.forEach(product => {
+    const row = document.createElement('tr');
+    row.className = selectedProductIds.has(product.id) ? 'row-selected' : '';
+    const imgSrc = product.imageUrl || placeholderSVG;
+    const stockVal = product.stockCount || product.stock || 0;
+    const stockClass = stockVal === 0 ? 'stock-out' : stockVal <= 5 ? 'stock-low' : 'stock-ok';
+    const checked = selectedProductIds.has(product.id) ? 'checked' : '';
+
+    row.innerHTML = `
+      <td style="text-align: center;" onclick="event.stopPropagation()"><input type="checkbox" class="row-checkbox" data-id="${product.id}" ${checked} onchange="toggleRowSelection(${product.id}, this)"></td>
+      <td><div class="product-thumbnail"><img src="${imgSrc}" alt="${product.name}" onerror="this.src='${placeholderSVG}'"></div></td>
+      <td class="td-product-name">${product.name}</td>
+      <td style="color: #666;">${product.brand || '\u2014'}</td>
+      <td><span class="cat-tag">${product.category || 'Uncategorized'}</span></td>
+      <td style="text-align: right; font-weight: 600;">$${(product.price || 0).toFixed(2)}</td>
+      <td style="text-align: center;"><span class="stock-indicator ${stockClass}">${stockVal}</span></td>
+      <td style="text-align: center;" onclick="event.stopPropagation()">
+        <button class="btn-delete-sm" onclick="deleteProduct(${product.id})" title="Delete">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </td>
+    `;
+
+    // Click row to open edit modal
+    row.style.cursor = 'pointer';
+    row.onclick = function() { editProduct(product.id); };
+    tbody.appendChild(row);
+  });
+
+  // Update select-all checkbox state
+  const selectAll = document.getElementById('selectAllCheckbox');
+  if (selectAll) selectAll.checked = false;
+  updateBulkBar();
+}
+
+function filterInventoryTable() {
+  loadInventoryTable();
+}
+
+function toggleRowSelection(productId, checkbox) {
+  if (checkbox.checked) {
+    selectedProductIds.add(productId);
+  } else {
+    selectedProductIds.delete(productId);
+  }
+  // Update row highlight
+  const row = checkbox.closest('tr');
+  if (row) row.className = checkbox.checked ? 'row-selected' : '';
+  updateBulkBar();
+}
+
+function toggleSelectAll(master) {
+  const checkboxes = document.querySelectorAll('.row-checkbox');
+  checkboxes.forEach(cb => {
+    const id = parseInt(cb.dataset.id);
+    cb.checked = master.checked;
+    if (master.checked) {
+      selectedProductIds.add(id);
+      cb.closest('tr').className = 'row-selected';
+    } else {
+      selectedProductIds.delete(id);
+      cb.closest('tr').className = '';
+    }
+  });
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  const bar = document.getElementById('bulkActionBar');
+  const countEl = document.getElementById('bulkSelectedCount');
+  if (selectedProductIds.size > 0) {
+    bar.style.display = 'flex';
+    countEl.textContent = selectedProductIds.size + ' selected';
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+function clearSelection() {
+  selectedProductIds.clear();
+  document.querySelectorAll('.row-checkbox').forEach(cb => {
+    cb.checked = false;
+    cb.closest('tr').className = '';
+  });
+  const selectAll = document.getElementById('selectAllCheckbox');
+  if (selectAll) selectAll.checked = false;
+  updateBulkBar();
+}
+
+function bulkEditSelected() {
+  if (selectedProductIds.size === 0) return;
+  // Edit the first selected product
+  const firstId = Array.from(selectedProductIds)[0];
+  editProduct(firstId);
+}
+
+async function bulkDeleteSelected() {
+  if (selectedProductIds.size === 0) return;
+  if (!confirm('Delete ' + selectedProductIds.size + ' selected product(s)? This cannot be undone.')) return;
+
+  const ids = Array.from(selectedProductIds);
+  let deleted = 0;
+  for (const id of ids) {
+    try {
+      const res = await fetch(API_BASE + '/api/products/' + id, { method: 'DELETE' });
+      if (res.ok) deleted++;
+    } catch(e) { /* skip */ }
+  }
+
+  selectedProductIds.clear();
+  await loadProducts();
+  buildNavigation();
+  displayProducts(allProducts);
+  loadInventoryTable();
+  updateSidebarProductCount();
+  alert(deleted + ' product(s) deleted.');
+}
+
+function triggerImageUpload(productId) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        uploadProductImage(productId, event.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  input.click();
+}
+
+async function uploadProductImage(productId, base64Data) {
+  try {
+    const response = await fetch(API_BASE + '/api/products/' + productId + '/image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageUrl: base64Data })
+    });
+    if (response.ok) {
+      alert('Image uploaded successfully');
+      await loadProducts();
+      loadInventoryTable();
+    } else {
+      alert('Failed to upload image');
+    }
+  } catch (error) {
+    console.error('Upload error:', error);
+    alert('Error uploading image: ' + error.message);
+  }
+}
+
+// ============ EDIT PRODUCT MODAL ============
+let editImageData = null; // stores base64 of newly selected image
+
+function editProduct(productId) {
+  const product = allProducts.find(p => p.id === productId);
+  if (!product) return;
+
+  editImageData = null;
+
+  // Populate form fields
+  document.getElementById('editProductId').value = product.id;
+  document.getElementById('editProductName').value = product.name || '';
+  document.getElementById('editProductBrand').value = product.brand || '';
+  document.getElementById('editProductPrice').value = product.price || 0;
+  document.getElementById('editProductStock').value = product.stockCount || product.stock || 0;
+
+  // Populate category dropdown
+  const catSelect = document.getElementById('editProductCategory');
+  catSelect.innerHTML = '';
+  const categories = new Set();
+  allProducts.forEach(p => { if (p.category) categories.add(p.category); });
+  // Add common defaults if not present
+  ['Fishing', 'Hunting', 'Outdoor', 'Camping', 'Apparel', 'Archery', 'General'].forEach(c => categories.add(c));
+
+  const sortedCats = Array.from(categories).sort();
+  sortedCats.forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    if (cat === product.category) opt.selected = true;
+    catSelect.appendChild(opt);
+  });
+
+  // Show image preview
+  const previewContainer = document.getElementById('editImagePreview');
+  const placeholder = document.getElementById('editImagePlaceholder');
+  if (product.imageUrl) {
+    previewContainer.innerHTML = '<img src="' + product.imageUrl + '" alt="Product" style="width:100%;height:100%;object-fit:cover;">';
+  } else {
+    previewContainer.innerHTML = '<span id="editImagePlaceholder" style="color:#999;font-size:12px;">Click to upload</span>';
+  }
+
+  document.getElementById('editProductModal').classList.add('active');
+}
+
+function closeEditModal() {
+  document.getElementById('editProductModal').classList.remove('active');
+  editImageData = null;
+}
+
+function previewEditImage(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    editImageData = e.target.result;
+    const previewContainer = document.getElementById('editImagePreview');
+    previewContainer.innerHTML = '<img src="' + editImageData + '" alt="Preview" style="width:100%;height:100%;object-fit:cover;">';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveProductEdit(event) {
+  event.preventDefault();
+
+  const productId = parseInt(document.getElementById('editProductId').value);
+  const payload = {
+    name: document.getElementById('editProductName').value.trim(),
+    brand: document.getElementById('editProductBrand').value.trim(),
+    price: parseFloat(document.getElementById('editProductPrice').value),
+    stock: parseInt(document.getElementById('editProductStock').value) || 0,
+    category: document.getElementById('editProductCategory').value
+  };
+
+  // Include image if a new one was selected
+  if (editImageData) {
+    payload.imageUrl = editImageData;
+  }
+
+  try {
+    const res = await fetch(API_BASE + '/api/products/' + productId, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      closeEditModal();
+      await loadProducts();
+      buildNavigation();
+      displayProducts(allProducts);
+      loadInventoryTable();
+    } else {
+      const data = await res.json();
+      alert('Failed to update: ' + (data.error || 'Unknown error'));
+    }
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}
+
+// ============ EXPORT PRODUCTS ============
+function exportProducts(format) {
+  const url = API_BASE + '/api/products/export' + (format === 'csv' ? '/csv' : '');
+  const filename = 'blackhawk-creek-products.' + format;
+
+  fetch(url)
+    .then(res => res.blob())
+    .then(blob => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    })
+    .catch(err => alert('Export failed: ' + err.message));
+}
+
+async function deleteProduct(productId) {
+  if (!confirm('Are you sure you want to delete this product?')) return;
+
+  try {
+    const res = await fetch(API_BASE + '/api/products/' + productId, { method: 'DELETE' });
+    if (res.ok) {
+      alert('Product deleted');
+      await loadProducts();
+      buildNavigation();
+      displayProducts(allProducts);
+      loadInventoryTable();
+    } else {
+      alert('Failed to delete product');
+    }
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}
+
+function showAddProductForm() {
+  switchBackofficeTab('add');
+}
+
+async function handleAddProduct(event) {
+  event.preventDefault();
+  const formData = new FormData(event.target);
+  const productData = {
+    name: formData.get('name'),
+    brand: formData.get('brand'),
+    category: formData.get('category'),
+    price: parseFloat(formData.get('price')),
+    stock: parseInt(formData.get('stock'))
+  };
+
+  try {
+    const response = await fetch(API_BASE + '/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(productData)
+    });
+    if (response.ok) {
+      alert('Product added successfully');
+      document.getElementById('addProductForm').reset();
+      await loadProducts();
+      buildNavigation();
+      displayProducts(allProducts);
+      switchBackofficeTab('inventory');
+      loadInventoryTable();
+    } else {
+      alert('Failed to add product');
+    }
+  } catch (error) {
+    console.error('Add product error:', error);
+    alert('Error adding product: ' + error.message);
+  }
+}
+
+// ============ CLOVER SYNC ============
+async function loadSyncStatus() {
+  const el = document.getElementById('syncStatus');
+  try {
+    const res = await fetch(API_BASE + '/api/sync-status');
+    const data = await res.json();
+    if (data.lastSync) {
+      const date = new Date(data.lastSync);
+      el.innerHTML = '<strong>Last synced:</strong> ' + date.toLocaleString() + '<br><strong>Products:</strong> ' + data.itemCount + '<br><strong>Clover configured:</strong> ' + (data.configured ? 'Yes' : 'No — check environment variables');
+    } else {
+      el.innerHTML = '<strong>Status:</strong> No sync has been run yet.' + (data.configured ? '' : '<br><span style="color:#b83a2e;">Clover credentials not configured. Check your environment variables on Render.</span>');
+    }
+  } catch (err) {
+    el.innerHTML = '<span style="color:#b83a2e;">Could not reach server.</span>';
+  }
+}
+
+async function runCloverSync() {
+  const btn = document.getElementById('syncButton');
+  btn.textContent = 'Syncing...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(API_BASE + '/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert('Sync complete! ' + data.message);
+      await loadProducts();
+      buildNavigation();
+      displayProducts(allProducts);
+      loadSyncStatus();
+    } else {
+      alert('Sync failed: ' + (data.error || 'Unknown error'));
+    }
+  } catch (err) {
+    alert('Sync error: ' + err.message);
+  } finally {
+    btn.textContent = 'Sync Now';
+    btn.disabled = false;
+  }
+}
+
+// ============ CATEGORY MANAGEMENT ============
+function loadCategoriesTab() {
+  const categories = new Set();
   allProducts.forEach(product => {
     if (product.category) categories.add(product.category);
   });
 
-  const navContainer = document.getElementById('navContainer');
-  navContainer.innerHTML = '';
+  const list = document.getElementById('categoriesList');
+  list.innerHTML = '';
 
-  // HOME button
-  const homeItem = document.createElement('div');
-  homeItem.className = 'nav-item';
-  homeItem.textContent = 'HOME';
-  homeItem.onclick = function() { goToHomepage(); };
-  navContainer.appendChild(homeItem);
-
-  // ALL PRODUCTS button
-  const allItem = document.createElement('div');
-  allItem.className = 'nav-item active';
-  allItem.textContent = 'ALL PRODUCTS';
-  allItem.onclick = function() { goToShop(); showCategory('All', this); };
-  navContainer.appendChild(allItem);
-
-  // Category items
-  categories.forEach(cat => {
-    if (cat !== 'All') {
-      const item = document.createElement('div');
-      item.className = 'nav-item';
-      item.textContent = cat.toUpperCase();
-      item.onclick = function() { goToShop(); showCategory(cat, this); };
-      navContainer.appendChild(item);
-    }
-  });
-}
-
-function showCategory(category, el) {
-  currentCategory = category;
-  const filtered = category === 'All'
-    ? allProducts
-    : allProducts.filter(p => p.category === category);
-  displayProducts(filtered);
-
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.classList.remove('active');
-  });
-  if (el) {
-    el.classList.add('active');
-  } else {
-    // Find matching nav item by text
-    const match = Array.from(document.querySelectorAll('.nav-item')).find(item =>
-      item.textContent === (category === 'All' ? 'ALL PRODUCTS' : category.toUpperCase())
-    );
-    if (match) match.classList.add('active');
-  }
-}
-
-// Homepage category groups — maps broad groups to multiple Clover categories
-const categoryGroups = {
-  lures: ['Soft Plastics', 'Hardbaits', 'Spinnerbaits', 'Bladed Jigs', 'Swim Jigs', 'Frogs'],
-  tackle: ['Hooks', 'Jigheads', 'Weights & Sinkers'],
-  gear: ['Rod & Reel Combos', 'Reel Care', 'Cleaning Products', 'Apparel & Accessories']
-};
-
-function showCategoryGroup(group) {
-  const cats = (categoryGroups[group] || []).map(c => c.toLowerCase());
-  const filtered = allProducts.filter(p => {
-    const pCat = (p.category || '').toLowerCase();
-    return cats.some(c => pCat === c || pCat.includes(c) || c.includes(pCat));
-  });
-  displayProducts(filtered);
-  // Highlight ALL PRODUCTS in nav since this is a cross-category filter
-  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-  const allNav = Array.from(document.querySelectorAll('.nav-item')).find(item => item.textContent === 'ALL PRODUCTS');
-  if (allNav) allNav.classList.add('active');
-  window.scrollTo(0, 0);
-}
-
-function displayProducts(productsToShow) {
-  const grid = document.getElementById('productsGrid');
-  grid.innerHTML = '';
-
-  productsToShow.forEach(product => {
-    const card = createProductCard(product);
-    grid.appendChild(card);
-  });
-}
-
-function createProductCard(product) {
-  const card = document.createElement('div');
-  card.className = 'product-card';
-
-  const placeholderSVG = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect fill="#f0f0f0" width="200" height="200"/><text x="100" y="90" text-anchor="middle" fill="#999" font-family="sans-serif" font-size="14">No Image</text><text x="100" y="115" text-anchor="middle" fill="#bbb" font-family="sans-serif" font-size="11">Available</text></svg>')}`;
-  let imageHTML = '';
-  const imgSrc = product.imageUrl || placeholderSVG;
-  const onerrorAttr = product.imageUrl ? ` onerror="this.onerror=null;this.src='${placeholderSVG}';"` : '';
-
-  imageHTML = `
-    <div class="product-card-image">
-      <img src="${imgSrc}" alt="${product.name}"${onerrorAttr} loading="lazy">
-      <button class="quick-add-btn" onclick="event.stopPropagation();quickAddToCart(${product.id}, this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        Add to Cart
-      </button>
-    </div>
-  `;
-
-  const brandHTML = product.brand ? `<div class="product-brand">${product.brand}</div>` : '';
-  const outOfStock = product.stockCount !== null && product.stockCount !== undefined && product.stockCount <= 0;
-
-  card.innerHTML = `
-    ${imageHTML}
-    <div class="product-card-content" onclick="openProductModal(${product.id})">
-      ${brandHTML}
-      <div class="product-name">${product.name}</div>
-      <div class="product-price">$${(product.price || 0).toFixed(2)}</div>
-      <button class="product-card-button" onclick="event.stopPropagation();openProductModal(${product.id})">View Details</button>
-    </div>
-  `;
-
-  return card;
-}
-
-function quickAddToCart(productId, btnEl) {
-  const product = allProducts.find(p => p.id === productId);
-  if (!product) return;
-
-  const existingItem = cart.find(item => item.id === product.id);
-  if (existingItem) {
-    existingItem.quantity += 1;
-  } else {
-    cart.push({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      quantity: 1,
-      imageUrl: product.imageUrl,
-      brand: product.brand
-    });
-  }
-
-  saveCartToStorage();
-  updateCartUI();
-
-  // Visual feedback
-  if (btnEl) {
-    btnEl.classList.add('added');
-    btnEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><polyline points="20 6 9 17 4 12"/></svg> Added!';
-    setTimeout(() => {
-      btnEl.classList.remove('added');
-      btnEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Add to Cart';
-    }, 1200);
-  }
-}
-
-// ============ PRODUCT MODAL ============
-function openProductModal(productId) {
-  selectedProduct = allProducts.find(p => p.id === productId);
-  if (!selectedProduct) return;
-
-  selectedQty = 1;
-
-  const imageContainer = document.getElementById('modalImage');
-  const modalPlaceholder = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"><rect fill="#f0f0f0" width="400" height="400"/><text x="200" y="190" text-anchor="middle" fill="#999" font-family="sans-serif" font-size="18">No Image</text><text x="200" y="220" text-anchor="middle" fill="#bbb" font-family="sans-serif" font-size="14">Available</text></svg>')}`;
-  if (selectedProduct.imageUrl) {
-    imageContainer.innerHTML = `<img src="${selectedProduct.imageUrl}" alt="${selectedProduct.name}" onerror="this.onerror=null;this.src='${modalPlaceholder}';">`;
-  } else {
-    imageContainer.innerHTML = `<img src="${modalPlaceholder}" alt="No image available">`;
-  }
-
-  document.getElementById('modalTitle').textContent = selectedProduct.name;
-  document.getElementById('modalDescription').textContent = selectedProduct.description || 'A premium product from Blackhawk Creek Outfitters.';
-  document.getElementById('modalPrice').textContent = '$' + (selectedProduct.price || 0).toFixed(2);
-  document.getElementById('qtyDisplay').textContent = '1';
-
-  document.getElementById('productModal').classList.add('active');
-}
-
-function closeProductModal() {
-  document.getElementById('productModal').classList.remove('active');
-  selectedProduct = null;
-}
-
-function increaseQty() {
-  selectedQty++;
-  document.getElementById('qtyDisplay').textContent = selectedQty;
-}
-
-function decreaseQty() {
-  if (selectedQty > 1) selectedQty--;
-  document.getElementById('qtyDisplay').textContent = selectedQty;
-}
-
-function addToCart() {
-  if (!selectedProduct) return;
-
-  const existingItem = cart.find(item => item.id === selectedProduct.id);
-  if (existingItem) {
-    existingItem.quantity += selectedQty;
-  } else {
-    cart.push({
-      id: selectedProduct.id,
-      name: selectedProduct.name,
-      price: selectedProduct.price,
-      quantity: selectedQty,
-      imageUrl: selectedProduct.imageUrl,
-      brand: selectedProduct.brand
-    });
-  }
-
-  saveCartToStorage();
-  updateCartUI();
-  closeProductModal();
-  alert('Added to cart!');
-}
-
-// ============ CART MANAGEMENT ============
-function toggleCart() {
-  document.getElementById('cartSidebar').classList.toggle('open');
-  document.getElementById('cartOverlay').classList.toggle('open');
-  document.body.style.overflow = document.getElementById('cartSidebar').classList.contains('open') ? 'hidden' : '';
-}
-
-function updateCartUI() {
-  const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-  document.getElementById('cartCount').textContent = count;
-
-  // Update header count
-  const headerCount = document.getElementById('cartHeaderCount');
-  if (headerCount) headerCount.textContent = count > 0 ? `(${count})` : '';
-
-  const cartItemsContainer = document.getElementById('cartItems');
-  cartItemsContainer.innerHTML = '';
-
-  if (cart.length === 0) {
-    cartItemsContainer.innerHTML = `
-      <div class="cart-empty">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:48px;height:48px;">
-          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-        </svg>
-        <p>Your cart is empty</p>
-      </div>`;
-  } else {
-    cart.forEach((item, index) => {
-      const itemDiv = document.createElement('div');
-      itemDiv.className = 'cart-item';
-      const linePrice = (item.price * item.quantity).toFixed(2);
-
-      let imageHTML = '';
-      if (item.imageUrl) {
-        imageHTML = `<div class="cart-item-image"><img src="${item.imageUrl}" alt="${item.name}"></div>`;
-      } else {
-        imageHTML = `<div class="cart-item-image" style="display:flex;align-items:center;justify-content:center;color:#d1d5db;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:24px;height:24px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-        </div>`;
-      }
-
-      itemDiv.innerHTML = `
-        ${imageHTML}
-        <div class="cart-item-details">
-          <div class="cart-item-name">${item.name}</div>
-          ${item.brand ? `<div class="cart-item-brand">${item.brand}</div>` : ''}
-          <div class="cart-item-bottom">
-            <div class="cart-item-qty">
-              <button onclick="event.stopPropagation();decreaseCartQty(${index})">−</button>
-              <span>${item.quantity}</span>
-              <button onclick="event.stopPropagation();increaseCartQty(${index})">+</button>
-            </div>
-            <div class="cart-item-line-price">$${linePrice}</div>
-          </div>
-        </div>
-        <button class="cart-item-trash" onclick="event.stopPropagation();removeFromCart(${index})" title="Remove item">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-            <line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
-          </svg>
-        </button>
-      `;
-      cartItemsContainer.appendChild(itemDiv);
-    });
-  }
-
-  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  document.getElementById('cartTotal').textContent = '$' + total.toFixed(2);
-  const subtotalEl = document.getElementById('cartSubtotal');
-  if (subtotalEl) subtotalEl.textContent = '$' + total.toFixed(2);
-
-  // Hide/show footer based on cart contents
-  const footer = document.querySelector('.cart-footer');
-  if (footer) footer.style.display = cart.length === 0 ? 'none' : '';
-}
-
-function increaseCartQty(index) {
-  cart[index].quantity++;
-  saveCartToStorage();
-  updateCartUI();
-}
-
-function decreaseCartQty(index) {
-  if (cart[index].quantity > 1) {
-    cart[index].quantity--;
-  } else {
-    removeFromCart(index);
-  }
-  saveCartToStorage();
-  updateCartUI();
-}
-
-function removeFromCart(index) {
-  cart.splice(index, 1);
-  saveCartToStorage();
-  updateCartUI();
-}
-
-function saveCartToStorage() {
-  localStorage.setItem('blackhawkcart', JSON.stringify(cart));
-}
-
-function loadCartFromStorage() {
-  const saved = localStorage.getItem('blackhawkcart');
-  if (saved) {
-    try {
-      cart = JSON.parse(saved);
-    } catch (e) {
-      cart = [];
-    }
-  }
-}
-
-// ============ CLOVER CHECKOUT ============
-let cloverInstance = null;
-let cloverTokenizer = null;
-
-async function checkout() {
-  if (cart.length === 0) {
-    alert('Your cart is empty!');
+  if (categories.size === 0) {
+    list.innerHTML = '<p style="color: #999; font-style: italic;">No categories found. Products will define categories automatically.</p>';
     return;
   }
-  // Close cart sidebar + overlay and navigate to checkout page
-  document.getElementById('cartSidebar').classList.remove('open');
-  document.getElementById('cartOverlay').classList.remove('open');
-  document.body.style.overflow = '';
-  goToCheckoutPage();
-}
 
-function goToCheckoutPage() {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('checkoutPage').classList.add('active');
-  document.getElementById('orderConfirmation').style.display = 'none';
-  window.scrollTo(0, 0);
-  populateCheckoutSummary();
-  initCloverTokenizer();
-}
-
-function goBackToCart() {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('storefront').classList.add('active');
-  document.getElementById('cartSidebar').classList.add('open');
-  document.getElementById('cartOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function populateCheckoutSummary() {
-  const container = document.getElementById('checkoutItems');
-  const placeholderSVG = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><rect fill="#f3f4f6" width="48" height="48" rx="8"/><text x="24" y="27" text-anchor="middle" fill="#ccc" font-family="sans-serif" font-size="8">img</text></svg>')}`;
-
-  container.innerHTML = cart.map(item => {
-    const imgSrc = item.imageUrl || placeholderSVG;
-    return `
-      <div class="checkout-item">
-        <div class="checkout-item-img">
-          <img src="${imgSrc}" alt="${item.name}" onerror="this.src='${placeholderSVG}'">
-          <div class="checkout-item-qty">${item.quantity}</div>
-        </div>
-        <div class="checkout-item-details">
-          <div class="checkout-item-name">${item.name}</div>
-          <div class="checkout-item-brand">${item.brand || ''}</div>
-        </div>
-        <div class="checkout-item-price">$${(item.price * item.quantity).toFixed(2)}</div>
+  categories.forEach(cat => {
+    const item = document.createElement('div');
+    item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f9f9f9; border-radius: 6px; border: 1px solid #e0e0e0;';
+    const count = allProducts.filter(p => p.category === cat).length;
+    item.innerHTML = `
+      <div>
+        <strong style="color: #1a1a1a;">${cat}</strong>
+        <span style="color: #999; font-size: 12px; margin-left: 8px;">(${count} product${count !== 1 ? 's' : ''})</span>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn-edit" onclick="renameCategory('${cat.replace(/'/g, "\\'")}')">Rename</button>
+        <button class="btn-delete" onclick="deleteCategory('${cat.replace(/'/g, "\\'")}')">Delete</button>
       </div>
     `;
-  }).join('');
-
-  const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-  const tax = Math.round(subtotal * 0.0825 * 100) / 100;
-  const total = Math.round((subtotal + tax) * 100) / 100;
-
-  document.getElementById('checkoutSubtotal').textContent = '$' + subtotal.toFixed(2);
-  document.getElementById('checkoutTax').textContent = '$' + tax.toFixed(2);
-  document.getElementById('checkoutTotal').textContent = '$' + total.toFixed(2);
+    list.appendChild(item);
+  });
 }
 
-let cloverConfig = null;
+function addCategory(name) {
+  const input = document.getElementById('categoryInput');
+  name = (name || input.value).trim();
 
-async function initCloverTokenizer() {
-  try {
-    const configRes = await fetch(API_BASE + '/api/checkout/config');
-    cloverConfig = await configRes.json();
-    console.log('✅ Checkout config loaded — environment:', cloverConfig.environment);
-    cloverTokenizer = true; // Flag that checkout is ready
-  } catch (err) {
-    console.error('Failed to load checkout config:', err);
-  }
-}
-
-function formatCardNumber(input) {
-  let v = input.value.replace(/\D/g, '').substring(0, 16);
-  input.value = v.replace(/(.{4})/g, '$1 ').trim();
-}
-
-function formatCardExp(input) {
-  let v = input.value.replace(/\D/g, '').substring(0, 4);
-  if (v.length >= 3) v = v.substring(0, 2) + '/' + v.substring(2);
-  input.value = v;
-}
-
-async function processCheckout() {
-  const btn = document.getElementById('placeOrderBtn');
-  const btnText = document.getElementById('placeOrderText');
-  const errorEl = document.getElementById('paymentError');
-  errorEl.style.display = 'none';
-
-  // Validate required fields
-  const email = document.getElementById('checkoutEmail').value.trim();
-  const shipFirst = document.getElementById('shipFirst').value.trim();
-  const shipLast = document.getElementById('shipLast').value.trim();
-  const shipAddress = document.getElementById('shipAddress').value.trim();
-  const shipCity = document.getElementById('shipCity').value.trim();
-  const shipState = document.getElementById('shipState').value;
-  const shipZip = document.getElementById('shipZip').value.trim();
-  const billZip = document.getElementById('billZip').value.trim();
-
-  // Get card details from input fields
-  const cardNum = document.getElementById('cardNumber').value.replace(/\s/g, '');
-  const cardExpRaw = document.getElementById('cardExp').value.trim();
-  const cardCvv = document.getElementById('cardCvv').value.trim();
-
-  if (!email || !shipFirst || !shipLast || !shipAddress || !shipCity || !shipZip || !billZip) {
-    errorEl.textContent = 'Please fill in all required fields.';
-    errorEl.style.display = 'block';
+  if (!name) {
+    alert('Please enter a category name');
     return;
   }
 
-  if (!cardNum || cardNum.length < 13 || cardNum.length > 19) {
-    errorEl.textContent = 'Please enter a valid card number.';
-    errorEl.style.display = 'block';
+  const categories = new Set();
+  allProducts.forEach(product => {
+    if (product.category) categories.add(product.category);
+  });
+
+  if (categories.has(name)) {
+    alert('This category already exists');
     return;
   }
 
-  if (!cardExpRaw || !cardExpRaw.includes('/')) {
-    errorEl.textContent = 'Please enter a valid expiration date (MM/YY).';
-    errorEl.style.display = 'block';
-    return;
-  }
-
-  if (!cardCvv || cardCvv.length < 3) {
-    errorEl.textContent = 'Please enter a valid CVV.';
-    errorEl.style.display = 'block';
-    return;
-  }
-
-  if (!cloverTokenizer || !cloverConfig) {
-    errorEl.textContent = 'Payment system is loading. Please wait a moment and try again.';
-    errorEl.style.display = 'block';
-    return;
-  }
-
-  // Parse expiration
-  const expParts = cardExpRaw.split('/');
-  const expMonth = expParts[0].trim();
-  const expYear = '20' + expParts[1].trim();
-
-  // Disable button
-  btn.disabled = true;
-  btnText.textContent = 'Processing...';
-
-  try {
-    // Tokenize card via Clover REST API (bypasses iframe entirely)
-    console.log('🔐 Tokenizing card via Clover API...');
-    const tokenUrl = cloverConfig.environment === 'production'
-      ? 'https://token.clover.com/v1/tokens'
-      : 'https://token-sandbox.dev.clover.com/v1/tokens';
-
-    const tokenRes = await fetch(tokenUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': cloverConfig.publicKey
-      },
-      body: JSON.stringify({
-        card: {
-          number: cardNum,
-          exp_month: expMonth,
-          exp_year: expYear,
-          cvv: cardCvv,
-          brand: detectCardBrand(cardNum)
-        }
-      })
-    });
-
-    const tokenData = await tokenRes.json();
-    console.log('🔐 Token response:', tokenRes.status, tokenData);
-
-    if (!tokenRes.ok || tokenData.error) {
-      const errMsg = tokenData.error?.message || tokenData.message || 'Card was declined. Please check your details.';
-      throw new Error(errMsg);
-    }
-
-    if (!tokenData.id) {
-      throw new Error('Failed to process card. Please try again.');
-    }
-
-    console.log('✅ Card tokenized:', tokenData.id);
-
-    // Build order items
-    const items = cart.map(item => {
-      const product = allProducts.find(p => p.id === item.id);
-      return {
-        id: item.id,
-        name: item.name,
-        brand: item.brand || (product ? product.brand : ''),
-        category: product ? product.category : '',
-        sku: product ? (product.sku || '') : '',
-        price: item.price,
-        quantity: item.quantity
-      };
-    });
-
-    const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-
-    // Send to our server
-    console.log('💳 Sending payment to server...');
-    const res = await fetch(API_BASE + '/api/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        token: tokenData.id,
-        amount: Math.round(subtotal * 100) / 100,
-        items,
-        email,
-        shipping: {
-          firstName: shipFirst,
-          lastName: shipLast,
-          address: shipAddress,
-          apt: document.getElementById('shipApt').value.trim(),
-          city: shipCity,
-          state: shipState,
-          zip: shipZip
-        },
-        billing: { zip: billZip }
-      })
-    });
-
-    let data;
-    try {
-      data = await res.json();
-    } catch (parseErr) {
-      throw new Error('Unexpected response from server. Please try again.');
-    }
-
-    console.log('💳 Server response:', res.status, data);
-
-    if (!res.ok) {
-      throw new Error(data.error || 'Payment failed. Please try again.');
-    }
-
-    // Show confirmation
-    document.getElementById('confOrderId').textContent = data.orderId;
-    document.getElementById('confEmail').textContent = email;
-    document.getElementById('confTotal').textContent = '$' + data.total.toFixed(2);
-    document.getElementById('confCard').textContent = (data.brand || 'Card').toUpperCase() + ' ending in ' + (data.last4 || '****');
-    document.getElementById('orderConfirmation').style.display = 'flex';
-
-    // Clear card fields
-    document.getElementById('cardNumber').value = '';
-    document.getElementById('cardExp').value = '';
-    document.getElementById('cardCvv').value = '';
-
-    // Clear cart
-    cart = [];
-    saveCartToStorage();
-    updateCartUI();
-    await loadProducts();
-
-  } catch (err) {
-    console.error('❌ Checkout error:', err);
-    errorEl.textContent = err.message || 'Something went wrong. Please try again.';
-    errorEl.style.display = 'block';
-  } finally {
-    btn.disabled = false;
-    btnText.textContent = 'Place Order';
-  }
-}
-
-function detectCardBrand(num) {
-  if (/^4/.test(num)) return 'VISA';
-  if (/^5[1-5]/.test(num) || /^2[2-7]/.test(num)) return 'MC';
-  if (/^3[47]/.test(num)) return 'AMEX';
-  if (/^6(?:011|5)/.test(num)) return 'DISCOVER';
-  return 'UNKNOWN';
-}
-
-function finishCheckout() {
-  document.getElementById('orderConfirmation').style.display = 'none';
-  goToHomepage();
-}
-
-// ============ SEARCH & FILTER ============
-function onSearchInput() {
-  const val = document.getElementById('searchInput').value;
-  const clearBtn = document.getElementById('searchClear');
-  if (clearBtn) clearBtn.classList.toggle('visible', val.length > 0);
-  performSearch();
-}
-
-function clearSearch() {
-  const input = document.getElementById('searchInput');
+  alert('Category "' + name + '" added! You can now assign products to this category by editing them.');
   input.value = '';
-  document.getElementById('searchClear').classList.remove('visible');
-  displayProducts(allProducts);
-  input.blur();
+  loadCategoriesTab();
 }
 
-function performSearch() {
-  const query = document.getElementById('searchInput').value.toLowerCase().trim();
-  if (!query) {
-    displayProducts(allProducts);
+function renameCategory(oldName) {
+  const newName = prompt('Rename category from "' + oldName + '" to:', oldName);
+  if (newName === null || !newName.trim()) return;
+  const finalName = newName.trim();
+
+  if (finalName === oldName) return;
+
+  const categories = new Set();
+  allProducts.forEach(product => {
+    if (product.category) categories.add(product.category);
+  });
+
+  if (categories.has(finalName)) {
+    alert('A category with this name already exists');
     return;
   }
-  const filtered = allProducts.filter(p =>
-    p.name.toLowerCase().includes(query) ||
-    (p.brand && p.brand.toLowerCase().includes(query)) ||
-    (p.category && p.category.toLowerCase().includes(query)) ||
-    (p.sku && p.sku.toLowerCase().includes(query))
-  );
-  displayProducts(filtered);
-  const storefront = document.getElementById('storefront');
-  if (storefront && !storefront.classList.contains('active')) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    storefront.classList.add('active');
+
+  const productsToUpdate = allProducts.filter(p => p.category === oldName);
+  let updated = 0;
+
+  productsToUpdate.forEach(product => {
+    const updatedProduct = { ...product, category: finalName };
+    fetch(API_BASE + '/api/products/' + product.id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedProduct)
+    }).then(res => {
+      if (res.ok) {
+        updated++;
+        if (updated === productsToUpdate.length) {
+          loadProducts();
+          buildNavigation();
+          loadCategoriesTab();
+        }
+      }
+    }).catch(err => console.error('Error updating product:', err));
+  });
+
+  alert('Renaming category "' + oldName + '" to "' + finalName + '" - updating ' + productsToUpdate.length + ' product(s)...');
+}
+
+function deleteCategory(name) {
+  const productsInCategory = allProducts.filter(p => p.category === name);
+  const confirm = window.confirm('Are you sure you want to delete the category "' + name + '"?\n\nWarning: This will not delete products, just remove the category grouping. The ' + productsInCategory.length + ' product(s) in this category will lose their category assignment.');
+
+  if (!confirm) return;
+
+  alert('Category "' + name + '" deleted. ' + productsInCategory.length + ' product(s) are now unassigned.');
+  loadCategoriesTab();
+}
+
+// ============ SALES DASHBOARD ============
+let salesCharts = {};
+
+async function loadSalesDashboard() {
+  try {
+    const res = await fetch(API_BASE + '/api/sales/summary');
+    const data = await res.json();
+    const period = document.getElementById('salesPeriodFilter').value;
+
+    // Pick the correct period data
+    const periodMap = { today: data.today, week: data.thisWeek, month: data.thisMonth, all: data.allTime };
+    const current = periodMap[period] || data.thisWeek;
+
+    // Compare period for sub-labels
+    const compare = period === 'today' ? data.thisWeek :
+                    period === 'week' ? data.thisMonth :
+                    period === 'month' ? data.lastMonth : null;
+
+    // Update KPI cards
+    updateKpi('kpiGrossSales', '$' + current.grossSales.toLocaleString('en-US', {minimumFractionDigits: 2}), current.grossSales, compare?.grossSales);
+    updateKpi('kpiNetRevenue', '$' + current.totalRevenue.toLocaleString('en-US', {minimumFractionDigits: 2}), current.totalRevenue, compare?.totalRevenue);
+    updateKpi('kpiOrders', current.orderCount.toLocaleString(), current.orderCount, compare?.orderCount, false);
+    updateKpi('kpiItemsSold', current.itemsSold.toLocaleString(), current.itemsSold, compare?.itemsSold, false);
+    updateKpi('kpiAvgTicket', '$' + current.avgTicket.toFixed(2), current.avgTicket, compare?.avgTicket);
+    updateKpi('kpiRefunds', '$' + current.totalRefunds.toLocaleString('en-US', {minimumFractionDigits: 2}), current.totalRefunds, null);
+    document.getElementById('kpiRefundsSub').textContent = current.refundCount + ' refund' + (current.refundCount !== 1 ? 's' : '');
+
+    // Render charts
+    renderRevenueTrendChart(data.dailySales);
+    renderCategorySalesChart(data.categorySales);
+    renderHourlySalesChart(data.hourlyToday);
+    renderPaymentChart(data.paymentBreakdown);
+
+    // Top items table
+    renderTopItemsTable(data.topItems);
+
+    // Recent orders table
+    renderRecentOrdersTable(data.recentOrders);
+
+  } catch (err) {
+    console.error('Failed to load sales dashboard:', err);
   }
-  const productsSection = document.querySelector('.products-section');
-  if (productsSection) productsSection.scrollIntoView({ behavior: 'smooth' });
 }
 
-function scrollToProducts() {
-  document.querySelector('.products-section').scrollIntoView({ behavior: 'smooth' });
+function updateKpi(id, displayValue, currentVal, compareVal, isCurrency) {
+  document.getElementById(id).textContent = displayValue;
+  const subEl = document.getElementById(id + 'Sub');
+  if (subEl && compareVal !== null && compareVal !== undefined && compareVal > 0) {
+    const pctChange = ((currentVal - compareVal) / compareVal * 100).toFixed(1);
+    const isUp = currentVal >= compareVal;
+    subEl.textContent = (isUp ? '\u25B2 ' : '\u25BC ') + Math.abs(pctChange) + '% vs prior';
+    subEl.className = 'kpi-sub ' + (isUp ? 'up' : 'down');
+  } else if (subEl) {
+    subEl.innerHTML = '&nbsp;';
+    subEl.className = 'kpi-sub';
+  }
 }
 
-// ============ NAVIGATION ============
-function goToHomepage() {
-  document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-  document.getElementById('homepage').classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-  document.querySelector('.nav-item').classList.add('active');
-}
+function renderRevenueTrendChart(dailySales) {
+  const canvas = document.getElementById('revenueTrendChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
 
-function goToShop() {
-  document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-  document.getElementById('storefront').classList.add('active');
-  if (!document.querySelector('.nav-item.active') || document.querySelector('.nav-item.active').textContent === 'HOME') {
-    const allProductsItem = Array.from(document.querySelectorAll('.nav-item')).find(item => item.textContent === 'ALL PRODUCTS');
-    if (allProductsItem) {
-      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-      allProductsItem.classList.add('active');
+  // Destroy old chart
+  if (salesCharts.revenue) { salesCharts.revenue = null; }
+
+  const w = canvas.parentElement.clientWidth - 40;
+  canvas.width = Math.max(w, 400);
+  canvas.height = 220;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (!dailySales || dailySales.length === 0) {
+    ctx.fillStyle = '#999';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('No sales data yet', canvas.width / 2, 110);
+    return;
+  }
+
+  const maxRev = Math.max(...dailySales.map(d => d.revenue), 1);
+  const padding = { top: 20, right: 20, bottom: 40, left: 60 };
+  const chartW = canvas.width - padding.left - padding.right;
+  const chartH = canvas.height - padding.top - padding.bottom;
+  const barW = Math.max(chartW / dailySales.length - 2, 3);
+
+  // Grid lines
+  ctx.strokeStyle = '#f0f0f0';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = padding.top + (chartH / 4) * i;
+    ctx.beginPath(); ctx.moveTo(padding.left, y); ctx.lineTo(padding.left + chartW, y); ctx.stroke();
+    ctx.fillStyle = '#aaa'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText('$' + Math.round(maxRev * (1 - i / 4)).toLocaleString(), padding.left - 8, y + 4);
+  }
+
+  // Bars
+  dailySales.forEach((d, i) => {
+    const x = padding.left + (i / dailySales.length) * chartW + 1;
+    const barH = (d.revenue / maxRev) * chartH;
+    const y = padding.top + chartH - barH;
+
+    const gradient = ctx.createLinearGradient(x, y, x, y + barH);
+    gradient.addColorStop(0, '#4a6741');
+    gradient.addColorStop(1, '#3d4a2f');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(x, y, barW, barH);
+
+    // X labels (every 5th day)
+    if (i % 5 === 0 || i === dailySales.length - 1) {
+      ctx.save();
+      ctx.fillStyle = '#888'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(d.label, x + barW / 2, padding.top + chartH + 16);
+      ctx.restore();
     }
-  }
-  displayProducts(currentCategory === 'All' ? allProducts : allProducts.filter(p => p.category === currentCategory));
-  window.scrollTo(0, 0);
+  });
+
+  // Revenue line overlay
+  ctx.beginPath();
+  ctx.strokeStyle = '#ff9800';
+  ctx.lineWidth = 2;
+  dailySales.forEach((d, i) => {
+    const x = padding.left + (i / dailySales.length) * chartW + barW / 2;
+    const y = padding.top + chartH - (d.revenue / maxRev) * chartH;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  salesCharts.revenue = true;
 }
+
+function renderCategorySalesChart(categorySales) {
+  const canvas = document.getElementById('categorySalesChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = canvas.parentElement.clientWidth - 40;
+  canvas.height = 220;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (!categorySales || categorySales.length === 0) {
+    ctx.fillStyle = '#999'; ctx.font = '14px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('No category data', canvas.width / 2, 110);
+    return;
+  }
+
+  const colors = ['#3d4a2f', '#5c7a4a', '#8fbc6b', '#c8e6c9', '#ff9800', '#42a5f5', '#ab47bc', '#ef5350', '#78909c', '#ffd54f'];
+  const total = categorySales.reduce((s, c) => s + c.revenue, 0);
+  const cx = canvas.width / 2;
+  const cy = 100;
+  const radius = 75;
+  let startAngle = -Math.PI / 2;
+
+  categorySales.slice(0, 8).forEach((cat, i) => {
+    const sliceAngle = (cat.revenue / total) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, radius, startAngle, startAngle + sliceAngle);
+    ctx.closePath();
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.fill();
+    startAngle += sliceAngle;
+  });
+
+  // Inner circle for donut effect
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius * 0.5, 0, Math.PI * 2);
+  ctx.fillStyle = 'white';
+  ctx.fill();
+
+  // Center text
+  ctx.fillStyle = '#333'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('$' + total.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0}), cx, cy + 5);
+
+  // Legend
+  const legendY = 190;
+  const legendItemW = canvas.width / Math.min(categorySales.length, 4);
+  categorySales.slice(0, 4).forEach((cat, i) => {
+    const x = (i * legendItemW) + 10;
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.fillRect(x, legendY, 10, 10);
+    ctx.fillStyle = '#666'; ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
+    const pct = ((cat.revenue / total) * 100).toFixed(0);
+    ctx.fillText(cat.category.substring(0, 12) + ' ' + pct + '%', x + 14, legendY + 9);
+  });
+}
+
+function renderHourlySalesChart(hourlyData) {
+  const canvas = document.getElementById('hourlySalesChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = canvas.parentElement.clientWidth - 40;
+  canvas.height = 200;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const maxRev = Math.max(...hourlyData.map(h => h.revenue), 1);
+  const padding = { top: 15, right: 15, bottom: 35, left: 50 };
+  const chartW = canvas.width - padding.left - padding.right;
+  const chartH = canvas.height - padding.top - padding.bottom;
+  const barW = Math.max(chartW / 24 - 2, 4);
+
+  // Grid
+  ctx.strokeStyle = '#f0f0f0'; ctx.lineWidth = 1;
+  for (let i = 0; i <= 3; i++) {
+    const y = padding.top + (chartH / 3) * i;
+    ctx.beginPath(); ctx.moveTo(padding.left, y); ctx.lineTo(padding.left + chartW, y); ctx.stroke();
+    ctx.fillStyle = '#aaa'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText('$' + Math.round(maxRev * (1 - i / 3)), padding.left - 6, y + 4);
+  }
+
+  hourlyData.forEach((h, i) => {
+    const x = padding.left + (i / 24) * chartW + 1;
+    const barH = (h.revenue / maxRev) * chartH;
+    const y = padding.top + chartH - barH;
+
+    ctx.fillStyle = h.revenue > 0 ? '#4a6741' : '#e0e0e0';
+    ctx.fillRect(x, y, barW, Math.max(barH, 1));
+
+    if (i % 3 === 0) {
+      ctx.fillStyle = '#888'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+      const label = i === 0 ? '12a' : i < 12 ? i + 'a' : i === 12 ? '12p' : (i - 12) + 'p';
+      ctx.fillText(label, x + barW / 2, padding.top + chartH + 16);
+    }
+  });
+}
+
+function renderPaymentChart(paymentData) {
+  const canvas = document.getElementById('paymentChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = canvas.parentElement.clientWidth - 40;
+  canvas.height = 200;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (!paymentData || paymentData.length === 0) {
+    ctx.fillStyle = '#999'; ctx.font = '14px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('No payment data', canvas.width / 2, 100);
+    return;
+  }
+
+  const colors = { card: '#42a5f5', cash: '#66bb6a', check: '#ff9800', gift: '#ab47bc', other: '#78909c' };
+  const total = paymentData.reduce((s, p) => s + p.total, 0);
+
+  paymentData.forEach((p, i) => {
+    const y = 20 + i * 50;
+    const barMaxW = canvas.width - 140;
+    const barW = total > 0 ? (p.total / total) * barMaxW : 0;
+
+    // Label
+    ctx.fillStyle = '#333'; ctx.font = '13px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText(p.method.charAt(0).toUpperCase() + p.method.slice(1), 10, y + 14);
+
+    // Bar
+    ctx.fillStyle = colors[p.method] || colors.other;
+    ctx.fillRect(80, y, barW, 24);
+
+    // Value
+    ctx.fillStyle = '#555'; ctx.font = '12px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('$' + p.total.toFixed(2) + ' (' + p.count + ')', 80 + barW + 8, y + 16);
+  });
+}
+
+function renderTopItemsTable(topItems) {
+  const tbody = document.getElementById('topItemsBody');
+  if (!tbody) return;
+
+  if (!topItems || topItems.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999;">No sales data yet</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = topItems.map((item, i) => `
+    <tr>
+      <td style="padding: 10px 16px; color: #999;">${i + 1}</td>
+      <td style="padding: 10px 16px; font-weight: 600;">${item.name}</td>
+      <td style="padding: 10px 16px; color: #666;">${item.brand || '\u2014'}</td>
+      <td style="padding: 10px 16px; color: #666;">${item.category || '\u2014'}</td>
+      <td style="padding: 10px 16px; text-align: right; font-weight: 600;">${item.quantity}</td>
+      <td style="padding: 10px 16px; text-align: right; font-weight: 600; color: #2e7d32;">$${item.revenue.toFixed(2)}</td>
+    </tr>
+  `).join('');
+}
+
+function renderRecentOrdersTable(orders) {
+  const tbody = document.getElementById('recentOrdersBody');
+  if (!tbody) return;
+
+  if (!orders || orders.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">No transactions yet</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = orders.map(order => {
+    const d = new Date(order.timestamp);
+    const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    const itemNames = order.items.map(i => i.name).slice(0, 3).join(', ') + (order.items.length > 3 ? '...' : '');
+    const payClass = order.paymentMethod === 'cash' ? 'cash' : order.paymentMethod === 'card' ? 'card' : 'other';
+    const statusClass = order.status === 'refunded' ? 'refunded' : 'completed';
+    const refundBtn = order.status === 'completed' ? `<button class="btn-refund" onclick="refundOrder(${order.id})">Refund</button>` : '\u2014';
+
+    return `
+      <tr style="${order.status === 'refunded' ? 'opacity: 0.6;' : ''}">
+        <td style="padding: 10px 16px; font-weight: 600;">#${order.id}</td>
+        <td style="padding: 10px 16px;">${dateStr}<br><span style="color:#999;font-size:11px;">${timeStr}</span></td>
+        <td style="padding: 10px 16px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${order.items.map(i => i.name + ' x' + i.quantity).join(', ')}">${itemNames}</td>
+        <td style="padding: 10px 16px; text-align: right;">${order.itemCount}</td>
+        <td style="padding: 10px 16px; text-align: right;">$${order.subtotal.toFixed(2)}</td>
+        <td style="padding: 10px 16px; text-align: right; color: #888;">$${(order.tax || 0).toFixed(2)}</td>
+        <td style="padding: 10px 16px; text-align: right; font-weight: 600;">$${order.total.toFixed(2)}</td>
+        <td style="padding: 10px 16px; text-align: center;"><span class="payment-badge ${payClass}">${order.paymentMethod}</span></td>
+        <td style="padding: 10px 16px; text-align: center;"><span class="status-badge ${statusClass}">${order.status}</span></td>
+        <td style="padding: 10px 16px; text-align: center;">${refundBtn}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function refundOrder(orderId) {
+  if (!confirm('Are you sure you want to refund order #' + orderId + '? This will restore stock and mark the order as refunded.')) return;
+
+  try {
+    const res = await fetch(API_BASE + '/api/sales/' + orderId + '/refund', { method: 'POST' });
+    if (res.ok) {
+      await loadProducts();
+      loadInventoryTable();
+      loadSalesDashboard();
+    } else {
+      const data = await res.json();
+      alert('Refund failed: ' + (data.error || 'Unknown error'));
+    }
+  } catch (err) {
+    alert('Refund error: ' + err.message);
+  }
+}
+
+function exportSales() {
+  const a = document.createElement('a');
+  a.href = API_BASE + '/api/sales/export/csv';
+  a.download = 'blackhawk-creek-sales.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// ============ FOOTER PAGES ============
+let footerPagesData = [
+  { title: 'About Us', links: [
+    { label: 'Our Story', content: 'Welcome to Blackhawk Creek Outfitters. We are passionate about the outdoors and dedicated to providing the best fishing and hunting gear to our community.' },
+    { label: 'Quality Promise', content: 'We stand behind every product we sell. Our team personally tests and curates each item in our catalog to ensure it meets our high standards.' },
+    { label: 'Sustainability', content: 'We are committed to sustainable practices and supporting conservation efforts to protect the natural resources we all enjoy.' }
+  ]},
+  { title: 'Customer Service', links: [
+    { label: 'Help & Support', content: 'Need help? Contact us at support@blackhawkcreek.com or call us during business hours. We are here to help with any questions about your order or our products.' },
+    { label: 'Track Order', content: 'To track your order, check your email for the shipping confirmation with tracking information. If you need further assistance, please contact our support team.' },
+    { label: 'Returns', content: 'We accept returns within 30 days of purchase. Items must be in original condition with tags attached. Contact us to initiate a return.' },
+    { label: 'Shipping Info', content: 'We offer free shipping on orders over $100. Standard shipping typically takes 3-5 business days. Expedited options are available at checkout.' }
+  ]},
+  { title: 'Resources', links: [
+    { label: 'Fishing Tips', content: 'Check back for fishing tips, seasonal guides, and expert advice to help you make the most of your time on the water.' },
+    { label: 'Gear Guide', content: 'Not sure what gear you need? Our gear guide breaks down essential equipment for beginners and experienced anglers alike.' },
+    { label: 'Blog', content: 'Visit our blog for the latest news, product reviews, and stories from the Blackhawk Creek community.' }
+  ]},
+  { title: 'Legal', links: [
+    { label: 'Privacy Policy', content: 'Your privacy is important to us. We collect only the information necessary to process your orders and improve your shopping experience. We never sell your personal data to third parties.' },
+    { label: 'Terms of Service', content: 'By using this website, you agree to our terms of service. All products are subject to availability. Prices are subject to change without notice.' },
+    { label: 'Accessibility', content: 'We are committed to making our website accessible to all users. If you experience any difficulties, please contact us and we will be happy to assist you.' }
+  ]}
+];
 
 async function loadFooterPagesFromServer() {
   try {
@@ -3760,6 +4028,105 @@ function closeFooterPage() {
 }
 
 // ---- Admin: Footer Pages Editor ----
+function loadFooterPagesEditor() {
+  const select = document.getElementById('footerSectionSelect');
+  select.innerHTML = footerPagesData.map((s, i) =>
+    `<option value="${i}">${s.title}</option>`
+  ).join('');
+  if (footerPagesData.length > 0) {
+    select.value = '0';
+    loadFooterSection();
+  } else {
+    document.getElementById('footerSectionEditor').style.display = 'none';
+  }
+}
+
+function loadFooterSection() {
+  const idx = parseInt(document.getElementById('footerSectionSelect').value);
+  const section = footerPagesData[idx];
+  if (!section) { document.getElementById('footerSectionEditor').style.display = 'none'; return; }
+
+  document.getElementById('footerSectionEditor').style.display = 'block';
+  document.getElementById('footerSectionTitle').value = section.title;
+  document.getElementById('footerSaveStatus').style.display = 'none';
+
+  const editor = document.getElementById('footerLinksEditor');
+  editor.innerHTML = section.links.map((link, li) => `
+    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:14px;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <label style="font-size:11px;font-weight:600;color:#666;">Link ${li + 1}</label>
+        <button onclick="removeFooterLink(${li})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:11px;font-weight:600;">Remove</button>
+      </div>
+      <input type="text" value="${link.label}" onchange="updateFooterLink(${li}, 'label', this.value)"
+        placeholder="Link label" style="width:100%;padding:7px 10px;border:1px solid #ddd;border-radius:5px;font-size:13px;font-family:inherit;margin-bottom:6px;box-sizing:border-box;">
+      <textarea onchange="updateFooterLink(${li}, 'content', this.value)"
+        placeholder="Page content shown when customer clicks this link..."
+        style="width:100%;padding:7px 10px;border:1px solid #ddd;border-radius:5px;font-size:13px;font-family:inherit;min-height:80px;resize:vertical;box-sizing:border-box;">${link.content || ''}</textarea>
+    </div>
+  `).join('');
+}
+
+function updateFooterLink(linkIdx, field, value) {
+  const sIdx = parseInt(document.getElementById('footerSectionSelect').value);
+  if (footerPagesData[sIdx] && footerPagesData[sIdx].links[linkIdx]) {
+    footerPagesData[sIdx].links[linkIdx][field] = value;
+  }
+}
+
+function addFooterLink() {
+  const sIdx = parseInt(document.getElementById('footerSectionSelect').value);
+  if (!footerPagesData[sIdx]) return;
+  footerPagesData[sIdx].links.push({ label: 'New Link', content: '' });
+  loadFooterSection();
+}
+
+function removeFooterLink(linkIdx) {
+  const sIdx = parseInt(document.getElementById('footerSectionSelect').value);
+  if (!footerPagesData[sIdx]) return;
+  footerPagesData[sIdx].links.splice(linkIdx, 1);
+  loadFooterSection();
+}
+
+function addFooterSection() {
+  const name = prompt('New section title:');
+  if (!name || !name.trim()) return;
+  footerPagesData.push({ title: name.trim(), links: [] });
+  loadFooterPagesEditor();
+  document.getElementById('footerSectionSelect').value = String(footerPagesData.length - 1);
+  loadFooterSection();
+}
+
+function deleteFooterSection() {
+  const sIdx = parseInt(document.getElementById('footerSectionSelect').value);
+  if (!confirm('Delete this section and all its links?')) return;
+  footerPagesData.splice(sIdx, 1);
+  loadFooterPagesEditor();
+}
+
+async function saveFooterPages() {
+  // Also save the current section title
+  const sIdx = parseInt(document.getElementById('footerSectionSelect').value);
+  if (footerPagesData[sIdx]) {
+    footerPagesData[sIdx].title = document.getElementById('footerSectionTitle').value.trim() || footerPagesData[sIdx].title;
+  }
+
+  try {
+    const res = await fetch(API_BASE + '/api/footer-pages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(footerPagesData)
+    });
+    if (res.ok) {
+      const status = document.getElementById('footerSaveStatus');
+      status.style.display = 'block';
+      setTimeout(() => status.style.display = 'none', 2000);
+      renderFooter();
+      loadFooterPagesEditor();
+    }
+  } catch (e) {
+    alert('Error saving footer pages: ' + e.message);
+  }
+}
 
 // ============ STARTUP ============
 document.addEventListener('DOMContentLoaded', initApp);

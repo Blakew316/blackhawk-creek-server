@@ -186,43 +186,191 @@
     .header-actions { gap: 12px; }
   }
 
-  /* ===================== NAV ===================== */
-  .main-nav {
-    background: var(--color-olive);
-    border-bottom: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  /* ===================== CATEGORY SIDEBAR NAV ===================== */
+  .main-nav { display: none; } /* hide old horizontal nav */
+
+  .shop-layout {
+    display: flex;
+    gap: 0;
+    min-height: 100vh;
   }
-  .main-nav .container {
-    display: flex; align-items: center; gap: 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+
+  /* Left category sidebar */
+  .cat-sidebar {
+    width: 280px;
+    min-width: 280px;
+    background: #ffffff;
+    border-right: 1px solid #e5e7eb;
+    padding: 24px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
   }
-  .main-nav .container::-webkit-scrollbar { display: none; }
-  .nav-item {
-    padding: 13px 22px;
+  .cat-sidebar::-webkit-scrollbar { width: 4px; }
+  .cat-sidebar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+  .cat-sidebar-title {
     font-family: var(--font-heading);
-    font-size: 13px; font-weight: 400;
-    letter-spacing: 2px; text-transform: uppercase;
-    color: rgba(255,255,255,0.9);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #111827;
+    padding: 0 20px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 8px;
+  }
+  .cat-group {
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .cat-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
     cursor: pointer;
-    transition: all var(--transition);
-    position: relative;
-    white-space: nowrap;
+    transition: background 0.15s;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
   }
-  .nav-item::after {
-    content: '';
-    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 0; height: 2px;
-    background: var(--color-gold);
-    transition: width var(--transition);
+  .cat-group-header:hover { background: #f9fafb; }
+  .cat-group-header .chevron {
+    width: 18px;
+    height: 18px;
+    color: #9ca3af;
+    transition: transform 0.2s;
+    flex-shrink: 0;
   }
-  .nav-item:hover { color: #fff; background: rgba(0,0,0,0.15); }
-  .nav-item:hover::after { width: 60%; }
-  .nav-item.active { color: var(--color-gold); background: rgba(0,0,0,0.2); }
-  .nav-item.active::after { width: 70%; }
-  .nav-item.sale { color: #ff7b7b; font-weight: 500; }
-  .nav-item.sale:hover { color: #ff5555; background: rgba(0,0,0,0.15); }
+  .cat-group.open .cat-group-header .chevron { transform: rotate(180deg); }
+  .cat-group.open .cat-group-header { color: var(--color-olive); }
+  .cat-group-items {
+    display: none;
+    padding: 0 20px 10px 32px;
+  }
+  .cat-group.open .cat-group-items { display: block; }
+  .cat-item {
+    display: block;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #6b7280;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.15s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+  }
+  .cat-item:hover { background: #f3f4f6; color: #111827; }
+  .cat-item.active { background: rgba(61,74,47,0.08); color: var(--color-olive); font-weight: 600; }
+
+  /* "All Products" and "Home" links at top */
+  .cat-top-links {
+    padding: 8px 12px;
+    margin-bottom: 4px;
+  }
+  .cat-top-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.15s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+  }
+  .cat-top-link:hover { background: #f3f4f6; }
+  .cat-top-link.active { background: rgba(61,74,47,0.1); color: var(--color-olive); font-weight: 600; }
+  .cat-top-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  /* Right product area */
+  .shop-products {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Mobile category drawer toggle */
+  .cat-drawer-toggle {
+    display: none; /* shown only on mobile */
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    cursor: pointer;
+    font-family: inherit;
+    margin-bottom: 16px;
+  }
+  .cat-drawer-toggle svg { width: 18px; height: 18px; }
+
+  /* Mobile drawer overlay */
+  .cat-drawer-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .cat-drawer-overlay.open { opacity: 1; }
+
+  /* Product count bar */
+  .shop-results-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .shop-results-count {
+    font-size: 14px;
+    color: #6b7280;
+  }
+  .shop-results-count strong { color: #111827; font-weight: 600; }
+
+  /* ===================== MOBILE CATEGORY SIDEBAR ===================== */
+  @media (max-width: 900px) {
+    .cat-sidebar {
+      position: fixed;
+      left: -300px;
+      top: 0;
+      width: 280px;
+      min-width: 280px;
+      height: 100vh;
+      height: 100dvh;
+      z-index: 1000;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: none;
+      border-right: none;
+    }
+    .cat-sidebar.open {
+      left: 0;
+      box-shadow: 8px 0 30px rgba(0,0,0,0.15);
+    }
+    .cat-drawer-overlay.open { display: block; opacity: 1; }
+    .cat-drawer-toggle { display: flex; }
+  }
 
   /* ===================== HERO ===================== */
   .hero {
@@ -682,21 +830,14 @@
 
   /* ===================== PRODUCTS SECTION ===================== */
   .products-section {
-    padding: 60px 0;
+    padding: 24px 24px 60px;
     background: var(--color-bg);
+    flex: 1;
   }
   .section-header {
-    text-align: center;
-    margin-bottom: 48px;
+    display: none; /* hide old header — replaced by results bar */
   }
-  .section-eyebrow {
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--color-olive);
-    margin-bottom: 12px;
-    font-weight: 600;
-  }
+  .section-eyebrow { display: none; }
   .section-title {
     font-family: var(--font-heading);
     font-size: 42px;
@@ -706,42 +847,35 @@
     text-transform: uppercase;
     letter-spacing: 2px;
   }
-  .section-subtitle {
-    font-size: 16px;
-    color: var(--color-text-body);
-    max-width: 600px;
-    margin: 0 auto;
-  }
+  .section-subtitle { display: none; }
 
   .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 28px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
   }
 
   /* ===================== PRODUCT CARD ===================== */
   .product-card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
+    background: #ffffff;
+    border: none;
+    border-radius: 0;
     overflow: hidden;
-    transition: all var(--transition);
+    transition: all 0.2s;
     cursor: pointer;
     display: flex;
     flex-direction: column;
     height: 100%;
-    box-shadow: var(--shadow-sm);
   }
   .product-card:hover {
-    box-shadow: var(--shadow-md);
-    border-color: var(--color-border-hover);
-    transform: translateY(-4px);
+    box-shadow: none;
+    transform: none;
   }
 
   .product-card-image {
     width: 100%;
-    height: 200px;
-    background: var(--color-surface-2);
+    aspect-ratio: 1 / 1;
+    background: #f5f5f5;
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -754,7 +888,7 @@
     object-fit: cover;
     transition: transform 0.3s;
   }
-  .product-card:hover .product-card-image img { transform: scale(1.05); }
+  .product-card:hover .product-card-image img { transform: scale(1.04); }
 
   /* Quick Add-to-Cart overlay on hover */
   .quick-add-btn {
@@ -789,7 +923,7 @@
   }
 
   .product-card-content {
-    padding: 18px;
+    padding: 12px 4px;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -797,48 +931,36 @@
 
   .product-brand {
     font-size: 10px;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     text-transform: uppercase;
-    color: var(--color-olive);
-    font-weight: 600;
-    margin-bottom: 6px;
+    color: #9ca3af;
+    font-weight: 500;
+    margin-bottom: 4px;
   }
 
   .product-name {
-    font-family: var(--font-heading);
-    font-size: 15px;
+    font-family: var(--font-body);
+    font-size: 13px;
     font-weight: 500;
-    color: var(--color-text-dark);
-    margin-bottom: 12px;
+    color: #111827;
+    margin-bottom: 8px;
     line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .product-price {
-    font-family: var(--font-heading);
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--color-olive);
-    margin-bottom: 14px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 700;
+    color: #111827;
     margin-top: auto;
   }
 
   .product-card-button {
-    width: 100%;
-    padding: 9px 16px;
-    background: transparent;
-    color: var(--color-olive);
-    border: 1.5px solid var(--color-olive);
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all var(--transition);
-  }
-  .product-card-button:hover {
-    background: var(--color-olive);
-    color: white;
+    display: none; /* hide the old button — using quick-add overlay instead */
   }
 
   /* ===================== FOOTER ===================== */
@@ -2335,7 +2457,19 @@
   @media (max-width: 768px) {
     .products-grid {
       grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
+      gap: 12px;
+    }
+    .products-section {
+      padding: 16px 12px 40px;
+    }
+    .product-card-content {
+      padding: 8px 2px;
+    }
+    .product-name {
+      font-size: 12px;
+    }
+    .product-price {
+      font-size: 14px;
     }
     .section-title {
       font-size: 28px;
@@ -2348,7 +2482,8 @@
 
   @media (max-width: 480px) {
     .products-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
     }
     .cart-sidebar {
       width: 100%;
@@ -2549,19 +2684,43 @@
 
 <!-- MAIN CONTENT -->
 <div id="storefront" class="page">
-  <!-- PRODUCTS SECTION -->
-  <section class="products-section">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-eyebrow">PREMIUM GEAR</div>
-        <h2 class="section-title">Featured Products</h2>
-        <p class="section-subtitle">Handpicked equipment for fishing and hunting enthusiasts</p>
+  <div class="shop-layout">
+    <!-- LEFT CATEGORY SIDEBAR -->
+    <aside class="cat-sidebar" id="catSidebar">
+      <div class="cat-sidebar-title">Shop by Category</div>
+      <div class="cat-top-links">
+        <button class="cat-top-link active" onclick="filterAllProducts(this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          All Products
+        </button>
       </div>
-      <div class="products-grid" id="productsGrid">
-        <!-- Products will be loaded here -->
+      <div id="catSidebarGroups">
+        <!-- Category groups built dynamically -->
       </div>
+    </aside>
+
+    <!-- MOBILE DRAWER OVERLAY -->
+    <div class="cat-drawer-overlay" id="catDrawerOverlay" onclick="closeCatDrawer()"></div>
+
+    <!-- RIGHT PRODUCT AREA -->
+    <div class="shop-products">
+      <section class="products-section">
+        <!-- Mobile category toggle -->
+        <button class="cat-drawer-toggle" onclick="openCatDrawer()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          Categories
+          <span id="activeCatLabel" style="color: var(--color-olive); font-weight: 600;">All Products</span>
+        </button>
+        <!-- Results bar -->
+        <div class="shop-results-bar">
+          <div class="shop-results-count" id="shopResultsCount"><strong>0</strong> products</div>
+        </div>
+        <div class="products-grid" id="productsGrid">
+          <!-- Products will be loaded here -->
+        </div>
+      </section>
     </div>
-  </section>
+  </div>
 </div>
 
 <!-- CHECKOUT PAGE -->
@@ -3070,81 +3229,149 @@ async function loadProducts(retries = 3) {
   }
 }
 
+// ============ CATEGORY SIDEBAR GROUPS (Bass Pro style) ============
+const categoryGroups = {
+  'Fishing Lures': ['Soft Plastics', 'Hardbaits', 'Spinnerbaits', 'Bladed Jigs', 'Swim Jigs', 'Frogs'],
+  'Terminal Tackle': ['Hooks', 'Jigheads', 'Weights & Sinkers'],
+  'Rods, Reels & Gear': ['Rod & Reel Combos', 'Reel Care', 'Cleaning Products', 'Apparel & Accessories']
+};
+
 function buildNavigation() {
-  const categories = new Set(['All']);
-  allProducts.forEach(product => {
-    if (product.category) categories.add(product.category);
-  });
+  const container = document.getElementById('catSidebarGroups');
+  if (!container) return;
+  container.innerHTML = '';
 
-  const navContainer = document.getElementById('navContainer');
-  navContainer.innerHTML = '';
+  // Gather all unique categories from products
+  const allCats = new Set();
+  allProducts.forEach(p => { if (p.category) allCats.add(p.category); });
 
-  // HOME button
-  const homeItem = document.createElement('div');
-  homeItem.className = 'nav-item';
-  homeItem.textContent = 'HOME';
-  homeItem.onclick = function() { goToHomepage(); };
-  navContainer.appendChild(homeItem);
+  // Track which categories are already in groups
+  const groupedCats = new Set();
+  Object.values(categoryGroups).forEach(cats => cats.forEach(c => groupedCats.add(c)));
 
-  // ALL PRODUCTS button
-  const allItem = document.createElement('div');
-  allItem.className = 'nav-item active';
-  allItem.textContent = 'ALL PRODUCTS';
-  allItem.onclick = function() { goToShop(); showCategory('All', this); };
-  navContainer.appendChild(allItem);
+  // Build sidebar groups
+  const chevronSVG = '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
 
-  // Category items
-  categories.forEach(cat => {
-    if (cat !== 'All') {
-      const item = document.createElement('div');
-      item.className = 'nav-item';
-      item.textContent = cat.toUpperCase();
-      item.onclick = function() { goToShop(); showCategory(cat, this); };
-      navContainer.appendChild(item);
-    }
-  });
-}
-
-function showCategory(category, el) {
-  currentCategory = category;
-  const filtered = category === 'All'
-    ? allProducts
-    : allProducts.filter(p => p.category === category);
-  displayProducts(filtered);
-
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.classList.remove('active');
-  });
-  if (el) {
-    el.classList.add('active');
-  } else {
-    // Find matching nav item by text
-    const match = Array.from(document.querySelectorAll('.nav-item')).find(item =>
-      item.textContent === (category === 'All' ? 'ALL PRODUCTS' : category.toUpperCase())
+  Object.entries(categoryGroups).forEach(([groupName, subcats]) => {
+    // Only show subcats that have products
+    const validSubcats = subcats.filter(sc =>
+      allProducts.some(p => (p.category || '').toLowerCase() === sc.toLowerCase())
     );
-    if (match) match.classList.add('active');
+    if (validSubcats.length === 0) return;
+
+    const group = document.createElement('div');
+    group.className = 'cat-group';
+    group.innerHTML = `
+      <button class="cat-group-header" onclick="toggleCatGroup(this.parentElement)">
+        ${groupName}
+        ${chevronSVG}
+      </button>
+      <div class="cat-group-items">
+        ${validSubcats.map(sc => {
+          const count = allProducts.filter(p => (p.category || '').toLowerCase() === sc.toLowerCase()).length;
+          return `<button class="cat-item" onclick="filterByCategory('${sc}', this)">${sc} <span style="color:#9ca3af;font-size:11px;">(${count})</span></button>`;
+        }).join('')}
+      </div>
+    `;
+    container.appendChild(group);
+  });
+
+  // Ungrouped categories
+  const ungrouped = [...allCats].filter(c => !groupedCats.has(c));
+  if (ungrouped.length > 0) {
+    const group = document.createElement('div');
+    group.className = 'cat-group';
+    group.innerHTML = `
+      <button class="cat-group-header" onclick="toggleCatGroup(this.parentElement)">
+        Other
+        ${chevronSVG}
+      </button>
+      <div class="cat-group-items">
+        ${ungrouped.map(sc => {
+          const count = allProducts.filter(p => p.category === sc).length;
+          return `<button class="cat-item" onclick="filterByCategory('${sc}', this)">${sc} <span style="color:#9ca3af;font-size:11px;">(${count})</span></button>`;
+        }).join('')}
+      </div>
+    `;
+    container.appendChild(group);
   }
 }
 
-// Homepage category groups — maps broad groups to multiple Clover categories
-const categoryGroups = {
-  lures: ['Soft Plastics', 'Hardbaits', 'Spinnerbaits', 'Bladed Jigs', 'Swim Jigs', 'Frogs'],
-  tackle: ['Hooks', 'Jigheads', 'Weights & Sinkers'],
-  gear: ['Rod & Reel Combos', 'Reel Care', 'Cleaning Products', 'Apparel & Accessories']
-};
+function toggleCatGroup(groupEl) {
+  groupEl.classList.toggle('open');
+}
+
+function filterAllProducts(el) {
+  currentCategory = 'All';
+  displayProducts(allProducts);
+  // Clear all active states
+  document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('.cat-top-link').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  updateActiveCatLabel('All Products');
+  closeCatDrawer();
+}
+
+function filterByCategory(category, el) {
+  currentCategory = category;
+  const filtered = allProducts.filter(p => (p.category || '').toLowerCase() === category.toLowerCase());
+  displayProducts(filtered);
+  // Update active state
+  document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('.cat-top-link').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  updateActiveCatLabel(category);
+  closeCatDrawer();
+}
+
+function showCategory(category, el) {
+  if (category === 'All') {
+    filterAllProducts(document.querySelector('.cat-top-link'));
+  } else {
+    filterByCategory(category);
+  }
+}
 
 function showCategoryGroup(group) {
-  const cats = (categoryGroups[group] || []).map(c => c.toLowerCase());
+  // Map old group names to new ones
+  const groupMap = { lures: 'Fishing Lures', tackle: 'Terminal Tackle', gear: 'Rods, Reels & Gear' };
+  const groupName = groupMap[group] || group;
+  const cats = (categoryGroups[groupName] || []).map(c => c.toLowerCase());
   const filtered = allProducts.filter(p => {
     const pCat = (p.category || '').toLowerCase();
     return cats.some(c => pCat === c || pCat.includes(c) || c.includes(pCat));
   });
   displayProducts(filtered);
-  // Highlight ALL PRODUCTS in nav since this is a cross-category filter
-  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-  const allNav = Array.from(document.querySelectorAll('.nav-item')).find(item => item.textContent === 'ALL PRODUCTS');
-  if (allNav) allNav.classList.add('active');
-  window.scrollTo(0, 0);
+  document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('.cat-top-link').forEach(i => i.classList.remove('active'));
+  updateActiveCatLabel(groupName);
+  // Open the matching group in sidebar
+  document.querySelectorAll('.cat-group').forEach(g => {
+    const header = g.querySelector('.cat-group-header');
+    if (header && header.textContent.trim().startsWith(groupName)) {
+      g.classList.add('open');
+    }
+  });
+}
+
+function updateActiveCatLabel(label) {
+  const el = document.getElementById('activeCatLabel');
+  if (el) el.textContent = label;
+}
+
+// Mobile drawer controls
+function openCatDrawer() {
+  document.getElementById('catSidebar').classList.add('open');
+  document.getElementById('catDrawerOverlay').classList.add('open');
+  document.getElementById('catDrawerOverlay').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeCatDrawer() {
+  document.getElementById('catSidebar').classList.remove('open');
+  const overlay = document.getElementById('catDrawerOverlay');
+  overlay.classList.remove('open');
+  setTimeout(() => { overlay.style.display = 'none'; }, 250);
+  document.body.style.overflow = '';
 }
 
 function displayProducts(productsToShow) {
@@ -3155,6 +3382,10 @@ function displayProducts(productsToShow) {
     const card = createProductCard(product);
     grid.appendChild(card);
   });
+
+  // Update results count
+  const countEl = document.getElementById('shopResultsCount');
+  if (countEl) countEl.innerHTML = '<strong>' + productsToShow.length + '</strong> products';
 }
 
 function createProductCard(product) {
@@ -3723,21 +3954,13 @@ function scrollToProducts() {
 function goToHomepage() {
   document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
   document.getElementById('homepage').classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-  document.querySelector('.nav-item').classList.add('active');
+  window.scrollTo(0, 0);
 }
 
 function goToShop() {
   document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
   document.getElementById('storefront').classList.add('active');
-  if (!document.querySelector('.nav-item.active') || document.querySelector('.nav-item.active').textContent === 'HOME') {
-    const allProductsItem = Array.from(document.querySelectorAll('.nav-item')).find(item => item.textContent === 'ALL PRODUCTS');
-    if (allProductsItem) {
-      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-      allProductsItem.classList.add('active');
-    }
-  }
-  displayProducts(currentCategory === 'All' ? allProducts : allProducts.filter(p => p.category === currentCategory));
+  displayProducts(currentCategory === 'All' ? allProducts : allProducts.filter(p => (p.category || '').toLowerCase() === currentCategory.toLowerCase()));
   window.scrollTo(0, 0);
 }
 
